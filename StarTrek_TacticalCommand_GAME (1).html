@@ -1,0 +1,3640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Star Trek: Tactical Command</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
+
+/* ── HEADER ── */
+#hdr{position:fixed;top:0;left:0;right:0;height:54px;z-index:300;background:#000;border-bottom:2px solid #995500;display:flex;align-items:stretch;}
+.hdr-pill{background:#ff9900;width:176px;border-radius:0 27px 27px 0;flex-shrink:0;display:flex;align-items:center;padding:0 20px;font-size:11px;font-weight:bold;color:#000;letter-spacing:3px;}
+.hdr-title{flex:1;display:flex;align-items:center;padding:0 24px;font-size:15px;letter-spacing:5px;color:#ff9900;text-transform:uppercase;}
+.hdr-segs{display:flex;align-items:center;gap:5px;padding:0 16px;}
+.hdr-seg{height:30px;border-radius:15px;padding:0 13px;display:flex;align-items:center;font-size:9px;letter-spacing:2px;font-weight:bold;color:#000;}
+.seg-a{background:#cc6600;}.seg-b{background:#ff9900;}.seg-c{background:#ffcc44;}
+.hdr-alert{display:flex;align-items:center;padding:0 18px;font-size:10px;letter-spacing:3px;color:#dd2200;animation:ablink .55s step-end infinite;}
+.hdr-alert.off{display:none;}
+@keyframes ablink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── TABS ── */
+#tabs{position:fixed;top:54px;left:0;right:0;height:34px;z-index:300;background:#030810;border-bottom:1px solid #111820;display:flex;align-items:stretch;padding:0 10px;}
+.tab{padding:0 20px;cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#334455;border-bottom:2px solid transparent;display:flex;align-items:center;transition:all .15s;white-space:nowrap;}
+.tab:hover{color:#99aabb;}.tab.on{color:#ff9900;border-bottom-color:#ff9900;}
+.tsep{width:1px;background:#111820;margin:8px 0;}
+
+/* ── APP AREA ── */
+#app{position:fixed;top:88px;left:0;right:0;bottom:42px;}
+.view{display:none;width:100%;height:100%;}.view.on{display:flex;}
+
+/* ── STATUS BAR ── */
+#sbar{position:fixed;bottom:0;left:0;right:0;height:42px;z-index:300;background:rgba(0,0,0,.93);border-top:1px solid #1e0d00;display:flex;align-items:center;gap:18px;padding:0 16px;}
+.sb-sys{display:flex;flex-direction:column;gap:1px;}
+.sb-lbl{font-size:7px;letter-spacing:2px;color:#3a1a00;text-transform:uppercase;}
+.sb-bar{height:4px;width:62px;background:#080300;border:1px solid #1c0a00;}
+.sb-fil{height:100%;transition:width .4s;}
+.sb-val{font-size:8px;letter-spacing:1px;}
+#sb-id{margin-left:auto;font-size:10px;letter-spacing:3px;color:#ff9900;}
+
+/* ── SCENARIO SCREEN ── */
+#scenario-screen{position:fixed;inset:0;background:#000;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+.sc-title{font-size:28px;letter-spacing:8px;color:#ff9900;text-transform:uppercase;}
+.sc-sub{font-size:11px;letter-spacing:4px;color:#445566;text-transform:uppercase;}
+.sc-panel{background:#030810;border:1px solid #ff9900;border-radius:4px;padding:24px 32px;width:480px;}
+.sc-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.sc-row-lbl{font-size:10px;letter-spacing:2px;color:#ff9900;text-transform:uppercase;width:140px;}
+select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;font-family:'Courier New',monospace;font-size:11px;padding:6px 8px;border-radius:2px;}
+.sc-diff-wrap{flex:1;display:flex;flex-direction:column;gap:4px;}
+#diff-slider{width:100%;accent-color:#ff9900;}
+.sc-diff-labels{display:flex;justify-content:space-between;font-size:8px;color:#445566;letter-spacing:1px;}
+.sc-launch{display:block;width:100%;padding:13px;background:#1a0800;border:2px solid #ff9900;border-radius:3px;color:#ff9900;font-family:'Courier New',monospace;font-size:14px;letter-spacing:5px;text-transform:uppercase;cursor:pointer;text-align:center;transition:all .15s;margin-top:8px;}
+.faction-btn{flex:1;padding:10px 12px;background:#030810;border:1px solid #1a2030;border-radius:3px;cursor:pointer;transition:all .15s;text-align:left;}
+.faction-btn:hover{background:#070f1e;}
+.faction-btn.fed.active{border-color:#2255aa;background:#030c1a;}
+.faction-btn.kli.active{border-color:#882200;background:#140600;}
+.sc-launch:hover{background:#2a1200;box-shadow:0 0 20px rgba(255,153,0,.25);}
+
+/* ── VICTORY SCREEN ── */
+#victory-screen{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+.vic-title{font-size:32px;letter-spacing:8px;text-transform:uppercase;}
+.vic-title.win{color:#ff9900;}.vic-title.lose{color:#cc2200;}
+.vic-sub{font-size:12px;letter-spacing:3px;color:#556677;}
+.vic-stats{background:#030810;border:1px solid #334455;padding:16px 28px;font-size:10px;color:#8899aa;letter-spacing:2px;line-height:2.2;}
+.vic-btn{padding:11px 40px;background:#030810;border:2px solid #ff9900;color:#ff9900;font-family:'Courier New',monospace;font-size:12px;letter-spacing:4px;cursor:pointer;text-transform:uppercase;border-radius:3px;transition:all .15s;}
+.vic-btn:hover{background:#1a0800;}
+
+/* ── TACTICAL MAP TAB ── */
+#v-tac{flex-direction:row;}
+#tac-log-panel{width:210px;background:#010810;border-right:1px solid #0d1a0d;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.tac-log-hdr{padding:6px 10px 5px;font-size:8px;letter-spacing:3px;color:#336633;text-transform:uppercase;border-bottom:1px solid #0d1a0d;display:flex;align-items:center;justify-content:space-between;background:#010a08;}
+.tac-log-entries{flex:1;overflow-y:auto;padding:0;display:flex;flex-direction:column-reverse;}
+.tac-log-entries .log-entry{padding:4px 8px;border-bottom:1px solid #050e08;font-size:8px;letter-spacing:.5px;line-height:1.6;}
+#tac-wrap{flex:1;position:relative;overflow:hidden;background:#010508;outline:none;}
+#tac-cv{display:block;cursor:crosshair;}
+#tac-zoom{position:absolute;bottom:9px;right:13px;font-size:9px;letter-spacing:2px;color:#232d38;pointer-events:none;}
+#tac-hex{position:absolute;bottom:9px;left:13px;font-size:9px;letter-spacing:2px;color:#232d38;pointer-events:none;}
+#tac-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:2px;color:#445566;pointer-events:none;background:rgba(0,0,0,.6);padding:4px 12px;border:1px solid #1a2030;border-radius:2px;}
+#tac-legend{position:absolute;bottom:28px;right:10px;background:rgba(1,4,12,.88);border:1px solid #1a2a3a;border-radius:3px;padding:8px 10px;pointer-events:none;min-width:148px;}
+.leg-title{font-size:8px;letter-spacing:3px;color:#ff9900;text-transform:uppercase;margin-bottom:7px;border-bottom:1px solid #1a2030;padding-bottom:4px;}
+.leg-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;}
+.leg-item:last-child{margin-bottom:0;}
+.leg-swatch{width:16px;height:16px;border-radius:2px;flex-shrink:0;margin-top:1px;}
+.leg-text{font-size:8px;color:#556677;letter-spacing:.5px;line-height:1.6;}
+.leg-text b{color:#8899aa;letter-spacing:1px;font-size:8px;}
+#tac-sb{width:268px;background:#030810;border-left:2px solid #ff9900;display:flex;flex-direction:column;overflow-y:auto;}
+
+/* ── COMBAT LOG ── */
+.log-main{flex:1;overflow-y:auto;padding:0;background:#020810;}
+.log-entry{padding:8px 16px;border-bottom:1px solid #080f18;font-size:10px;letter-spacing:1px;line-height:1.7;}
+.log-entry.roll{color:#cc8800;}.log-entry.hit{color:#cc2200;}.log-entry.miss{color:#445566;}
+.log-entry.dmg{color:#ff4400;}.log-entry.info{color:#4488aa;}.log-entry.phase{color:#ff9900;border-bottom:1px solid #331100;font-size:11px;letter-spacing:2px;}
+.log-entry.ok{color:#336633;}.log-entry.ai{color:#884488;}
+.log-entry .die{display:inline-block;background:#1a1000;border:1px solid #553300;padding:1px 5px;border-radius:2px;margin:0 2px;font-weight:bold;}
+.log-entry .chart{display:inline-block;background:#001a30;border:1px solid #224466;padding:1px 5px;border-radius:2px;margin:0 2px;}
+
+/* ── POWER ALLOCATION TAB ── */
+#v-pwr{flex-direction:row;}
+.pwr-main{flex:1;padding:18px 22px;overflow-y:auto;background:#020810;}
+.pwr-right{width:260px;background:#030810;border-left:2px solid #2a1000;padding:14px;overflow-y:auto;}
+.pwr-hdr{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #111820;flex-wrap:wrap;}
+.pwr-name{font-size:18px;color:#ff9900;letter-spacing:3px;}
+.pwr-badge{background:#120600;border:1px solid #ff9900;border-radius:2px;padding:4px 12px;font-size:10px;letter-spacing:2px;color:#ff9900;}
+.pwr-sec{font-size:9px;letter-spacing:3px;color:#ff9900;text-transform:uppercase;border-bottom:1px solid #150b00;padding-bottom:5px;margin:16px 0 10px;}
+.budget-wrap{margin-bottom:14px;}
+.budget-track{height:8px;background:#0a1020;border:1px solid #151f2e;border-radius:4px;overflow:hidden;display:flex;margin-top:5px;transition:border-color .2s;}
+.budget-track.full{border-color:#ff9900;animation:budgetpulse .4s ease-out;}
+@keyframes budgetpulse{0%{box-shadow:0 0 0 0 rgba(255,153,0,.6)}50%{box-shadow:0 0 0 6px rgba(255,153,0,.2)}100%{box-shadow:0 0 0 0 rgba(255,153,0,0)}}
+#p-rem.zero{color:#ff9900!important;font-weight:bold;}
+#p-rem.over{color:#cc2200!important;}
+.bseg{height:100%;transition:width .2s;}
+.bleg{display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;}
+.bleg-i{display:flex;align-items:center;gap:4px;font-size:8px;letter-spacing:1px;color:#384858;}
+.bleg-dot{width:7px;height:7px;border-radius:50%;}
+.pwr-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:7px 10px;background:#050c18;border:1px solid #0c1622;border-radius:3px;}
+.pwr-row.locked{opacity:.5;pointer-events:none;}
+.pwr-lbl{width:136px;font-size:10px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;}
+.pwr-sl{flex:1;-webkit-appearance:none;height:4px;background:#0a1522;border-radius:2px;outline:none;}
+.pwr-sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:#ff9900;border-radius:50%;cursor:pointer;box-shadow:0 0 5px rgba(255,153,0,.45);}
+.pwr-sl.shld::-webkit-slider-thumb{background:#3366cc;}
+.pwr-val{width:38px;text-align:right;font-size:11px;color:#cc8800;letter-spacing:1px;}
+.pwr-val.sv{color:#3366cc;}
+.shld-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:360px;margin-bottom:10px;}
+.sf{padding:7px 3px;text-align:center;background:#050c18;border:1px solid #0c1622;border-radius:3px;}
+.sf-face-row{background:#050c18;border:1px solid #0c1622;border-radius:3px;padding:5px 7px;display:flex;flex-direction:column;gap:2px;}
+.sf-face-lbl{font-size:8px;color:#3366cc;letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between;}
+.sf-face-sl{-webkit-appearance:none;height:3px;background:#0a1522;border-radius:2px;outline:none;width:100%;}
+.sf-face-sl::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:#3366cc;border-radius:50%;cursor:pointer;}
+.sf-face-sl:disabled{opacity:.4;}
+.sf-l{font-size:8px;color:#283850;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.sf-v{font-size:13px;color:#3366cc;letter-spacing:2px;}
+.sf-p{font-size:8px;color:#1a2840;letter-spacing:1px;margin-top:1px;}
+.wpn-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;padding:7px 10px;background:#050c18;border:1px solid #0c1622;border-radius:3px;}
+.wpn-row.locked{opacity:.5;pointer-events:none;}
+.wpn-arm{width:16px;height:16px;border-radius:50%;border:2px solid #2a0800;background:#090200;cursor:pointer;flex-shrink:0;transition:all .14s;}
+.wpn-arm.on{background:#aa1a00;border-color:#dd2200;box-shadow:0 0 6px rgba(180,30,0,.45);}
+.wpn-nm{flex:1;font-size:10px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;}
+.wpn-arc{font-size:9px;color:#283040;width:26px;text-align:center;letter-spacing:1px;}
+.wpn-in{width:40px;background:#030810;border:1px solid #141e2e;color:#cc2200;font-size:11px;text-align:center;font-family:'Courier New',monospace;padding:3px;border-radius:2px;}
+.wpn-in:disabled{color:#222;border-color:#0a0e14;}
+.wpn-dmg{font-size:9px;color:#3a2010;width:42px;text-align:right;letter-spacing:1px;}
+.commit{display:block;width:100%;margin-top:16px;padding:11px;background:#120600;border:2px solid #ff9900;border-radius:3px;color:#ff9900;font-family:'Courier New',monospace;font-size:12px;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center;}
+.commit:hover{background:#220d00;box-shadow:0 0 14px rgba(255,153,0,.18);}
+.commit:disabled{opacity:.4;cursor:not-allowed;}
+.plog-e{font-size:9px;letter-spacing:1px;line-height:1.8;padding:2px 0;border-bottom:1px solid #08101a;}
+.plog-e.ok{color:#2a6a3a;}.plog-e.warn{color:#aa7a00;}.plog-e.dmg{color:#aa2a00;}.plog-e.inf{color:#2a4880;}
+
+/* ── DAMAGE TAB ── */
+#v-dmg{flex-direction:row;}
+#dmg-wrap{flex:1;position:relative;overflow:hidden;background:#010508;}
+#dmg-cv{display:block;}
+#dmg-sb{width:272px;background:#030810;border-left:2px solid #770f00;display:flex;flex-direction:column;overflow:hidden;}
+.sys-row{display:flex;align-items:center;gap:7px;padding:6px 12px;border-bottom:1px solid #080e18;}
+.sys-nm{font-size:9px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;width:114px;}
+.sys-tr{flex:1;height:5px;background:#090f1a;border:1px solid #0c1522;}
+.sys-fi{height:100%;transition:width .5s;}
+.sys-pc{font-size:8px;width:36px;text-align:right;letter-spacing:1px;}
+.dlog-wrap{flex:1;overflow-y:auto;}
+.dlog-e{font-size:9px;letter-spacing:1px;line-height:1.7;padding:3px 12px;border-bottom:1px solid #060b14;}
+.dlog-e.crit{color:#bb2200;}.dlog-e.warn{color:#bb7700;}.dlog-e.ok{color:#2a6634;}.dlog-e.inf{color:#2a4880;}
+
+/* ── SHARED SIDEBAR ── */
+.sidebar{background:#030810;display:flex;flex-direction:column;overflow-y:auto;}
+.s-sec{border-bottom:1px solid #0c1420;padding:12px 13px;}
+.s-lbl{font-size:9px;letter-spacing:3px;color:#ff9900;text-transform:uppercase;margin-bottom:9px;}
+.ship-card{background:#050c18;border:1px solid #141e2e;border-radius:3px;padding:9px 10px;margin-bottom:7px;}
+.ship-card.player{border-color:#1a44aa;}.ship-card.enemy{border-color:#662200;}
+.sc-nm{font-size:12px;color:#dce8ff;letter-spacing:1px;margin-bottom:2px;}
+.sc-cl{font-size:9px;color:#384860;letter-spacing:1px;text-transform:uppercase;}
+.sc-bars{margin-top:6px;display:flex;flex-direction:column;gap:3px;}
+.sc-br{display:flex;align-items:center;gap:6px;}
+.sc-bl{font-size:8px;color:#283040;width:42px;letter-spacing:1px;text-transform:uppercase;}
+.sc-bt{flex:1;height:4px;background:#070e18;border:1px solid #0c1622;}
+.sc-bf{height:100%;transition:width .4s;}
+.phase-wrap{padding:12px 13px;}
+.turn-big{font-size:22px;color:#ff9900;letter-spacing:4px;line-height:1;}
+.turn-sub{font-size:9px;color:#3a2800;letter-spacing:2px;margin-top:3px;text-transform:uppercase;}
+.phases{display:flex;gap:4px;margin-top:9px;flex-wrap:wrap;}
+.pip{padding:3px 7px;font-size:7px;letter-spacing:1px;text-transform:uppercase;border:1px solid #111820;color:#283040;border-radius:2px;cursor:default;}
+.pip.done{border-color:#163020;color:#264a34;background:#050f08;}
+.pip.now{border-color:#aa5500;color:#ff9900;background:#160900;}
+.action-btn{display:block;width:100%;margin:4px 0;padding:8px;background:#040c18;border:1px solid #334455;color:#8899aa;font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;border-radius:2px;text-align:center;transition:all .13s;}
+.action-btn:hover{border-color:#ff9900;color:#ff9900;background:#0d0800;}
+.action-btn:disabled{opacity:.3;cursor:not-allowed;}
+.action-btn.primary{border-color:#ff9900;color:#ff9900;background:#120600;}
+.action-btn.primary:hover{background:#220d00;}
+.action-btn.danger{border-color:#aa2200;color:#aa2200;}
+.wpn-fire-btn{display:block;width:100%;padding:7px 8px;background:#080300;border:1px solid #331100;color:#884422;font-family:'Courier New',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;text-align:left;border-radius:2px;transition:all .15s;position:relative;overflow:hidden;}
+.wpn-fire-btn:hover{background:#120500;border-color:#cc3300;color:#cc4422;}
+.wpn-fire-btn.charged{border-color:#cc2200;color:#ff4422;background:#120500;}
+.wpn-fire-btn.charged::after{content:'';position:absolute;inset:0;background:rgba(200,40,0,.08);animation:wpnglow .9s ease-in-out infinite alternate;}
+@keyframes wpnglow{from{background:rgba(200,40,0,.04)}to{background:rgba(200,40,0,.18)}}
+.wpn-fire-btn.fired{opacity:.35;cursor:not-allowed;border-color:#331100;color:#553322;}
+.wpn-fire-btn.blocked{border-color:#664400;color:#775500;cursor:not-allowed;background:#0a0500;}
+.wfb-block{font-size:7px;letter-spacing:1px;color:#cc7700;margin-top:2px;padding:1px 0;}
+.wpn-terrain-badge{font-size:7px;letter-spacing:.5px;color:#886600;background:#120900;padding:1px 4px;border-radius:2px;margin-left:4px;vertical-align:middle;}
+.wpn-terrain-badge.tgt{color:#446600;}
+.wpn-fire-btn .wfb-name{font-size:9px;letter-spacing:1px;text-transform:uppercase;}
+.wpn-fire-btn .wfb-info{font-size:8px;color:#664433;letter-spacing:1px;margin-top:2px;}
+.wpn-fire-btn.charged .wfb-info{color:#aa4422;}
+</style>
+</head>
+<body>
+
+<!-- SCENARIO SCREEN -->
+<div id="scenario-screen">
+  <div class="sc-title">Star Trek</div>
+  <div class="sc-sub">Tactical Command Simulator</div>
+  <div class="sc-panel">
+    <div class="sc-row">
+      <div class="sc-row-lbl">Play As</div>
+      <div style="flex:1;display:flex;gap:8px;">
+        <div class="faction-btn fed active" id="fb-fed" onclick="chooseFaction('fed')">
+          <div style="font-size:11px;letter-spacing:2px;color:#4499ff;margin-bottom:3px">⬡ FEDERATION</div>
+          <div style="font-size:9px;color:#334466;letter-spacing:1px">USS Enterprise · Constitution</div>
+        </div>
+        <div class="faction-btn kli" id="fb-kli" onclick="chooseFaction('kli')">
+          <div style="font-size:11px;letter-spacing:2px;color:#cc5522;margin-bottom:3px">⬡ KLINGON</div>
+          <div style="font-size:9px;color:#442211;letter-spacing:1px">IKS Kronos · D-7 Class</div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-row">
+      <div class="sc-row-lbl">Your Ship</div>
+      <select class="sc-sel" id="player-ship">
+        <option value="Constitution">USS Enterprise — Constitution Class</option>
+      </select>
+    </div>
+    <div class="sc-row">
+      <div class="sc-row-lbl">Enemy Ship</div>
+      <select class="sc-sel" id="enemy-ship">
+        <option value="D7">IKS Kronos — D-7 Class</option>
+      </select>
+    </div>
+    <div class="sc-row">
+      <div class="sc-row-lbl">AI Difficulty</div>
+      <div class="sc-diff-wrap">
+        <input type="range" id="diff-slider" min="1" max="5" value="2" oninput="updDiffLabel()">
+        <div class="sc-diff-labels">
+          <span>Cadet</span><span>Ensign</span><span>Lt. Cmdr</span><span>Captain</span><span>Admiral</span>
+        </div>
+        <div style="font-size:10px;color:#ff9900;letter-spacing:2px;margin-top:4px" id="diff-label">ENSIGN</div>
+      </div>
+    </div>
+    <button class="sc-launch" onclick="launchGame()">⬡ Engage</button>
+  </div>
+  <div style="font-size:9px;color:#334455;letter-spacing:2px">CLICK HEXES TO MOVE · ARROW KEYS TO CHANGE FACING · SCROLL TO ZOOM</div>
+</div>
+
+<!-- VICTORY SCREEN -->
+<div id="victory-screen">
+  <div class="vic-title" id="vic-title">VICTORY</div>
+  <div class="vic-sub" id="vic-sub">Enemy vessel destroyed</div>
+  <div class="vic-stats" id="vic-stats"></div>
+  <button class="vic-btn" onclick="location.reload()">⬡ New Mission</button>
+</div>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="hdr-pill" id="hdr-faction">STARFLEET</div>
+  <div class="hdr-title" id="hdr-title">Tactical Command</div>
+  <div class="hdr-segs">
+    <div class="hdr-seg seg-a" id="hdr-turn">TURN 1</div>
+    <div class="hdr-seg seg-b" id="hdr-phase">POWER</div>
+    <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
+  </div>
+  <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
+</div>
+
+<!-- TABS -->
+<div id="tabs">
+  <div class="tab on" onclick="sw('tac',this)">⬡ Tactical Map</div>
+  <div class="tsep"></div>
+  <div class="tab" onclick="sw('pwr',this)">◈ Power Allocation</div>
+  <div class="tsep"></div>
+  <div class="tab" onclick="sw('dmg',this)">⚠ Damage Control</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<!-- TACTICAL MAP -->
+<div id="v-tac" class="view on">
+  <div id="tac-log-panel">
+    <div class="tac-log-hdr">
+      <span>COMBAT LOG</span>
+      <span id="tac-log-badge" style="background:#cc2200;color:#fff;font-size:7px;padding:1px 5px;border-radius:2px;display:none">NEW</span>
+    </div>
+    <div id="combat-log" class="tac-log-entries"></div>
+  </div>
+  <div id="tac-wrap" tabindex="0">
+    <canvas id="tac-cv"></canvas>
+    <div id="tac-zoom">TACTICAL VIEW</div>
+    <div id="tac-hex"></div>
+    <div id="tac-hint">POWER ALLOCATION PHASE — Go to ◈ Power Allocation tab</div>
+    <div id="tac-legend">
+      <div class="leg-title">TERRAIN</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#160828;border:1px solid #5a20a0"></div><div class="leg-text"><b>NEBULA</b><br>Sensors −30%<br>No sensor lock</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#181008;border:1px solid #7a5010"></div><div class="leg-text"><b>ASTEROID</b><br>+1 cover vs beams<br>Move costs +1</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#081408;border:1px solid #206020"></div><div class="leg-text"><b>GRAVITY WELL</b><br>Move costs +1 to leave<br>Torpedoes arc</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#010a18;border:1px solid #224466"></div><div class="leg-text"><b>OPEN SPACE</b><br>No modifiers</div></div>
+    </div>
+  </div>
+  <div id="tac-sb" class="sidebar">
+    <div class="s-sec">
+      <div class="s-lbl">Your Ship</div>
+      <div class="ship-card player" id="card-player">
+        <div class="sc-nm" id="p-name">USS Enterprise</div>
+        <div class="sc-cl" id="p-class">Constitution Class · NCC-1701</div>
+        <div class="sc-bars">
+          <div class="sc-br"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="pb-hull" style="background:#336633"></div></div><span class="sc-bv" id="pv-hull" style="font-size:9px;margin-left:4px;color:#448844">100%</span></div>
+          <div class="sc-br"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="pb-shld" style="background:#1a44aa"></div></div><span class="sc-bv" id="pv-shld" style="font-size:9px;margin-left:4px;color:#2255aa">—</span></div>
+          <div class="sc-br"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="pb-pwr" style="background:#aa6600"></div></div><span class="sc-bv" id="pv-pwr" style="font-size:9px;margin-left:4px;color:#cc7700">38</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="s-sec">
+      <div class="s-lbl">Enemy Contact</div>
+      <div class="ship-card enemy" id="card-enemy">
+        <div class="sc-nm" id="e-name" style="color:#cc6644">IKS Kronos</div>
+        <div class="sc-cl" id="e-class">D-7 Class</div>
+        <div class="sc-bars">
+          <div class="sc-br"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="eb-hull" style="background:#884422"></div></div><span class="sc-bv" id="ev-hull" style="font-size:9px;margin-left:4px;color:#aa5533">100%</span></div>
+          <div class="sc-br"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="eb-shld" style="background:#884422"></div></div><span class="sc-bv" id="ev-shld" style="font-size:9px;margin-left:4px;color:#aa5533">—</span></div>
+          <div class="sc-br"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="eb-pwr" style="background:#553300"></div></div><span class="sc-bv" id="ev-pwr" style="font-size:9px;margin-left:4px;color:#774400">34</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phase-wrap">
+      <div class="s-lbl">Turn Status</div>
+      <div class="turn-big" id="sb-turn">TURN 1</div>
+      <div class="turn-sub" id="sb-phase">Power Allocation</div>
+      <div class="phases" id="sb-phases">
+        <div class="pip now" id="pip-pwr">Power</div>
+        <div class="pip" id="pip-m1">Move 1</div>
+        <div class="pip" id="pip-f1">Fire 1</div>
+        <div class="pip" id="pip-m2">Move 2</div>
+        <div class="pip" id="pip-f2">Fire 2</div>
+        <div class="pip" id="pip-m3">Move 3</div>
+        <div class="pip" id="pip-f3">Fire 3</div>
+        <div class="pip" id="pip-rp">Repower</div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+        <button class="action-btn primary" id="btn-endphase" onclick="endPhase()">End Phase →</button>
+        <button class="action-btn" id="btn-hold" onclick="holdStation()" style="display:none">Hold Station</button>
+        <button class="action-btn" id="btn-undo" onclick="playerUndoMove()" style="display:none;border-color:#886600;color:#886600">↩ Undo Last Move</button>
+        <button class="action-btn danger" id="btn-nofire" onclick="declareNoFire()" style="display:none">◯ No Fire</button>
+        <div id="wpn-fire-panel" style="display:none;flex-direction:column;gap:4px;"></div>
+      </div>
+    </div>
+    <div class="s-sec">
+      <div class="s-lbl">Range to Enemy</div>
+      <div style="font-size:18px;color:#ff9900;letter-spacing:4px" id="sb-range">—</div>
+      <div style="font-size:9px;color:#334455;letter-spacing:1px;margin-top:4px" id="sb-tac-adv">—</div>
+    </div>
+    <div class="s-sec">
+      <div class="s-lbl">Move Points</div>
+      <div style="font-size:9px;color:#556677;letter-spacing:1px;line-height:2" id="sb-move-info">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- POWER ALLOCATION -->
+<div id="v-pwr" class="view">
+  <div class="pwr-main">
+    <div class="pwr-hdr">
+      <div>
+        <div class="pwr-name" id="pwr-ship-name">USS ENTERPRISE</div>
+        <div style="font-size:10px;color:#384858;letter-spacing:2px;margin-top:2px" id="pwr-ship-sub">NCC-1701 · Constitution Class</div>
+      </div>
+      <div class="pwr-badge">TOTAL POWER: <span id="pwr-total" style="color:#ffcc44">38</span></div>
+      <div style="font-size:10px;color:#336644;letter-spacing:2px;margin-left:auto">LEFT: <span id="p-rem" style="color:#44cc88">0</span></div>
+    </div>
+    <div class="budget-wrap">
+      <div style="font-size:9px;letter-spacing:2px;color:#283040;text-transform:uppercase;margin-bottom:5px">Power Budget</div>
+      <div class="budget-track">
+        <div class="bseg" id="bs-mv" style="background:#bb7700;opacity:.85"></div>
+        <div class="bseg" id="bs-sh" style="background:#1a44aa;opacity:.85"></div>
+        <div class="bseg" id="bs-wp" style="background:#991800;opacity:.85"></div>
+        <div class="bseg" id="bs-rm" style="background:#141e28;opacity:.6"></div>
+      </div>
+      <div class="bleg">
+        <div class="bleg-i"><div class="bleg-dot" style="background:#bb7700"></div>Movement</div>
+        <div class="bleg-i"><div class="bleg-dot" style="background:#1a44aa"></div>Shields</div>
+        <div class="bleg-i"><div class="bleg-dot" style="background:#991800"></div>Weapons</div>
+        <div class="bleg-i"><div class="bleg-dot" style="background:#141e28"></div>Unused</div>
+      </div>
+    </div>
+    <div class="pwr-sec">Movement</div>
+    <div class="pwr-row" id="pwr-mv-row">
+      <div class="pwr-lbl">Power to Movement</div>
+      <input type="range" class="pwr-sl" id="sl-mv" min="0" max="30" value="8" oninput="clampSlider('sl-mv');updPwr()">
+      <div class="pwr-val" id="v-mv">8</div>
+    </div>
+    <div style="padding:2px 10px 10px;font-size:9px;color:#283040;letter-spacing:1px">
+      → <span id="mv-pts" style="color:#bb7700">2 move pts</span> · Phase split: <span id="mv-spl" style="color:#445566">1/1/0</span>
+    </div>
+    <div class="pwr-sec">Shields — <span id="shld-ratio-lbl" style="color:#3366cc">Ratio 1/2</span>
+      <span style="float:right;cursor:pointer;font-size:8px;letter-spacing:1px;color:#3366cc;border:1px solid #1a3366;padding:1px 6px;border-radius:2px" id="shld-mode-btn" onclick="toggleShieldMode()">MANUAL</span>
+    </div>
+    <div class="pwr-row" id="pwr-sh-row">
+      <div class="pwr-lbl">Power to Shields</div>
+      <input type="range" class="pwr-sl shld" id="sl-sh" min="0" max="30" value="0" oninput="clampSlider('sl-sh');updPwr()">
+      <div class="pwr-val sv" id="v-sh">0</div>
+    </div>
+    <div style="padding:2px 10px 6px;font-size:9px;color:#283040;letter-spacing:1px">
+      → <span id="shld-pts-lbl" style="color:#1a44aa">0 total pts</span> · Max/face: <span id="shld-max-lbl" style="color:#334466">8</span>
+    </div>
+    <!-- AUTO mode: even distribution display -->
+    <div id="shld-auto-panel">
+      <div class="shld-grid" id="shld-grid">
+        <div class="sf"><div class="sf-l">F-Port</div><div class="sf-v" id="sf-fp">0</div><div class="sf-p">pts</div></div>
+        <div class="sf"><div class="sf-l">Forward</div><div class="sf-v" id="sf-fw">0</div><div class="sf-p">pts</div></div>
+        <div class="sf"><div class="sf-l">F-Stbd</div><div class="sf-v" id="sf-fs">0</div><div class="sf-p">pts</div></div>
+        <div class="sf"><div class="sf-l">A-Port</div><div class="sf-v" id="sf-ap">0</div><div class="sf-p">pts</div></div>
+        <div style="display:flex;align-items:center;justify-content:center;font-size:9px;color:#1a2a3a;letter-spacing:1px" id="shld-center">AUTO</div>
+        <div class="sf"><div class="sf-l">A-Stbd</div><div class="sf-v" id="sf-as">0</div><div class="sf-p">pts</div></div>
+        <div style="visibility:hidden"></div>
+        <div class="sf"><div class="sf-l">Aft</div><div class="sf-v" id="sf-aft">0</div><div class="sf-p">pts</div></div>
+        <div style="visibility:hidden"></div>
+      </div>
+      <div style="padding:2px 10px 4px;font-size:8px;color:#283040;letter-spacing:1px">Points distributed evenly across all faces</div>
+    </div>
+    <!-- MANUAL mode: per-face sliders -->
+    <div id="shld-manual-panel" style="display:none;padding:4px 10px 6px">
+      <div style="font-size:8px;color:#2a4060;letter-spacing:1px;margin-bottom:6px">Remaining shield pts: <span id="shld-manual-rem" style="color:#3366cc">0</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px" id="shld-face-rows"></div>
+    </div>
+    <div class="pwr-sec">Weapons</div>
+    <div id="wpn-rows"></div>
+    <button class="commit" id="commit-btn" onclick="commitPwr()">⬡ Commit Power Allocation</button>
+  </div>
+  <div class="pwr-right">
+    <div class="s-lbl" style="padding-bottom:8px;border-bottom:1px solid #150a00;margin-bottom:9px">Allocation Log</div>
+    <div id="p-log"></div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid #150a00">
+      <div class="s-lbl" style="margin-bottom:7px">Ship Stats</div>
+      <div id="ship-stats-panel" style="font-size:9px;letter-spacing:1px;color:#384858;display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid #150a00">
+      <div class="s-lbl" style="margin-bottom:7px">Tactical Advantage</div>
+      <div id="tac-adv-panel" style="font-size:9px;letter-spacing:1px;color:#384858;display:flex;flex-direction:column;gap:4px">
+        <div>Your move pts: <span id="tac-p-mv" style="color:#bb7700">—</span></div>
+        <div>Enemy est.: <span id="tac-e-mv" style="color:#774433">?</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DAMAGE CONTROL -->
+<div id="v-dmg" class="view">
+  <div id="dmg-wrap"><canvas id="dmg-cv"></canvas></div>
+  <div id="dmg-sb">
+    <div class="s-sec">
+      <div class="s-lbl">System Status</div>
+      <div id="sys-rows"></div>
+    </div>
+    <div style="padding:8px 12px 3px"><div class="s-lbl">Damage Log</div></div>
+    <div class="dlog-wrap" id="dmg-log"></div>
+  </div>
+</div>
+
+
+</div><!-- #app -->
+
+<!-- STATUS BAR -->
+<div id="sbar">
+  <div class="sb-sys"><div class="sb-lbl">Hull</div><div class="sb-bar"><div class="sb-fil" id="sbf-hull"></div></div><div class="sb-val" id="sbv-hull"></div></div>
+  <div class="sb-sys"><div class="sb-lbl">Fwd Shield</div><div class="sb-bar"><div class="sb-fil" id="sbf-shld"></div></div><div class="sb-val" id="sbv-shld"></div></div>
+  <div class="sb-sys"><div class="sb-lbl">Warp Core</div><div class="sb-bar"><div class="sb-fil" id="sbf-warp"></div></div><div class="sb-val" id="sbv-warp"></div></div>
+  <div class="sb-sys"><div class="sb-lbl">Weapons</div><div class="sb-bar"><div class="sb-fil" id="sbf-wpn"></div></div><div class="sb-val" id="sbv-wpn"></div></div>
+  <div class="sb-sys"><div class="sb-lbl">Sensors</div><div class="sb-bar"><div class="sb-fil" id="sbf-sens"></div></div><div class="sb-val" id="sbv-sens"></div></div>
+  <div id="sb-id">USS ENTERPRISE · NCC-1701</div>
+</div>
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════════
+// SHIP DATA REGISTRY — add ships here for full roster
+// ═══════════════════════════════════════════════════════════════════════════
+const SHIP_REGISTRY = {
+  Constitution: {
+    name:'USS Enterprise', reg:'NCC-1701', cls:'Constitution Class', faction:'fed',
+    totalPower:38, moveRatio:4, shieldRatio:0.5, maxShieldPerFace:8,
+    superstructureMax:24,
+    enginePower:{warp:24,impulse:14},
+    weapons:[
+      {id:'pa',name:'Phaser Bank A',type:'beam',arcs:[0,1,5],chart:'W',maxPower:10,dmgMod:{bonus:3,maxRange:10}},
+      {id:'pb',name:'Phaser Bank B',type:'beam',arcs:[0,2,3],chart:'W',maxPower:10,dmgMod:{bonus:3,maxRange:10}},
+      {id:'pt',name:'Photon Torpedo',type:'missile',arcs:[0],chart:'O',armCost:6,fixedDmg:20,maxRange:15},
+    ]
+  },
+  D7: {
+    name:'IKS Kronos', reg:'N/A', cls:'D-7 Class', faction:'kli',
+    totalPower:34, moveRatio:4, shieldRatio:0.5, maxShieldPerFace:7,
+    superstructureMax:20,
+    enginePower:{warp:20,impulse:14},
+    weapons:[
+      {id:'da',name:'Disruptor Bank A',type:'beam',arcs:[0,1,5],chart:'S',maxPower:8,dmgMod:{bonus:2,maxRange:8}},
+      {id:'db',name:'Disruptor Bank B',type:'beam',arcs:[0,2,3],chart:'S',maxPower:8,dmgMod:{bonus:2,maxRange:8}},
+      {id:'dt',name:'Photon Torpedo',type:'missile',arcs:[0],chart:'O',armCost:6,fixedDmg:18,maxRange:15},
+    ]
+  }
+  // FUTURE SHIPS: Excelsior, Miranda, K'tinga, BirdOfPrey, Warbird, etc.
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FASA SHIP CONSTRUCTION MANUAL — DATA TABLES (2nd Edition)
+// Source: FASA 2204, Ship Construction Manual 2nd Ed.
+// All data read directly from PDF tables pp.40-55 (Fed) and pp.48-55 (Kli)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── SHIP CLASSES (p.13) ─────────────────────────────────────────────────────
+// Class determined by total mass (metric tons)
+const SHIP_CLASSES = [
+  {cls:'I',   minMt:0,   maxMt:5},
+  {cls:'II',  minMt:5,   maxMt:15},
+  {cls:'III', minMt:15,  maxMt:25},
+  {cls:'IV',  minMt:25,  maxMt:40},
+  {cls:'V',   minMt:40,  maxMt:60},
+  {cls:'VI',  minMt:60,  maxMt:80},
+  {cls:'VII', minMt:80,  maxMt:100},
+  {cls:'VIII',minMt:100, maxMt:120},
+  {cls:'IX',  minMt:120, maxMt:140},
+  {cls:'X',   minMt:140, maxMt:160},
+  {cls:'XI',  minMt:160, maxMt:180},
+  {cls:'XII', minMt:180, maxMt:210},
+  {cls:'XIII',minMt:210, maxMt:240},
+  {cls:'XIV', minMt:240, maxMt:300},
+  {cls:'XV',  minMt:300, maxMt:350},
+  {cls:'XVI', minMt:350, maxMt:400},
+  {cls:'XVII',minMt:400, maxMt:450},
+  {cls:'XVIII',minMt:450,maxMt:500},
+  {cls:'XIX', minMt:500, maxMt:600},
+  {cls:'XX',  minMt:600, maxMt:700},
+];
+function getShipClass(totalMt){
+  for(const c of SHIP_CLASSES) if(totalMt>=c.minMt&&totalMt<c.maxMt) return c.cls;
+  return 'XX';
+}
+
+// ── FEDERATION CONTROL COMPUTERS (p.40) ──────────────────────────────────────
+// mass=system mass mt, shipClasses=range string, ssReq=SS requirement,
+// maxWDF=max weapon damage factor allowed, avail=availability code, cost=MCr
+const FED_COMPUTERS = {
+  'L-12':{mass:50,  shipClasses:'I-III',   ssReq:0.1, maxWDF:2,   avail:'LLL/90', cost:4},
+  'L-13':{mass:450, shipClasses:'I-IX',    ssReq:0.3, maxWDF:5,   avail:'LLL/88', cost:11},
+  'L-14':{mass:1050,shipClasses:'II-IX',   ssReq:0.5, maxWDF:10,  avail:'LLL/85', cost:17},
+  'M-1': {mass:2900,shipClasses:'IV-X',    ssReq:0.9, maxWDF:30,  avail:'LLL/82', cost:48},
+  'M-2': {mass:3800,shipClasses:'VII-XII', ssReq:1.1, maxWDF:40,  avail:'LLL/74', cost:60},
+  'M-3': {mass:4700,shipClasses:'VIII-XIII',ssReq:1.5,maxWDF:50,  avail:'LLL/60', cost:71},
+  'M-4': {mass:5750,shipClasses:'IX-XIV',  ssReq:2.0, maxWDF:70,  avail:'LLL/42', cost:83},
+  'M-6': {mass:6000,shipClasses:'X-XV',    ssReq:2.0, maxWDF:90,  avail:'LLL/20', cost:150},
+  'M-7': {mass:11500,shipClasses:'XIII',   ssReq:3.0, maxWDF:150, avail:'LLL/None',cost:null},
+};
+
+// ── FEDERATION WARP ENGINE TYPES (p.41 — Single Engine) ──────────────────────
+// power=power units available, computer=required control computer,
+// ssReq=superstructure requirement, cost=MCr (single engine)
+const FED_WARP_ENGINES = {
+  'FWA-1':{mass:2400,  power:6,  computer:'L-12', ssReq:0.2, cost:2.4},
+  'FWA-2':{mass:2400,  power:8,  computer:'L-12', ssReq:0.2, cost:3.0},
+  'FWB-1':{mass:18000, power:9,  computer:'L-14', ssReq:1.4, cost:36},
+  'FWB-2':{mass:18000, power:12, computer:'L-14', ssReq:1.4, cost:42},
+  'FWC-1':{mass:60000, power:14, computer:'L-14', ssReq:4.8, cost:240},
+  'FWC-2':{mass:60000, power:20, computer:'M-1',  ssReq:4.8, cost:264},
+  'FWD-1':{mass:50000, power:10, computer:'L-14', ssReq:4.0, cost:200},
+  'FWD-2':{mass:50000, power:16, computer:'M-1',  ssReq:4.0, cost:227},
+  'FWE-1':{mass:40000, power:8,  computer:'L-13', ssReq:3.2, cost:123},
+  'FWE-2':{mass:40000, power:12, computer:'L-13', ssReq:3.2, cost:135},
+  'FWF-1':{mass:62000, power:18, computer:'M-1',  ssReq:5.0, cost:248},
+  'FWG-1':{mass:50000, power:20, computer:'M-1',  ssReq:4.0, cost:303.5},
+  // Tandem (each engine):
+  'FWH-1':{mass:8000,  power:10, computer:'L-14', ssReq:0.6, cost:9,  tandem:true},
+  'FMWA-1':{mass:600,  power:2,  computer:'L-13', ssReq:0.1, cost:1.2, tandem:true},
+  'FTWA-1':{mass:156000,power:38,computer:'M-7',  ssReq:12.4,cost:null, tandem:true, experimental:true},
+};
+
+// ── FEDERATION IMPULSE ENGINE TYPES (p.44) ───────────────────────────────────
+const FED_IMPULSE_ENGINES = {
+  'FIA-1':{mass:150, power:1,  computer:'L-12', shipClasses:'I',      ssReq:0.1, cost:1},
+  'FIA-2':{mass:150, power:2,  computer:'L-12', shipClasses:'I-II',   ssReq:0.1, cost:1},
+  'FIA-3':{mass:150, power:3,  computer:'L-12', shipClasses:'I-III',  ssReq:0.1, cost:2},
+  'FIB-1':{mass:200, power:2,  computer:'L-12', shipClasses:'VII',    ssReq:0.1, cost:1},
+  'FIB-2':{mass:200, power:4,  computer:'L-12', shipClasses:'IV-VIII',ssReq:0.1, cost:2},
+  'FIB-3':{mass:200, power:6,  computer:'L-13', shipClasses:'V-IX',   ssReq:0.1, cost:3},
+  'FIC-1':{mass:255, power:1,  computer:'L-12', shipClasses:'III-VI', ssReq:0.1, cost:1},
+  'FIC-2':{mass:255, power:3,  computer:'L-12', shipClasses:'V-IX',   ssReq:0.1, cost:2},
+  'FIC-3':{mass:255, power:6,  computer:'L-13', shipClasses:'VII-XI', ssReq:0.1, cost:3},
+  'FID-1':{mass:315, power:2,  computer:'L-12', shipClasses:'IV-VII', ssReq:0.1, cost:2},
+  'FID-2':{mass:315, power:4,  computer:'L-12', shipClasses:'VII-XII',ssReq:0.1, cost:3},
+  'FID-3':{mass:315, power:8,  computer:'L-13', shipClasses:'XII-XX', ssReq:0.1, cost:4},
+  'FIE-1':{mass:350, power:4,  computer:'L-12', shipClasses:'VI-VIII',ssReq:0.1, cost:3},
+  'FIE-2':{mass:350, power:8,  computer:'L-13', shipClasses:'VII-XII',ssReq:0.1, cost:4},
+  'FIE-3':{mass:350, power:16, computer:'M-1',  shipClasses:'XI-XX',  ssReq:0.1, cost:5},
+  'FIF-1':{mass:438, power:12, computer:'L-14', shipClasses:'VIII-XI',ssReq:0.1, cost:4},
+  'FIF-2':{mass:438, power:16, computer:'M-1',  shipClasses:'IX-XIII',ssReq:0.1, cost:5},
+  'FIF-3':{mass:438, power:20, computer:'M-1',  shipClasses:'XI-XX',  ssReq:0.1, cost:7},
+  'FIG-1':{mass:1060,power:24, computer:'M-2',  shipClasses:'X-XIII', ssReq:0.1, cost:10},
+  'FIG-2':{mass:1060,power:32, computer:'M-3',  shipClasses:'XII-XV', ssReq:0.1, cost:18},
+  'FIG-3':{mass:1060,power:40, computer:'M-4',  shipClasses:'XIV-XV', ssReq:0.1, cost:34},
+  'FMIA': {mass:10,  power:1,  computer:'L-12', shipClasses:'I',      ssReq:0.1, cost:1},
+};
+
+// ── FEDERATION SHIELD GENERATORS (p.46) ──────────────────────────────────────
+// ser=Shield Efficiency Rating (SER = 1/shieldPointRatio, e.g. SER=2 means 2pts per power)
+const FED_SHIELDS = {
+  'FSA':{mass:110, ser:1,   ssReq:0.2, avail:'LRL/92', cost:3},
+  'FSB':{mass:140, ser:2,   ssReq:0.9, avail:'LRL/72', cost:6},
+  'FSC':{mass:160, ser:1,   ssReq:0.2, avail:'LRL/90', cost:4},
+  'FSD':{mass:175, ser:2,   ssReq:1.0, avail:'LRL/71', cost:8},
+  'FSE':{mass:230, ser:1,   ssReq:0.5, avail:'LRL/86', cost:5},
+  'FSF':{mass:235, ser:2,   ssReq:1.8, avail:'LRL/69', cost:10},
+  'FSG':{mass:265, ser:1,   ssReq:0.6, avail:'LRL/84', cost:6},
+  'FSH':{mass:305, ser:2,   ssReq:1.9, avail:'LRL/64', cost:12},
+  'FSI':{mass:510, ser:3,   ssReq:1.0, avail:'LRL/50', cost:18},
+  'FSJ':{mass:300, ser:1,   ssReq:1.1, avail:'LRL/79', cost:7},
+  'FSK':{mass:380, ser:2,   ssReq:2.8, avail:'LRL/62', cost:14},
+  'FSL':{mass:575, ser:3,   ssReq:1.8, avail:'LRL/48', cost:21},
+  'FSM':{mass:330, ser:1,   ssReq:1.0, avail:'LRL/77', cost:8},
+  'FSN':{mass:415, ser:2,   ssReq:2.9, avail:'LRL/60', cost:16},
+  'FSO':{mass:615, ser:2,   ssReq:3.1, avail:'LRL/46', cost:24},
+  'FSP':{mass:845, ser:4,   ssReq:2.1, avail:'LRL/43', cost:32},
+};
+
+// ── FEDERATION PHASER BEAM WEAPONS (p.47) ────────────────────────────────────
+// dmgMods: ranges where +3/+2/+1 damage bonus applies (hex ranges, inclusive)
+// wdf=weapon damage factor (single/bank), ssReq=[single,bank]
+const FED_PHASERS = {
+  'FH-1': {mass:250, maxPower:2,  chart:'F', maxRange:8,  dmgMod:{plus3:null,        plus2:null,        plus1:null},       wdf:0.5,  ssReq:[0.5,0.8],  cost:38},
+  'FH-2': {mass:375, maxPower:3,  chart:'H', maxRange:10, dmgMod:{plus3:null,        plus2:null,        plus1:[1,10]},     wdf:1.3,  ssReq:[0.6,0.9],  cost:56},
+  'FH-3': {mass:625, maxPower:5,  chart:'W', maxRange:20, dmgMod:{plus3:[1,10],      plus2:[11,17],     plus1:[18,20]},    wdf:5.8,  ssReq:[0.8,1.2],  cost:94},
+  'FH-4': {mass:375, maxPower:3,  chart:'Q', maxRange:14, dmgMod:{plus3:null,        plus2:[1,8],       plus1:[9,14]},     wdf:2.6,  ssReq:[0.7,1.1],  cost:56},
+  'FH-5': {mass:500, maxPower:4,  chart:'R', maxRange:16, dmgMod:{plus3:null,        plus2:[1,8],       plus1:[9,16]},     wdf:3.1,  ssReq:[0.8,1.2],  cost:75},
+  'FH-6': {mass:300, maxPower:3,  chart:'N', maxRange:13, dmgMod:{plus3:null,        plus2:null,        plus1:[8,13]},     wdf:2.3,  ssReq:[1.2,1.8],  cost:45},
+  'FH-7': {mass:400, maxPower:4,  chart:'Q', maxRange:14, dmgMod:{plus3:null,        plus2:[1,8],       plus1:[9,14]},     wdf:3.2,  ssReq:[1.4,2.1],  cost:60},
+  'FH-8': {mass:500, maxPower:5,  chart:'T', maxRange:18, dmgMod:{plus3:null,        plus2:[1,10],      plus1:[11,18]},    wdf:4.3,  ssReq:[1.6,2.4],  cost:75},
+  'FH-9': {mass:600, maxPower:6,  chart:'X', maxRange:22, dmgMod:{plus3:null,        plus2:[1,12],      plus1:[13,22]},    wdf:6.0,  ssReq:[1.7,2.5],  cost:90},
+  'FH-10':{mass:420, maxPower:7,  chart:'W', maxRange:20, dmgMod:{plus3:[1,10],      plus2:[11,17],     plus1:[18,20]},    wdf:9.7,  ssReq:[2.0,3.0],  cost:63},
+  'FH-11':{mass:600, maxPower:10, chart:'Y', maxRange:24, dmgMod:{plus3:[1,10],      plus2:[11,17],     plus1:[18,24]},    wdf:10.7, ssReq:[2.2,3.2],  cost:90},
+  'FH-12':{mass:360, maxPower:6,  chart:'R', maxRange:16, dmgMod:{plus3:null,        plus2:[1,9],       plus1:[10,16]},    wdf:4.9,  ssReq:[1.0,1.5],  cost:58},
+  'FH-13':{mass:620, maxPower:8,  chart:'T', maxRange:18, dmgMod:{plus3:[1,5],       plus2:[6,12],      plus1:[13,18]},    wdf:6.5,  ssReq:[1.8,2.7],  cost:65},
+};
+
+// ── FEDERATION LASER WEAPONS (p.47) ──────────────────────────────────────────
+const FED_LASERS = {
+  'FL-1':{mass:500, maxPower:2, chart:'D', maxRange:6,  dmgMod:{plus3:null,plus2:null,     plus1:null},    wdf:0.4, ssReq:0.8, cost:9},
+  'FL-2':{mass:610, maxPower:2, chart:'F', maxRange:8,  dmgMod:{plus3:null,plus2:null,     plus1:null},    wdf:0.6, ssReq:0.9, cost:12},
+  'FL-3':{mass:680, maxPower:2, chart:'G', maxRange:10, dmgMod:{plus3:null,plus2:null,     plus1:[1,4]},   wdf:0.7, ssReq:1.2, cost:14},
+  'FL-4':{mass:740, maxPower:3, chart:'G', maxRange:10, dmgMod:{plus3:null,plus2:null,     plus1:[1,4]},   wdf:1.0, ssReq:1.5, cost:20},
+  'FL-5':{mass:820, maxPower:2, chart:'H', maxRange:10, dmgMod:{plus3:null,plus2:[1,4],    plus1:[5,7]},   wdf:1.1, ssReq:2.0, cost:22},
+  'FL-6':{mass:930, maxPower:3, chart:'H', maxRange:10, dmgMod:{plus3:null,plus2:[1,4],    plus1:[5,7]},   wdf:1.4, ssReq:2.4, cost:32},
+};
+
+// ── FEDERATION MISSILE WEAPONS (p.47) ────────────────────────────────────────
+const FED_MISSILES = {
+  'FP-1':{mass:200, armCost:1, fixedDmg:10, chart:'L', maxRange:12, wdf:4.4,  ssReq:1.3, cost:30},
+  'FP-2':{mass:120, armCost:1, fixedDmg:6,  chart:'H', maxRange:10, wdf:2.0,  ssReq:0.9, cost:18},
+  'FP-3':{mass:100, armCost:1, fixedDmg:6,  chart:'D', maxRange:6,  wdf:1.2,  ssReq:0.8, cost:15},
+  'FP-4':{mass:240, armCost:1, fixedDmg:20, chart:'S', maxRange:16, wdf:12.5, ssReq:2.0, cost:36},
+  'FP-5':{mass:200, armCost:1, fixedDmg:16, chart:'R', maxRange:16, wdf:9.5,  ssReq:1.8, cost:30},
+  'FP-6':{mass:160, armCost:1, fixedDmg:12, chart:'O', maxRange:14, wdf:6.7,  ssReq:1.8, cost:24},
+  'FP-7':{mass:210, armCost:1, fixedDmg:8,  chart:'R', maxRange:16, wdf:4.8,  ssReq:0.8, cost:32},
+};
+
+// ── FEDERATION ACCELERATOR CANNONS (p.47) ────────────────────────────────────
+const FED_ACCELERATORS = {
+  'FAC-1':{mass:480, armCost:3, fixedDmg:8,  chart:'F', maxRange:8,  wdf:0.6, ssReq:1.5, cost:10},
+  'FAC-2':{mass:660, armCost:4, fixedDmg:10, chart:'G', maxRange:10, wdf:1.4, ssReq:2.4, cost:14},
+  'FAC-3':{mass:840, armCost:4, fixedDmg:12, chart:'H', maxRange:10, wdf:2.0, ssReq:2.9, cost:16},
+};
+
+// ── KLINGON CONTROL COMPUTERS (p.48) ─────────────────────────────────────────
+const KLI_COMPUTERS = {
+  'ZD-1':{mass:90,   shipClasses:'I-II',   ssReq:0.1, maxWDF:2,   avail:'LLL/58', cost:6},
+  'ZD-2':{mass:605,  shipClasses:'I-VII',  ssReq:0.4, maxWDF:7,   avail:'LLL/52', cost:21},
+  'ZD-3':{mass:1900, shipClasses:'III-VII',ssReq:0.8, maxWDF:16,  avail:'LLL/44', cost:32},
+  'ZD-4':{mass:3850, shipClasses:'III-XII',ssReq:1.2, maxWDF:25,  avail:'LLL/37', cost:94},
+  'ZD-5':{mass:7100, shipClasses:'VI-XIV', ssReq:2.0, maxWDF:40,  avail:'LLL/25', cost:140},
+  'ZD-6':{mass:9800, shipClasses:'VII-XV', ssReq:2.3, maxWDF:60,  avail:'LLL/16', cost:260},
+  'ZD-7':{mass:11550,shipClasses:'IX-XX',  ssReq:2.8, maxWDF:80,  avail:'LLL/12', cost:435},
+  'ZD-8':{mass:14680,shipClasses:'XI-XX',  ssReq:3.4, maxWDF:140, avail:'LLL/03', cost:630},
+};
+
+// ── KLINGON WARP ENGINE TYPES (p.49 — Single Engine) ─────────────────────────
+const KLI_WARP_ENGINES = {
+  'KWA-1':{mass:1800,  power:5,  computer:'ZD-1', ssReq:0.1, cost:24},
+  'KWA-2':{mass:2500,  power:10, computer:'ZD-2', ssReq:0.2, cost:37},
+  'KWB-1':{mass:6000,  power:8,  computer:'ZD-2', ssReq:0.5, cost:60},
+  'KWB-2':{mass:7000,  power:12, computer:'ZD-2', ssReq:0.6, cost:77},
+  'KWB-3':{mass:10000, power:13, computer:'ZD-2', ssReq:1.1, cost:105},
+  'KWC-1':{mass:25000, power:14, computer:'ZD-3', ssReq:2.0, cost:500},
+  'KWC-2':{mass:25000, power:18, computer:'ZD-3', ssReq:2.0, cost:535},
+  'KWC-3':{mass:25000, power:22, computer:'ZD-4', ssReq:2.0, cost:660},
+  'KWD-1':{mass:30000, power:16, computer:'ZD-3', ssReq:2.4, cost:1200},
+  'KWD-2':{mass:30000, power:10, computer:'ZD-2', ssReq:2.4, cost:1150},
+  'KWE-1':{mass:40000, power:9,  computer:'ZD-2', ssReq:3.2, cost:1650},
+  'KWE-2':{mass:45000, power:16, computer:'ZD-3', ssReq:3.2, cost:2375},
+  'KWE-3':{mass:45000, power:20, computer:'ZD-4', ssReq:3.2, cost:2900},
+  'KWF-1':{mass:35000, power:15, computer:'ZD-3', ssReq:2.8, cost:2150},
+  'KWG-1':{mass:65000, power:26, computer:'ZD-5', ssReq:4.1, cost:3700},
+};
+
+// ── KLINGON SHIELD GENERATORS (p.54) ─────────────────────────────────────────
+const KLI_SHIELDS = {
+  'KSA':{mass:115, ser:1,   ssReq:0.1, avail:'LRL/48', cost:5},
+  'KSB':{mass:160, ser:1,   ssReq:0.2, avail:'LRL/45', cost:7},
+  'KSC':{mass:190, ser:1,   ssReq:0.3, avail:'LRL/43', cost:8},
+  'KSD':{mass:240, ser:2,   ssReq:1.0, avail:'LRL/37', cost:16},
+  'KSE':{mass:230, ser:1,   ssReq:0.5, avail:'LRL/27', cost:10},
+  'KSF':{mass:300, ser:1.5, ssReq:0.7, avail:'LRL/18', cost:15},
+  'KSG':{mass:310, ser:2,   ssReq:1.4, avail:'LRL/36', cost:20},
+  'KSH':{mass:375, ser:3,   ssReq:2.1, avail:'LRL/26', cost:30},
+  'KSI':{mass:275, ser:1,   ssReq:0.6, avail:'LRL/17', cost:12},
+  'KSJ':{mass:360, ser:1.5, ssReq:0.8, avail:'LRL/42', cost:18},
+  'KSK':{mass:375, ser:2,   ssReq:2.0, avail:'LRL/35', cost:24},
+  'KSL':{mass:450, ser:3,   ssReq:2.1, avail:'LRL/25', cost:36},
+  'KSM':{mass:345, ser:1,   ssReq:0.9, avail:'LRL/16', cost:15},
+  'KSN':{mass:450, ser:1.5, ssReq:1.1, avail:'LRL/33', cost:23},
+  'KSO':{mass:470, ser:2,   ssReq:2.1, avail:'LRL/23', cost:30},
+  'KSP':{mass:560, ser:3,   ssReq:2.2, avail:'LRL/14', cost:45},
+};
+
+// ── KLINGON DISRUPTOR BEAM WEAPONS (p.55) ────────────────────────────────────
+const KLI_DISRUPTORS = {
+  'KD-1': {mass:150, maxPower:4,  chart:'B', maxRange:10, dmgMod:{plus3:null,    plus2:null,     plus1:null},    wdf:0.7,  ssReq:[0.3,0.6],  cost:46},
+  'KD-2': {mass:180, maxPower:4,  chart:'G', maxRange:10, dmgMod:{plus3:null,    plus2:null,     plus1:[1,10]},  wdf:1.4,  ssReq:[0.4,0.8],  cost:54},
+  'KD-3': {mass:210, maxPower:5,  chart:'I', maxRange:12, dmgMod:{plus3:null,    plus2:null,     plus1:[1,12]},  wdf:2.7,  ssReq:[0.6,1.2],  cost:64},
+  'KD-4': {mass:450, maxPower:4,  chart:'J', maxRange:10, dmgMod:{plus3:null,    plus2:null,     plus1:[1,10]},  wdf:2.0,  ssReq:[0.6,1.2],  cost:136},
+  'KD-5': {mass:575, maxPower:4,  chart:'P', maxRange:18, dmgMod:{plus3:null,    plus2:[1,10],   plus1:[11,18]}, wdf:3.1,  ssReq:[0.8,1.6],  cost:172},
+  'KD-6': {mass:600, maxPower:6,  chart:'T', maxRange:18, dmgMod:{plus3:null,    plus2:[1,18],   plus1:null},    wdf:5.1,  ssReq:[0.9,1.8],  cost:180},
+  'KD-7': {mass:350, maxPower:7,  chart:'L', maxRange:12, dmgMod:{plus3:null,    plus2:[1,6],    plus1:[7,12]},  wdf:3.8,  ssReq:[1.1,2.2],  cost:106},
+  'KD-8': {mass:800, maxPower:7,  chart:'U', maxRange:20, dmgMod:{plus3:[1,7],   plus2:[8,15],   plus1:[16,20]}, wdf:6.1,  ssReq:[1.6,3.2],  cost:240},
+  'KD-9': {mass:600, maxPower:5,  chart:'W', maxRange:20, dmgMod:{plus3:[1,7],   plus2:[8,15],   plus1:[16,20]}, wdf:5.0,  ssReq:[1.3,2.6],  cost:182},
+  'KD-10':{mass:300, maxPower:3,  chart:'C', maxRange:6,  dmgMod:{plus3:null,    plus2:null,     plus1:[1,6]},   wdf:0.7,  ssReq:[0.5,1.0],  cost:90},
+  'KD-11':{mass:340, maxPower:5,  chart:'F', maxRange:8,  dmgMod:{plus3:null,    plus2:[1,4],    plus1:[5,8]},   wdf:1.7,  ssReq:[0.6,1.2],  cost:102},
+  'KD-12':{mass:700, maxPower:9,  chart:'H', maxRange:10, dmgMod:{plus3:[1,3],   plus2:[4,8],    plus1:[9,10]},  wdf:3.7,  ssReq:[1.0,2.0],  cost:210},
+  'KD-13':{mass:520, maxPower:5,  chart:'X', maxRange:22, dmgMod:{plus3:[1,7],   plus2:[8,15],   plus1:[16,22]}, wdf:5.7,  ssReq:[1.6,3.2],  cost:156},
+  'KD-14':{mass:660, maxPower:8,  chart:'D', maxRange:6,  dmgMod:{plus3:null,    plus2:null,     plus1:[1,6]},   wdf:2.1,  ssReq:[0.6,1.2],  cost:200},
+};
+
+// ── KLINGON MISSILE WEAPONS (p.55) ───────────────────────────────────────────
+const KLI_MISSILES = {
+  'KP-1':{mass:225, armCost:1, fixedDmg:6,  chart:'F', maxRange:8,  wdf:1.5,  ssReq:0.8, cost:80},
+  'KP-2':{mass:375, armCost:1, fixedDmg:10, chart:'H', maxRange:10, wdf:3.3,  ssReq:1.0, cost:120},
+  'KP-3':{mass:550, armCost:2, fixedDmg:15, chart:'R', maxRange:16, wdf:4.5,  ssReq:1.0, cost:200},
+  'KP-4':{mass:675, armCost:2, fixedDmg:18, chart:'Q', maxRange:14, wdf:4.9,  ssReq:1.3, cost:210},
+  'KP-5':{mass:300, armCost:1, fixedDmg:10, chart:'Q', maxRange:14, wdf:5.5,  ssReq:1.2, cost:120},
+  'KP-6':{mass:600, armCost:2, fixedDmg:20, chart:'R', maxRange:16, wdf:5.9,  ssReq:1.6, cost:240},
+};
+
+// ── KLINGON IMPULSE ENGINES (p.52) ───────────────────────────────────────────
+const KLI_IMPULSE_ENGINES = {
+  'KIA-1':{mass:213, power:1,  computer:'ZD-1', shipClasses:'I',        ssReq:0.1, cost:17},
+  'KIA-2':{mass:213, power:2,  computer:'ZD-1', shipClasses:'II',       ssReq:0.1, cost:28},
+  'KIA-3':{mass:213, power:3,  computer:'ZD-1', shipClasses:'II-III',   ssReq:0.1, cost:40},
+  'KIB-1':{mass:325, power:3,  computer:'ZD-1', shipClasses:'II-V',     ssReq:0.1, cost:34},
+  'KIB-2':{mass:325, power:2,  computer:'ZD-1', shipClasses:'V-X',      ssReq:0.1, cost:38},
+  'KIC-1':{mass:568, power:2,  computer:'ZD-1', shipClasses:'II-V',     ssReq:0.1, cost:41},
+  'KIC-2':{mass:568, power:4,  computer:'ZD-1', shipClasses:'V-X',      ssReq:0.1, cost:50},
+  'KIC-3':{mass:568, power:5,  computer:'ZD-2', shipClasses:'IX-XII',   ssReq:0.1, cost:68},
+  'KIC-4':{mass:568, power:8,  computer:'ZD-2', shipClasses:'X-XVIII',  ssReq:0.1, cost:97},
+  'KID-1':{mass:715, power:6,  computer:'ZD-2', shipClasses:'V-VII',    ssReq:0.1, cost:79},
+  'KID-2':{mass:715, power:4,  computer:'ZD-1', shipClasses:'VIII-XII', ssReq:0.1, cost:62},
+  'KIE-1':{mass:850, power:6,  computer:'ZD-1', shipClasses:'X-XIII',   ssReq:0.1, cost:94},
+  'KIE-2':{mass:850, power:12, computer:'ZD-2', shipClasses:'VIII-X',   ssReq:0.1, cost:135},
+  'KIE-3':{mass:850, power:18, computer:'ZD-3', shipClasses:'VI-VIII',  ssReq:0.1, cost:181},
+  'KIF-1':{mass:960, power:17, computer:'ZD-3', shipClasses:'XII-XVIII',ssReq:0.1, cost:174},
+  'KIF-2':{mass:960, power:23, computer:'ZD-4', shipClasses:'VIII-XII', ssReq:0.1, cost:278},
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ROMULAN STAR EMPIRE (pp.56-65)
+// ══════════════════════════════════════════════════════════════════════════════
+const ROM_COMPUTERS = {
+  'R1M':{mass:60,   shipClasses:'I-III',  ssReq:0.1, maxWDF:3,   avail:'LLL/43', cost:6},
+  'R2M':{mass:680,  shipClasses:'II-IX',  ssReq:0.5, maxWDF:8,   avail:'LLL/39', cost:24},
+  'R3M':{mass:1950, shipClasses:'II-X',   ssReq:0.8, maxWDF:25,  avail:'LLL/32', cost:34},
+  'R4M':{mass:3170, shipClasses:'III-XII',ssReq:1.0, maxWDF:50,  avail:'LLL/28', cost:70},
+  'R5M':{mass:5250, shipClasses:'VI-XV',  ssReq:1.8, maxWDF:75,  avail:'LLL/14', cost:100},
+  'R6M':{mass:8100, shipClasses:'X-XIX',  ssReq:2.1, maxWDF:105, avail:'LLL/05', cost:230},
+};
+const ROM_WARP_ENGINES = {
+  'RWA-1':{mass:3000, power:6,  computer:'R1M',ssReq:0.2,cost:4.2},
+  'RWA-2':{mass:2800, power:8,  computer:'R1M',ssReq:0.2,cost:5.0},
+  'RWB-1':{mass:8000, power:10, computer:'R2M',ssReq:0.6,cost:7.2},
+  'RWB-2':{mass:8200, power:9,  computer:'R2M',ssReq:0.6,cost:8.5},
+  'RWC-1':{mass:20000,power:12, computer:'R2M',ssReq:1.6,cost:49},
+  'RWC-2':{mass:20000,power:14, computer:'R2M',ssReq:1.6,cost:50},
+  'RWD-1':{mass:30000,power:15, computer:'R2M',ssReq:2.4,cost:145},
+  'RWD-2':{mass:30000,power:18, computer:'R3M',ssReq:2.4,cost:192},
+  'RWE-1':{mass:40000,power:12, computer:'R2M',ssReq:3.2,cost:206},
+  'RWF-1':{mass:50000,power:16, computer:'R3M',ssReq:4.0,cost:312},
+  'RWF-2':{mass:50000,power:18, computer:'R3M',ssReq:4.0,cost:322},
+  'RWG-1':{mass:70000,power:22, computer:'R4M',ssReq:5.6,cost:497},
+};
+const ROM_SHIELDS = {
+  'RSA':{mass:105,ser:1,ssReq:0.2,avail:'LRL/35',cost:3},  'RSB':{mass:145,ser:1,ssReq:0.3,avail:'LRL/33',cost:5},
+  'RSC':{mass:205,ser:2,ssReq:0.9,avail:'LRL/22',cost:10}, 'RSD':{mass:170,ser:1,ssReq:0.5,avail:'LRL/32',cost:6},
+  'RSE':{mass:235,ser:2,ssReq:1.1,avail:'LRL/21',cost:15}, 'RSF':{mass:330,ser:3,ssReq:1.9,avail:'LRL/15',cost:19},
+  'RSG':{mass:230,ser:1,ssReq:0.7,avail:'LRL/29',cost:8},  'RSH':{mass:320,ser:2,ssReq:1.4,avail:'LRL/20',cost:18},
+  'RSI':{mass:450,ser:3,ssReq:2.0,avail:'LRL/12',cost:25}, 'RSJ':{mass:270,ser:1,ssReq:0.8,avail:'LRL/28',cost:10},
+  'RSK':{mass:380,ser:2,ssReq:1.9,avail:'LRL/17',cost:21}, 'RSL':{mass:530,ser:3,ssReq:2.1,avail:'LRL/11',cost:29},
+  'RSM':{mass:315,ser:1,ssReq:0.9,avail:'LRL/27',cost:11}, 'RSN':{mass:440,ser:2,ssReq:2.0,avail:'LRL/16',cost:24},
+  'RSO':{mass:615,ser:3,ssReq:2.4,avail:'LRL/10',cost:35},
+};
+const ROM_BEAMS = {
+  'RB-1': {mass:200,maxPower:2, chart:'G',maxRange:10,dmgMod:{plus3:null,plus2:null,     plus1:null},     wdf:0.5, ssReq:[0.5,0.8],cost:45},
+  'RB-2': {mass:225,maxPower:2, chart:'K',maxRange:15,dmgMod:{plus3:null,plus2:null,     plus1:null},     wdf:0.8, ssReq:[0.6,0.9],cost:51},
+  'RB-2a':{mass:400,maxPower:3, chart:'K',maxRange:15,dmgMod:{plus3:null,plus2:[5,9],    plus1:[10,14]},  wdf:2.1, ssReq:[0.8,1.2],cost:120},
+  'RB-3': {mass:600,maxPower:6, chart:'A',maxRange:4, dmgMod:{plus3:null,plus2:null,     plus1:[1,4]},    wdf:0.8, ssReq:[0.3,0.5],cost:135},
+  'RB-3a':{mass:750,maxPower:6, chart:'L',maxRange:12,dmgMod:{plus3:null,plus2:[4,8],    plus1:[9,12]},   wdf:3.7, ssReq:[0.7,1.0],cost:165},
+  'RB-4': {mass:650,maxPower:6, chart:'J',maxRange:10,dmgMod:{plus3:null,plus2:[1,2],    plus1:[3,6]},    wdf:3.2, ssReq:[0.6,0.9],cost:142},
+  'RB-5': {mass:750,maxPower:5, chart:'V',maxRange:21,dmgMod:{plus3:null,plus2:[1,10],   plus1:[11,16]},  wdf:4.7, ssReq:[1.5,2.3],cost:168},
+  'RB-6': {mass:650,maxPower:6, chart:'T',maxRange:18,dmgMod:{plus3:null,plus2:[1,18],   plus1:null},     wdf:5.1, ssReq:[1.3,1.9],cost:146},
+  'RB-7': {mass:500,maxPower:4, chart:'J',maxRange:10,dmgMod:{plus3:null,plus2:[1,6],    plus1:[7,10]},   wdf:2.3, ssReq:[0.6,0.9],cost:100},
+  'RB-7a':{mass:675,maxPower:4, chart:'M',maxRange:14,dmgMod:{plus3:null,plus2:[1,8],    plus1:[9,14]},   wdf:3.0, ssReq:[0.9,1.2],cost:150},
+  'RB-8': {mass:600,maxPower:6, chart:'N',maxRange:13,dmgMod:{plus3:null,plus2:[5,9],    plus1:[10,13]},  wdf:4.1, ssReq:[1.0,1.5],cost:140},
+  'RB-9': {mass:700,maxPower:6, chart:'W',maxRange:20,dmgMod:{plus3:null,plus2:[9,16],   plus1:[17,20]},  wdf:6.5, ssReq:[1.5,2.3],cost:162},
+  'RB-10':{mass:750,maxPower:8, chart:'U',maxRange:20,dmgMod:{plus3:null,plus2:[9,16],   plus1:[17,20]},  wdf:6.9, ssReq:[1.6,2.4],cost:183},
+  'RB-11':{mass:850,maxPower:9, chart:'V',maxRange:21,dmgMod:{plus3:null,plus2:[1,10],   plus1:[11,16]},  wdf:7.9, ssReq:[1.8,2.8],cost:210},
+};
+const ROM_MISSILES = {
+  'RP-1':{mass:135,armCost:1,fixedDmg:6, chart:'F',maxRange:8, wdf:1.5,ssReq:0.8,cost:34},
+  'RP-2':{mass:180,armCost:1,fixedDmg:8, chart:'H',maxRange:10,wdf:2.4,ssReq:1.0,cost:45},
+  'RP-3':{mass:225,armCost:1,fixedDmg:10,chart:'Q',maxRange:14,wdf:5.5,ssReq:1.2,cost:55},
+};
+// Plasma weapons — damage degrades by range using lookup tables
+const ROM_PLASMA = {
+  'RPL-1':{mass:120,armCost:10,chart:'E',maxRange:8, plasmaDmgChart:'RL-1',wdf:3.9, ssReq:2.1,cost:270},
+  'RPL-2':{mass:180,armCost:15,chart:'M',maxRange:14,plasmaDmgChart:'RL-2',wdf:11.1,ssReq:3.4,cost:500},
+  'RPL-3':{mass:150,armCost:8, chart:'T',maxRange:18,plasmaDmgChart:'RL-3',wdf:13.7,ssReq:2.5,cost:325},
+};
+const ROM_PLASMA_DMG = {
+  'RL-1':{1:24,2:20,3:20,4:16,5:16,6:12,7:8,8:4},
+  'RL-2':{1:32,2:32,3:32,4:24,5:24,6:24,7:20,8:20,9:16,10:16,11:12,12:12,13:8,14:8},
+  'RL-3':{1:28,2:28,3:28,4:28,5:24,6:24,7:24,8:20,9:20,10:20,11:20,12:16,13:16,14:12,15:12,16:8,17:8,18:8},
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ORION COLONIES (pp.66-69)
+// ══════════════════════════════════════════════════════════════════════════════
+const ORI_COMPUTERS = {
+  'Mark I':  {mass:40,  shipClasses:'I-III',ssReq:0.1,maxWDF:2, avail:'LLL/68',cost:3},
+  'Mark II': {mass:320, shipClasses:'II-VI',ssReq:0.3,maxWDF:8, avail:'LLL/63',cost:9},
+  'Mark III':{mass:860, shipClasses:'II-X', ssReq:0.5,maxWDF:22,avail:'LLL/59',cost:22},
+  'Mark IV': {mass:2750,shipClasses:'III-X',ssReq:1.0,maxWDF:40,avail:'LLL/52',cost:50},
+};
+const ORI_WARP_ENGINES = {
+  'OWA-1':{mass:6000, power:15,computer:'Mark III',ssReq:0.5,cost:65},
+  'OWA-2':{mass:6000, power:17,computer:'Mark III',ssReq:0.5,cost:85},
+  'OWB-1':{mass:1400, power:8, computer:'Mark I',  ssReq:0.2,cost:20},
+  'OWC-1':{mass:3000, power:6, computer:'Mark I',  ssReq:0.4,cost:38},
+  'OWD-1':{mass:10000,power:12,computer:'Mark II', ssReq:1.0,cost:200},
+  'OWE-1':{mass:8000, power:10,computer:'Mark II', ssReq:0.8,cost:175},
+};
+const ORI_SHIELDS = {
+  'OSA-1':{mass:60, ser:1,ssReq:0.2,avail:'LRL/60',cost:1},  'OSB-2':{mass:85, ser:2,ssReq:0.5,avail:'LRL/55',cost:2},
+  'OSC-3':{mass:125,ser:3,ssReq:1.0,avail:'LRL/47',cost:8},  'OSD-1':{mass:100,ser:1,ssReq:0.2,avail:'LRL/59',cost:2},
+  'OSE-2':{mass:140,ser:2,ssReq:0.6,avail:'LRL/54',cost:3},  'OSF-3':{mass:205,ser:3,ssReq:1.8,avail:'LRL/46',cost:10},
+  'OSG-1':{mass:185,ser:1,ssReq:0.4,avail:'LRL/58',cost:3},  'OSH-2':{mass:255,ser:2,ssReq:1.0,avail:'LRL/53',cost:4},
+  'OSI-3':{mass:365,ser:3,ssReq:2.0,avail:'LRL/45',cost:15}, 'OSJ-4':{mass:480,ser:4,ssReq:2.5,avail:'LRL/44',cost:25},
+};
+const ORI_DISRUPTORS = {
+  'OD-1':{mass:60, maxPower:3,chart:'E',maxRange:8, dmgMod:{plus3:null,plus2:null,     plus1:null},   wdf:0.6,ssReq:[0.2,0.3],cost:9},
+  'OD-2':{mass:80, maxPower:3,chart:'J',maxRange:10,dmgMod:{plus3:null,plus2:null,     plus1:[6,10]}, wdf:1.9,ssReq:[0.4,0.6],cost:12},
+  'OD-3':{mass:150,maxPower:4,chart:'R',maxRange:16,dmgMod:{plus3:null,plus2:null,     plus1:[1,16]}, wdf:3.0,ssReq:[0.8,1.5],cost:23},
+  'OD-4':{mass:180,maxPower:6,chart:'T',maxRange:18,dmgMod:{plus3:null,plus2:[1,18],   plus1:null},   wdf:5.2,ssReq:[1.2,2.0],cost:27},
+  'OD-5':{mass:210,maxPower:7,chart:'U',maxRange:20,dmgMod:{plus3:null,plus2:[1,10],   plus1:[11,20]},wdf:5.8,ssReq:[1.8,3.0],cost:32},
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GORN ALLIANCE (pp.70-75)
+// ══════════════════════════════════════════════════════════════════════════════
+const GOR_COMPUTERS = {
+  '1AG':{mass:45,  shipClasses:'I-II',   ssReq:0.2,maxWDF:5, avail:'None',cost:null},
+  '1BG':{mass:515, shipClasses:'II-VI',  ssReq:0.8,maxWDF:10,avail:'None',cost:null},
+  '1CG':{mass:1400,shipClasses:'II-X',   ssReq:1.3,maxWDF:20,avail:'None',cost:null},
+  '1DG':{mass:3350,shipClasses:'IV-XIV', ssReq:2.1,maxWDF:40,avail:'None',cost:null},
+  '1EG':{mass:6800,shipClasses:'IX-XVII',ssReq:2.9,maxWDF:80,avail:'None',cost:null},
+};
+const GOR_WARP_ENGINES = {
+  'GWA-1':{mass:3500, power:8, computer:'1AG',ssReq:0.3,cost:null},
+  'GWB-1':{mass:12000,power:10,computer:'1BG',ssReq:1.0,cost:null},
+  'GWC-1':{mass:16000,power:14,computer:'1BG',ssReq:1.2,cost:null},
+  'GWC-2':{mass:18000,power:16,computer:'1CG',ssReq:1.4,cost:null},
+  'GWD-1':{mass:26000,power:15,computer:'1CG',ssReq:2.2,cost:null},
+  'GWD-2':{mass:40000,power:17,computer:'1CG',ssReq:3.3,cost:null},
+  'GWE-1':{mass:60000,power:22,computer:'1CG',ssReq:5.0,cost:null},
+  'GWF-1':{mass:72000,power:24,computer:'1DG',ssReq:6.0,cost:null},
+  'GWG-1':{mass:34000,power:14,computer:'1CG',ssReq:2.8,cost:null},
+};
+const GOR_SHIELDS = {
+  'GSA':{mass:80, ser:1,ssReq:0.3,avail:'None',cost:null}, 'GSB':{mass:120,ser:1,ssReq:0.5,avail:'None',cost:null},
+  'GSC':{mass:160,ser:1,ssReq:0.7,avail:'None',cost:null}, 'GSD':{mass:200,ser:2,ssReq:1.2,avail:'None',cost:null},
+  'GSF':{mass:280,ser:2,ssReq:1.5,avail:'None',cost:null}, 'GSG':{mass:300,ser:2,ssReq:1.8,avail:'None',cost:null},
+  'GSI':{mass:400,ser:3,ssReq:2.0,avail:'None',cost:null}, 'GSJ':{mass:340,ser:2,ssReq:1.8,avail:'None',cost:null},
+  'GSL':{mass:500,ser:3,ssReq:2.2,avail:'None',cost:null}, 'GSM':{mass:440,ser:2,ssReq:2.0,avail:'None',cost:null},
+  'GSN':{mass:580,ser:3,ssReq:2.4,avail:'None',cost:null},
+};
+const GOR_BLASTERS = {
+  'GBL-1':{mass:280,maxPower:4,chart:'B',maxRange:10,dmgMod:{plus3:null,plus2:null,     plus1:null},    wdf:0.7,ssReq:[0.4,0.7],cost:null},
+  'GBL-2':{mass:300,maxPower:4,chart:'G',maxRange:10,dmgMod:{plus3:null,plus2:null,     plus1:null},    wdf:1.1,ssReq:[0.6,1.1],cost:null},
+  'GBL-3':{mass:340,maxPower:3,chart:'K',maxRange:15,dmgMod:{plus3:null,plus2:[6,10],   plus1:[11,15]}, wdf:2.3,ssReq:[1.0,1.9],cost:null},
+  'GBL-4':{mass:400,maxPower:5,chart:'P',maxRange:18,dmgMod:{plus3:null,plus2:[1,6],    plus1:[7,12]},  wdf:2.8,ssReq:[1.4,2.7],cost:null},
+  'GBL-5':{mass:480,maxPower:4,chart:'O',maxRange:14,dmgMod:{plus3:null,plus2:[7,12],   plus1:[13,18]}, wdf:3.4,ssReq:[1.8,3.5],cost:null},
+  'GBL-6':{mass:600,maxPower:7,chart:'M',maxRange:14,dmgMod:{plus3:null,plus2:[1,5],    plus1:[6,10]},  wdf:4.5,ssReq:[2.2,4.0],cost:null},
+  'GBL-7':{mass:640,maxPower:5,chart:'R',maxRange:16,dmgMod:{plus3:null,plus2:[7,12],   plus1:[13,16]}, wdf:4.4,ssReq:[2.4,4.6],cost:null},
+  'GBL-8':{mass:680,maxPower:6,chart:'W',maxRange:20,dmgMod:{plus3:null,plus2:[1,10],   plus1:[11,15]}, wdf:6.5,ssReq:[2.8,5.3],cost:null},
+};
+const GOR_MISSILES = {
+  'GP-1':{mass:200,armCost:2,fixedDmg:5, chart:'E',maxRange:8, wdf:0.8,ssReq:0.8,cost:null},
+  'GP-2':{mass:400,armCost:2,fixedDmg:10,chart:'K',maxRange:15,wdf:3.0,ssReq:1.2,cost:null},
+  'GP-3':{mass:520,armCost:2,fixedDmg:8, chart:'O',maxRange:14,wdf:4.1,ssReq:1.0,cost:null},
+  'GP-4':{mass:710,armCost:2,fixedDmg:16,chart:'K',maxRange:15,wdf:6.7,ssReq:1.8,cost:null},
+};
+
+// ── MASTER WEAPON LOOKUP — all factions ──────────────────────────────────────
+const ALL_WEAPONS = {
+  ...Object.fromEntries(Object.entries(FED_PHASERS).map(([k,v])=>[k,{...v,faction:'fed',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(FED_LASERS).map(([k,v])=>[k,{...v,faction:'fed',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(FED_MISSILES).map(([k,v])=>[k,{...v,faction:'fed',wtype:'missile',name:k}])),
+  ...Object.fromEntries(Object.entries(FED_ACCELERATORS).map(([k,v])=>[k,{...v,faction:'fed',wtype:'missile',name:k}])),
+  ...Object.fromEntries(Object.entries(KLI_DISRUPTORS).map(([k,v])=>[k,{...v,faction:'kli',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(KLI_MISSILES).map(([k,v])=>[k,{...v,faction:'kli',wtype:'missile',name:k}])),
+  ...Object.fromEntries(Object.entries(ROM_BEAMS).map(([k,v])=>[k,{...v,faction:'rom',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(ROM_MISSILES).map(([k,v])=>[k,{...v,faction:'rom',wtype:'missile',name:k}])),
+  ...Object.fromEntries(Object.entries(ROM_PLASMA).map(([k,v])=>[k,{...v,faction:'rom',wtype:'plasma',name:k}])),
+  ...Object.fromEntries(Object.entries(ORI_DISRUPTORS).map(([k,v])=>[k,{...v,faction:'ori',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(GOR_BLASTERS).map(([k,v])=>[k,{...v,faction:'gor',wtype:'beam',name:k}])),
+  ...Object.fromEntries(Object.entries(GOR_MISSILES).map(([k,v])=>[k,{...v,faction:'gor',wtype:'missile',name:k}])),
+};
+
+// ── FULL FIRING CHARTS — all letters from tables ──────────────────────────────
+// Extending the existing partial FIRING_CHARTS with all chart letters found in weapon tables
+// Format: range(hex) -> [minRoll, maxRoll] on d10
+// Charts read from FASA Starship Tactical Combat Simulator rulebook
+const FIRING_CHARTS_EXTENDED = {
+  A:{ 1:[1,9],2:[1,8],3:[1,6],4:[1,4],5:[0,0],6:[0,0],7:[0,0],8:[0,0],9:[0,0],10:[0,0],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  B:{ 1:[1,9],2:[1,8],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,4],8:[1,4],9:[1,3],10:[1,2],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  C:{ 1:[1,7],2:[1,6],3:[1,5],4:[1,4],5:[1,3],6:[1,2],7:[0,0],8:[0,0],9:[0,0],10:[0,0],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  D:{ 1:[1,7],2:[1,6],3:[1,5],4:[1,5],5:[1,4],6:[1,3],7:[0,0],8:[0,0],9:[0,0],10:[0,0],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  F:{ 1:[1,8],2:[1,7],3:[1,6],4:[1,5],5:[1,5],6:[1,4],7:[1,3],8:[1,2],9:[0,0],10:[0,0],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  G:{ 1:[1,8],2:[1,7],3:[1,6],4:[1,6],5:[1,5],6:[1,4],7:[1,4],8:[1,3],9:[1,2],10:[1,1],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  H:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,5],6:[1,5],7:[1,4],8:[1,3],9:[1,3],10:[1,2],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  I:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,4],8:[1,4],9:[1,3],10:[1,3],11:[1,2],12:[1,1],13:[0,0],14:[0,0],15:[0,0]},
+  J:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,3],10:[1,3],11:[0,0],12:[0,0],13:[0,0],14:[0,0],15:[0,0]},
+  K:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,3],13:[1,2],14:[1,1],15:[1,1]},
+  M:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,2],13:[1,1],14:[1,1],15:[0,0]},
+  L:{ 1:[1,7],2:[1,6],3:[1,6],4:[1,5],5:[1,5],6:[1,4],7:[1,4],8:[1,3],9:[1,3],10:[1,2],11:[1,2],12:[1,1],13:[0,0],14:[0,0],15:[0,0]},
+  N:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,3],10:[1,3],11:[1,2],12:[1,1],13:[1,1],14:[0,0],15:[0,0]},
+  O:{ 1:[1,6],2:[1,6],3:[1,5],4:[1,5],5:[1,5],6:[1,4],7:[1,4],8:[1,3],9:[1,3],10:[1,3],11:[1,2],12:[1,2],13:[1,1],14:[1,1],15:[0,0]},
+  P:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,4],10:[1,3],11:[1,3],12:[1,2],13:[1,1],14:[1,1],15:[1,1],16:[1,1],17:[1,1],18:[1,1]},
+  Q:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,4],10:[1,3],11:[1,3],12:[1,2],13:[1,1],14:[1,1],15:[0,0]},
+  R:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,4],10:[1,3],11:[1,3],12:[1,2],13:[1,2],14:[1,1],15:[1,1],16:[1,1]},
+  S:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,5],6:[1,5],7:[1,4],8:[1,4],9:[1,3],10:[1,3],11:[1,2],12:[1,2],13:[1,1],14:[1,1],15:[0,0]},
+  T:{ 1:[1,8],2:[1,7],3:[1,7],4:[1,6],5:[1,6],6:[1,5],7:[1,5],8:[1,4],9:[1,4],10:[1,3],11:[1,3],12:[1,2],13:[1,2],14:[1,1],15:[1,1],16:[1,1],17:[1,1],18:[1,1]},
+  U:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,3],13:[1,2],14:[1,2],15:[1,1],16:[1,1],17:[1,1],18:[1,1],19:[1,1],20:[1,1]},
+  V:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,3],13:[1,2],14:[1,2],15:[1,1],16:[1,1],17:[1,1],18:[1,1],19:[1,1],20:[1,1],21:[1,1]},
+  W:{ 1:[1,8],2:[1,7],3:[1,6],4:[1,6],5:[1,5],6:[1,5],7:[1,4],8:[1,4],9:[1,4],10:[1,3],11:[1,3],12:[1,2],13:[1,2],14:[1,1],15:[0,0]},
+  X:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,3],13:[1,2],14:[1,2],15:[1,1],16:[1,1],17:[1,1],18:[1,1],19:[1,1],20:[1,1],21:[1,1],22:[1,1]},
+  Y:{ 1:[1,8],2:[1,8],3:[1,7],4:[1,7],5:[1,6],6:[1,6],7:[1,5],8:[1,5],9:[1,4],10:[1,4],11:[1,3],12:[1,3],13:[1,2],14:[1,2],15:[1,1],16:[1,1],17:[1,1],18:[1,1],19:[1,1],20:[1,1],21:[1,1],22:[1,1],23:[1,1],24:[1,1]},
+};
+// ── CONSTRUCTION HELPER — look up damage mod bonus for a weapon at range ──────
+function getWeaponDmgBonus(weaponData, range){
+  if(!weaponData||!weaponData.dmgMod) return 0;
+  const m=weaponData.dmgMod;
+  if(m.plus3&&range>=m.plus3[0]&&range<=m.plus3[1]) return 3;
+  if(m.plus2&&range>=m.plus2[0]&&range<=m.plus2[1]) return 2;
+  if(m.plus1&&range>=m.plus1[0]&&range<=m.plus1[1]) return 1;
+  return 0;
+}
+
+// ── CONSTRUCTION HELPER — build a weapon definition for SHIP_REGISTRY ─────────
+// type: 'FH','KD','FP','KP','FL','FAC'  id: e.g. 'FH-3'
+// arcs: array of arc indices [0=F,1=F-Stbd,2=A-Stbd,3=Aft,4=A-Port,5=F-Port]
+function buildWeapon(id, arcs, customName){
+  const prefix=id.slice(0,2);
+  let src=null, wtype='beam';
+  if(prefix==='FH') src=FED_PHASERS[id];
+  else if(prefix==='FL') src=FED_LASERS[id];
+  else if(prefix==='FP'){src=FED_MISSILES[id];wtype='missile';}
+  else if(prefix==='FA'){src=FED_ACCELERATORS[id];wtype='missile';}
+  else if(prefix==='KD') src=KLI_DISRUPTORS[id];
+  else if(prefix==='KP'){src=KLI_MISSILES[id];wtype='missile';}
+  if(!src){console.warn('Unknown weapon:',id);return null;}
+  const w={id:id.toLowerCase().replace('-',''),name:customName||id,type:wtype,arcs,chart:src.chart,maxRange:src.maxRange};
+  if(wtype==='beam'){w.maxPower=src.maxPower;w.dmgMod=src.dmgMod;}
+  else{w.armCost=src.armCost;w.fixedDmg=src.fixedDmg;}
+  return w;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// END FASA CONSTRUCTION DATA
+// ═══════════════════════════════════════════════════════════════════════════
+
+// FASA Firing Charts — full set defined above in FIRING_CHARTS_EXTENDED, merged into FIRING_CHARTS
+// Keeping W, S, O here as primary game charts (already in FIRING_CHARTS_EXTENDED above)
+const FIRING_CHARTS = Object.assign({}, FIRING_CHARTS_EXTENDED);
+
+// FASA Movement Per Phase Table
+function movePtsPerPhase(total) {
+  if(total<=0) return [0,0,0];
+  const p1 = Math.ceil(total/3);
+  const p2 = Math.ceil((total-p1)/2);
+  const p3 = total-p1-p2;
+  return [p1,p2,p3];
+}
+
+// Damage location table (d10)
+const DMG_LOCATION = {1:'shieldGen',2:'beam',3:'missile',4:'engine',5:'engine',6:'engine',7:'superstructure',8:'superstructure',9:'superstructure',10:'sensors'};
+
+// Shield face names and arc relationships
+// Face 0=Fwd,1=F-Stbd,2=A-Stbd,3=Aft,4=A-Port,5=F-Port
+const SHIELD_NAMES = ['Fwd','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+
+// Facing 0=North(up), increasing clockwise. Arc 0=fwd=facing dir
+// Weapon arc indices relative to ship facing
+const ARC_NAMES = ['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════════════════════════════
+const COLS=24, ROWS=18, HR=30;
+let GS = null; // Game State — null until launched
+let aiDifficulty = 2;
+const DIFF_NAMES = ['','Cadet','Ensign','Lt. Cmdr','Captain','Admiral'];
+
+function mkShip(key, col, row, facing) {
+  const tmpl = SHIP_REGISTRY[key];
+  return {
+    key, col, row, facing,
+    name:tmpl.name, reg:tmpl.reg, cls:tmpl.cls, faction:tmpl.faction,
+    totalPower: tmpl.totalPower,
+    currentPower: tmpl.totalPower, // reduced by engine damage
+    moveRatio: tmpl.moveRatio,
+    shieldRatio: tmpl.shieldRatio,
+    maxShieldPerFace: tmpl.maxShieldPerFace,
+    superstructure: tmpl.superstructureMax,
+    superstructureMax: tmpl.superstructureMax,
+    enginePower: {...tmpl.enginePower},
+    shields: [0,0,0,0,0,0],          // current pts each face
+    shieldGenAlive: [true,true,true,true,true,true],
+    sensors: 100,
+    weapons: tmpl.weapons.map(w=>({...w,
+      armed:false, poweredWith:0, fired:false, alive:true
+    })),
+    // Allocation this turn
+    alloc: { move:0, shields:0, shieldDist:[0,0,0,0,0,0], weapons:{} },
+    movePts:[0,0,0],      // per sub-phase
+    movePtsUsed:[0,0,0],
+    // AI internals
+    ai: false,
+    aiFireCounter: false, // secret: will they fire this phase?
+  };
+}
+
+function launchGame() {
+  const pk = document.getElementById('player-ship').value;
+  const ek = document.getElementById('enemy-ship').value;
+  aiDifficulty = parseInt(document.getElementById('diff-slider').value);
+  document.getElementById('hdr-diff').textContent = DIFF_NAMES[aiDifficulty];
+
+  // Place ships: left side faces right (facing 1=E), right side faces left (facing 4=W)
+  const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
+  const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
+  es.ai = true;
+  // If player chose Klingon, flip sides so visual layout is correct
+  if(playerFaction==='kli'){
+    ps.col=19; ps.row=9; ps.facing=4;
+    es.col=4;  es.row=9; es.facing=1;
+  }
+
+  GS = {
+    turn: 1,
+    phase: 'power', // power|tacadv|move1|fire1|move2|fire2|move3|fire3|repower
+    subPhaseIdx: 0, // 0,1,2 for move/fire cycles
+    player: ps,
+    enemy: es,
+    tacAdvWinner: null, // 'player'|'enemy'
+    playerFireDeclared: null, // null|true|false
+    enemyFireDeclared: null,
+    combatLog: [],
+    dmgLog: [],
+    turn_stats: { playerShotsFired:0, playerShotsHit:0, enemyShotsFired:0, enemyShotsHit:0 },
+  };
+
+  document.getElementById('scenario-screen').style.display='none';
+  document.getElementById('hdr-alert').classList.remove('off');
+  initUI();
+  initTac();
+  initDmg();
+  // Focus tactical canvas so arrow keys work immediately
+  setTimeout(()=>document.getElementById('tac-wrap')?.focus(),100);
+  // Start tactical ambient soundscape
+  setTimeout(()=>setAmbTab('tac'),400);
+  enterPhase('power');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+const PHASES = ['power','tacadv','move1','fire1','move2','fire2','move3','fire3','repower'];
+const PHASE_NAMES = {power:'Power Allocation',tacadv:'Tactical Advantage',move1:'Movement — Phase 1',fire1:'Firing — Phase 1',move2:'Movement — Phase 2',fire2:'Firing — Phase 2',move3:'Movement — Phase 3',fire3:'Firing — Phase 3',repower:'Repowering Shields'};
+const MOVE_PHASES = ['move1','move2','move3'];
+const FIRE_PHASES = ['fire1','fire2','fire3'];
+
+function enterPhase(phase) {
+  GS.phase = phase;
+  updatePhaseUI();
+  logPhase('— '+PHASE_NAMES[phase]+' —');
+  snd('phase');
+
+  if(phase==='power') {
+    unlockPowerUI();
+    showHint('Go to ◈ Power Allocation tab, set your power, then click Commit');
+    showButtons(['endphase'],false);
+  }
+  else if(phase==='tacadv') {
+    resolveTacAdv();
+  }
+  else if(MOVE_PHASES.includes(phase)) {
+    const idx = MOVE_PHASES.indexOf(phase);
+    GS.subPhaseIdx = idx;
+    // Loser moves first (FASA rule) — so player moves if they lost or it's the player's input needed
+    showHint('Click hex to move · Arrow/A-D/Q-E keys to rotate · Undo to take back');
+    showButtons(['endphase','hold','undo'],false);
+    highlightMoveHexes(true); // true = clear undo history for new sub-phase
+    // AI moves immediately if AI has advantage (loser moves first)
+    if(GS.tacAdvWinner==='player') {
+      // AI lost tac adv -> AI moves first -> but AI is automatic
+      aiDoMove(idx);
+    }
+  }
+  else if(FIRE_PHASES.includes(phase)) {
+    const idx = FIRE_PHASES.indexOf(phase);
+    GS.subPhaseIdx = idx;
+    // Reset fire declarations
+    GS.playerFireDeclared = null;
+    GS.enemyFireDeclared = null;
+    // AI decides secretly
+    aiDecideFire();
+    showHint('Select weapons to fire · or No Fire to skip this phase');
+    showButtons(['endphase','nofire'],true);
+    const panel=document.getElementById('wpn-fire-panel');
+    if(panel) panel.style.display='flex';
+    buildWpnFireBtns();
+    refreshWpnFireBtns(); // show block reasons immediately
+    GS.playerFireDeclared=null;
+    highlightFiringArcs();
+  }
+  else if(phase==='repower') {
+    repowerShields();
+    setTimeout(()=>{ endTurn(); },1200);
+  }
+}
+
+function endPhase() {
+  const p = GS.phase;
+  if(p==='power') { /* commit handled by commitPwr */ return; }
+
+  if(MOVE_PHASES.includes(p)) {
+    // If player has tac adv, AI (loser) moved first at phase start.
+    // If enemy has tac adv, player (loser) moves via UI, then End Phase -> AI moves.
+    if(GS.tacAdvWinner==='enemy') {
+      aiDoMove(GS.subPhaseIdx);
+    }
+    setTimeout(()=>advanceFromMove(), 400);
+  }
+  else if(FIRE_PHASES.includes(p)) {
+    // Player clicked End Phase during fire phase — treat as no fire for unfired weapons
+    // AI fires are revealed, then advance
+    const efired=GS.enemyFireDeclared;
+    const seq=['move1','fire1','move2','fire2','move3','fire3','repower'];
+    const ci=seq.indexOf(GS.phase);
+    log(`--- End fire phase: Enemy=${efired?'FIRE':'no fire'} ---`,'phase');
+    if(efired) resolveShipFiring(GS.enemy,GS.player,GS.subPhaseIdx);
+    checkVictory();
+    if(!GS.over){
+      if(ci>=0&&ci<seq.length-1) enterPhase(seq[ci+1]);
+      else enterPhase('repower');
+    }
+  }
+}
+
+function advanceFromMove() {
+  // FASA sequence: move1->fire1->move2->fire2->move3->fire3->repower
+  const seq = ['move1','fire1','move2','fire2','move3','fire3','repower'];
+  const ci = seq.indexOf(GS.phase);
+  if(ci>=0 && ci<seq.length-1) enterPhase(seq[ci+1]);
+  else enterPhase('repower');
+}
+
+function holdStation() {
+  if(!GS||!MOVE_PHASES.includes(GS.phase)) return;
+  const s = GS.player;
+  const idx = GS.subPhaseIdx;
+  const pts = s.movePts[idx] - s.movePtsUsed[idx];
+  if(pts>0) {
+    s.movePtsUsed[idx] += 1;
+    log(`${s.name}: Hold Station (1 move point used)`,'info');
+    snd('move');
+    highlightMoveHexes();
+    updateSidebar();
+  } else {
+    log('No move points left this sub-phase','warn');
+  }
+}
+
+function declareFire(willFire) {
+  GS.playerFireDeclared = willFire;
+  log(`You: ${willFire?'FIRE COUNTER placed':'NO FIRE counter placed'}`,'info');
+  // Reveal both
+  revealFireDeclarations();
+}
+
+function revealFireDeclarations() {
+  // Called when AI fires — player fires are now handled individually via fireWeapon().
+  const efired = GS.enemyFireDeclared;
+  const pfired = GS.playerFireDeclared;
+  if(efired) resolveShipFiring(GS.enemy, GS.player, GS.subPhaseIdx);
+  if(pfired===false) log('Player: No fire this phase','info'); // already logged
+  checkVictory();
+  if(!GS.over) {
+    const seq=['move1','fire1','move2','fire2','move3','fire3','repower'];
+    const ci=seq.indexOf(GS.phase);
+    if(ci>=0&&ci<seq.length-1) enterPhase(seq[ci+1]);
+    else enterPhase('repower');
+  }
+}
+
+function repowerShields() {
+  [GS.player, GS.enemy].forEach(s=>{
+    s.shieldGenAlive.forEach((alive,i)=>{
+      if(alive) {
+        s.shields[i] = s.alloc.shieldDist[i];
+      }
+    });
+    log(`${s.name}: Shields repowered`,'ok');
+  });
+  updateSidebar();
+  renderDmgView();
+}
+
+function endTurn() {
+  GS.turn++;
+  [GS.player,GS.enemy].forEach(s=>{
+    s.weapons.forEach(w=>{w.fired=false;w.armed=false;w.poweredWith=0;});
+    s.movePtsUsed=[0,0,0];
+    s.alloc={move:0,shields:0,shieldDist:[0,0,0,0,0,0],weapons:{}};
+  });
+  document.getElementById('hdr-turn').textContent='TURN '+GS.turn;
+  document.getElementById('sb-turn').textContent='TURN '+GS.turn;
+  // Reset ALL power UI to zero
+  const mvEl=document.getElementById('sl-mv');
+  const shEl=document.getElementById('sl-sh');
+  if(mvEl) mvEl.value=0;
+  if(shEl) shEl.value=0;
+  document.querySelectorAll('.wpn-arm').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.wpn-in').forEach(i=>{i.disabled=true;i.value=0;});
+  // Reset shield face display to zero
+  ['fw','fp','fs','ap','as','aft'].forEach(id=>{
+    const el=document.getElementById('sf-'+id);
+    if(el) el.textContent='0';
+  });
+  // Reset budget bar
+  ['bs-mv','bs-sh','bs-wp','bs-rm'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.width='0%';
+  });
+  const remEl=document.getElementById('p-rem');
+  if(remEl){
+    remEl.textContent=GS.player.currentPower;
+    remEl.style.color='#44cc88';
+    remEl.classList.remove('zero','over');
+  }
+  const track=document.getElementById('bs-mv')?.parentElement;
+  if(track) track.classList.remove('full');
+  setHumLevel(0);
+  unlockPowerUI();
+  reachable=[];
+  // Reset shield manual state
+  shieldManualPts=[0,0,0,0,0,0];
+  const sfrows=document.getElementById('shld-face-rows');
+  if(sfrows) sfrows.innerHTML='';
+  // Reset fire panel
+  const fp=document.getElementById('wpn-fire-panel');
+  if(fp){fp.style.display='none';fp.innerHTML='';}
+  updateSidebar();
+  enterPhase('power');
+}
+
+function endTurnSeq() {
+  // After repower, check if we should advance
+  const seq=['move1','fire1','move2','fire2','move3','fire3','repower'];
+  const ci=seq.indexOf(GS.phase);
+  if(ci<seq.length-1) enterPhase(seq[ci+1]);
+  else endTurn();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POWER ALLOCATION
+// ═══════════════════════════════════════════════════════════════════════════
+function getWpnPowerUsed(){
+  // Count all weapon power committed — missiles use fixed armCost when armed
+  if(!GS) return 0;
+  let wp=0;
+  GS.player.weapons.forEach(w=>{
+    const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
+    const isArmed=armBtn&&armBtn.classList.contains('on');
+    if(w.type==='missile'){
+      if(isArmed) wp+=w.armCost||6;
+    } else {
+      const el=document.getElementById('wi-'+w.id);
+      if(el&&!el.disabled) wp+=parseInt(el.value)||0;
+    }
+  });
+  return wp;
+}
+
+function clampWeaponInput(wid){
+  // Called before updPwr on weapon number input change.
+  // Clamps this weapon's input to the remaining budget after mv+sh+other weapons.
+  if(!GS) return;
+  const s=GS.player;
+  const tot=s.currentPower;
+  const mv=parseInt(document.getElementById('sl-mv').value)||0;
+  const sh=parseInt(document.getElementById('sl-sh').value)||0;
+  // Sum all OTHER armed beam weapons (not this one) + missiles
+  let otherWp=0;
+  s.weapons.forEach(w=>{
+    if(w.id===wid) return; // skip self
+    const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
+    const isArmed=armBtn&&armBtn.classList.contains('on');
+    if(!isArmed) return;
+    if(w.type==='missile') otherWp+=w.armCost||6;
+    else{const el=document.getElementById('wi-'+w.id);if(el&&!el.disabled) otherWp+=parseInt(el.value)||0;}
+  });
+  const available=Math.max(0, tot-mv-sh-otherWp);
+  const el=document.getElementById('wi-'+wid);
+  if(el&&!el.disabled){
+    const v=parseInt(el.value)||0;
+    const maxAllowed=Math.min(parseInt(el.max)||v, available);
+    if(v>maxAllowed) el.value=maxAllowed;
+    // Update the visual max so the up-arrow won't go past budget
+    el.max=maxAllowed;
+  }
+}
+
+function clampSlider(changedId){
+  if(!GS) return;
+  const s=GS.player;
+  const tot=s.currentPower;
+  const mvEl=document.getElementById('sl-mv');
+  const shEl=document.getElementById('sl-sh');
+  const wp=getWpnPowerUsed();
+  const mv=parseInt(mvEl.value)||0;
+  const sh=parseInt(shEl.value)||0;
+  const used=mv+sh+wp;
+  if(used>tot){
+    const over=used-tot;
+    if(changedId==='sl-mv') mvEl.value=Math.max(0,mv-over);
+    else if(changedId==='sl-sh') shEl.value=Math.max(0,sh-over);
+  }
+  // After clamping sliders, also update weapon input max values
+  if(GS) GS.player.weapons.forEach(w=>{
+    if(w.type==='missile') return;
+    const el=document.getElementById('wi-'+w.id);
+    if(!el||el.disabled) return;
+    const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
+    if(!armBtn||!armBtn.classList.contains('on')) return;
+    // Re-clamp this weapon with updated slider values
+    clampWeaponInput(w.id);
+  });
+}
+
+// Shield allocation mode: 'auto' = even distribute, 'manual' = per-face
+let shieldMode='auto';
+// Manual per-face allocations (in points, not power)
+let shieldManualPts=[0,0,0,0,0,0]; // [Fwd, F-Stbd, A-Stbd, Aft, A-Port, F-Port]
+const SHIELD_FACE_IDS=['Fwd','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+
+function toggleShieldMode(){
+  shieldMode=shieldMode==='auto'?'manual':'auto';
+  const btn=document.getElementById('shld-mode-btn');
+  const autoP=document.getElementById('shld-auto-panel');
+  const manP=document.getElementById('shld-manual-panel');
+  if(shieldMode==='manual'){
+    btn.textContent='AUTO';btn.style.color='#cc8800';btn.style.borderColor='#aa6600';
+    if(autoP) autoP.style.display='none';
+    if(manP) manP.style.display='block';
+    buildShieldFaceSliders();
+  } else {
+    btn.textContent='MANUAL';btn.style.color='#3366cc';btn.style.borderColor='#1a3366';
+    if(autoP) autoP.style.display='block';
+    if(manP) manP.style.display='none';
+    shieldManualPts=[0,0,0,0,0,0];
+  }
+  updPwr();
+}
+
+function buildShieldFaceSliders(){
+  if(!GS) return;
+  const s=GS.player;
+  const container=document.getElementById('shld-face-rows');
+  if(!container) return;
+  container.innerHTML='';
+  SHIELD_FACE_IDS.forEach((name,i)=>{
+    const alive=s.shieldGenAlive[i];
+    const max=alive?s.maxShieldPerFace:0;
+    const row=document.createElement('div');
+    row.className='sf-face-row';
+    row.innerHTML=`
+      <div class="sf-face-lbl">
+        <span>${name}</span>
+        <span id="sfm-v-${i}" style="color:#3366cc">${shieldManualPts[i]}pts</span>
+      </div>
+      <input type="range" class="sf-face-sl" id="sfm-sl-${i}"
+        min="0" max="${max}" value="${shieldManualPts[i]}"
+        ${alive?'':'disabled'}
+        oninput="updShieldFace(${i})">
+      ${alive?'':'<div style=\"font-size:7px;color:#441100;letter-spacing:1px;margin-top:2px\">GEN OFFLINE</div>'}
+    `;
+    container.appendChild(row);
+  });
+}
+
+function updShieldFace(faceIdx){
+  if(!GS||shieldMode!=='manual') return;
+  const s=GS.player;
+  const val=parseInt(document.getElementById(`sfm-sl-${faceIdx}`)?.value)||0;
+  shieldManualPts[faceIdx]=Math.min(val,s.maxShieldPerFace);
+  // Calculate total power needed for all faces
+  const totalPts=shieldManualPts.reduce((a,b)=>a+b,0);
+  const pwrNeeded=Math.ceil(totalPts*s.shieldRatio);
+  // Update the main shield power slider
+  const shEl=document.getElementById('sl-sh');
+  if(shEl){shEl.value=Math.min(pwrNeeded,s.currentPower);clampSlider('sl-sh');}
+  // Update display
+  const remEl=document.getElementById('shld-manual-rem');
+  const totalPwr=parseInt(document.getElementById('sl-sh')?.value)||0;
+  const availPts=Math.floor(totalPwr/s.shieldRatio);
+  const usedPts=shieldManualPts.reduce((a,b)=>a+b,0);
+  if(remEl) remEl.textContent=Math.max(0,availPts-usedPts);
+  document.getElementById(`sfm-v-${faceIdx}`).textContent=shieldManualPts[faceIdx]+'pts';
+  updPwr();
+}
+
+function updPwr() {
+  if(!GS) return;
+  const s = GS.player;
+  const mv = parseInt(document.getElementById('sl-mv').value)||0;
+  const sh = parseInt(document.getElementById('sl-sh').value)||0;
+  const wp = getWpnPowerUsed();
+  const used=mv+sh+wp, rem=Math.max(0,s.currentPower-used);
+  document.getElementById('v-mv').textContent=mv;
+  document.getElementById('v-sh').textContent=sh;
+  document.getElementById('p-rem').textContent=rem;
+  document.getElementById('p-rem').style.color=rem>0?'#44cc88':rem===0?'#ff9900':'#cc2200';
+  const tot=s.currentPower;
+  const pct=v=>Math.max(0,Math.min(100,Math.round(v/tot*100)))+'%';
+  document.getElementById('bs-mv').style.width=pct(mv);
+  document.getElementById('bs-sh').style.width=pct(sh);
+  document.getElementById('bs-wp').style.width=pct(wp);
+  document.getElementById('bs-rm').style.width=pct(rem);
+  const mp=Math.floor(mv/s.moveRatio);
+  document.getElementById('mv-pts').textContent=mp+' move pt'+(mp!==1?'s':'');
+  const [p1,p2,p3]=movePtsPerPhase(mp);
+  document.getElementById('mv-spl').textContent=`${p1}/${p2}/${p3}`;
+  document.getElementById('tac-p-mv').textContent=mp;
+  // Shield display
+  const spts=Math.floor(sh/s.shieldRatio);
+  document.getElementById('shld-pts-lbl').textContent=spts+' total pts';
+  if(shieldMode==='auto'){
+    const perFace=Math.min(s.maxShieldPerFace, Math.floor(spts/6)||0);
+    const bonus=spts-(perFace*6);
+    ['fw','fp','fs','ap','as','aft'].forEach((id,i)=>{
+      const v=Math.min(s.maxShieldPerFace, perFace+(i<bonus?1:0));
+      const el=document.getElementById('sf-'+id);
+      if(el) el.textContent=v;
+    });
+  } else {
+    // Manual mode — update remaining display
+    const usedPts=shieldManualPts.reduce((a,b)=>a+b,0);
+    const remEl=document.getElementById('shld-manual-rem');
+    if(remEl) remEl.textContent=Math.max(0,spts-usedPts);
+    // Clamp any face that exceeds available points
+    shieldManualPts.forEach((p,i)=>{
+      const sl=document.getElementById(`sfm-sl-${i}`);
+      const vEl=document.getElementById(`sfm-v-${i}`);
+      if(sl) sl.max=s.maxShieldPerFace;
+      if(vEl) vEl.textContent=p+'pts';
+    });
+  }
+  // Update move range on map
+  playerMovePts = mp;
+  renderTac();
+  // Budget feedback
+  const track = document.getElementById('bs-mv')?.parentElement;
+  const remEl = document.getElementById('p-rem');
+  if(track) track.classList.toggle('full', rem===0);
+  if(remEl){
+    remEl.classList.toggle('zero', rem===0);
+    remEl.classList.toggle('over', rem<0);
+  }
+  // Power hum scales with fraction allocated
+  const frac=GS?Math.max(0,Math.min(1,(mv+sh+wp)/GS.player.currentPower)):0;
+  setHumLevel(frac);
+}
+
+function togArm(btn, wid) {
+  if(!GS) return;
+  const w = GS.player.weapons.find(x=>x.id===wid);
+  if(!w||!w.alive) return;
+  const on = !btn.classList.contains('on');
+  btn.classList.toggle('on',on);
+  const inp = document.getElementById('wi-'+wid);
+  if(inp) {
+    if(w.type==='missile') {
+      // Missiles cost fixed armCost; input stays disabled but we track armed state
+      inp.disabled=true;
+      inp.value=on?w.armCost||6:0;
+    } else {
+      inp.disabled=!on;
+      if(!on) inp.value=0;
+    }
+  }
+  updPwr();
+}
+
+function commitPwr() {
+  if(!GS||GS.phase!=='power') return;
+  const s = GS.player;
+  const mv=parseInt(document.getElementById('sl-mv').value)||0;
+  const sh=parseInt(document.getElementById('sl-sh').value)||0;
+  let wp=0, wpnAlloc={};
+  s.weapons.forEach(w=>{
+    const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
+    const inp=document.getElementById('wi-'+w.id);
+    w.armed=armBtn&&armBtn.classList.contains('on');
+    let pwr=0;
+    if(w.armed){
+      if(w.type==='missile') pwr=w.armCost||6;
+      else pwr=inp?parseInt(inp.value)||0:0;
+    }
+    w.poweredWith=pwr;
+    if(w.armed) wp+=pwr;
+    wpnAlloc[w.id]=pwr;
+    w.fired=false;
+  });
+  const tot=s.currentPower;
+  if(mv+sh+wp>tot){
+    log('⚠ Over budget! Reduce allocation.','warn'); return;
+  }
+  const mp=Math.floor(mv/s.moveRatio);
+  const [p1,p2,p3]=movePtsPerPhase(mp);
+  s.movePts=[p1,p2,p3]; s.movePtsUsed=[0,0,0];
+  const spts=Math.floor(sh/s.shieldRatio);
+  let dist;
+  if(shieldMode==='manual'){
+    // Use per-face manual allocation, clamped to generator status and max
+    dist=shieldManualPts.map((p,i)=>s.shieldGenAlive[i]?Math.min(p,s.maxShieldPerFace):0);
+    // Verify total pts don't exceed what power provides
+    const distTotal=dist.reduce((a,b)=>a+b,0);
+    if(distTotal>spts){
+      log('⚠ Manual shield allocation exceeds available shield points — auto-reducing','warn');
+      const scale=spts/distTotal;
+      dist=dist.map(p=>Math.floor(p*scale));
+    }
+  } else {
+    const perFace=Math.min(s.maxShieldPerFace,Math.floor(spts/6)||0);
+    const bonus=spts-(perFace*6);
+    dist=[0,1,2,3,4,5].map(i=>Math.min(s.maxShieldPerFace,perFace+(i<bonus?1:0)));
+  }
+  s.alloc={move:mv,shields:sh,shieldDist:dist,weapons:wpnAlloc};
+  lockPowerUI();
+  setHumLevel(0); // silence hum after commit
+  addPlog(`[T${GS.turn}] Move:${mv} Shld:${sh} Wpn:${wp} — committed`,'ok');
+  log(`You committed power: Move ${mv}→${mp}pts, Shields ${sh}→${spts}pts, Weapons ${wp}`,'info');
+  // AI allocates
+  aiAllocatePower();
+  // Then tacadv
+  enterPhase('tacadv');
+}
+
+function lockPowerUI(){
+  document.getElementById('pwr-mv-row').classList.add('locked');
+  document.getElementById('pwr-sh-row').classList.add('locked');
+  document.querySelectorAll('.wpn-row').forEach(r=>r.classList.add('locked'));
+  document.getElementById('commit-btn').disabled=true;
+}
+function unlockPowerUI(){
+  document.getElementById('pwr-mv-row').classList.remove('locked');
+  document.getElementById('pwr-sh-row').classList.remove('locked');
+  document.querySelectorAll('.wpn-row').forEach(r=>r.classList.remove('locked'));
+  document.getElementById('commit-btn').disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TACTICAL ADVANTAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function resolveTacAdv() {
+  const pm=GS.player.movePts.reduce((a,b)=>a+b,0);
+  const em=GS.enemy.movePts.reduce((a,b)=>a+b,0);
+  let winner;
+  if(pm!==em){ winner=pm>em?'player':'enemy'; }
+  else {
+    const pr=d10(),er=d10();
+    log(`Tac Adv tie — dice: You rolled <span class="die">${pr}</span>, Enemy rolled <span class="die">${er}</span>`,'roll');
+    winner=pr>=er?'player':'enemy';
+  }
+  GS.tacAdvWinner=winner;
+  const winnerName=winner==='player'?GS.player.name:'AI '+GS.enemy.name;
+  log(`Tactical Advantage: ${winnerName} wins (${pm} vs ${em} move pts)`,'phase');
+  log(winner==='player'?'You move last — enemy exposes their position first':'Enemy moves last — you must move first (exposing your position)','info');
+  document.getElementById('sb-tac-adv').textContent='Tac Adv: '+(winner==='player'?'YOURS':'ENEMY\'S');
+  snd('tactical');
+  setTimeout(()=>enterPhase('move1'),800);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOVEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+function hexCen(c,r){return{x:HR*Math.sqrt(3)*(c+(r%2)*.5),y:HR*1.5*r};}
+function hexAt(wx,wy){const r=Math.round(wy/(HR*1.5));const c=Math.round((wx-(r%2)*HR*Math.sqrt(3)*.5)/(HR*Math.sqrt(3)));return{col:c,row:r};}
+function hexDist(c1,r1,c2,r2){
+  // Offset to cube coords
+  function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;const y=-x-z;return{x,y,z};}
+  const a=toCube(c1,r1),b=toCube(c2,r2);
+  return Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y),Math.abs(a.z-b.z));
+}
+
+// Facing: 0=NE, 1=E, 2=SE, 3=SW, 4=W, 5=NW
+// Neighbour offsets [even row, odd row] for each facing
+const HEX_DIRS_EVEN = [[1,-1],[1,0],[1,1],[0,1],[-1,0],[0,-1]];
+const HEX_DIRS_ODD  = [[1,-1],[1,0],[0,1],[-1,1],[-1,0],[-1,-1]];
+function neighbour(col,row,dir){
+  const d=(row%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD)[((dir%6)+6)%6];
+  return{col:col+d[0],row:row+d[1]};
+}
+function inBounds(c,r){return c>=0&&c<COLS&&r>=0&&r<ROWS;}
+
+// Returns all hexes reachable within pts movement points
+function reachableHexes(col,row,facing,pts){
+  if(pts<=0) return [];
+  const visited=new Set();
+  const result=[];
+  const queue=[{col,row,facing,rem:pts}];
+  visited.add(`${col},${row},${facing}`);
+  while(queue.length){
+    const {col:c,row:r,facing:f,rem}=queue.shift();
+    if(rem<=0) continue;
+    // forward
+    const fwd=neighbour(c,r,f);
+    if(inBounds(fwd.col,fwd.row)){
+      const k=`${fwd.col},${fwd.row},${f}`;
+      if(!visited.has(k)){visited.add(k);result.push({col:fwd.col,row:fwd.row});queue.push({col:fwd.col,row:fwd.row,facing:f,rem:rem-1});}
+    }
+    // sideslip port (move forward-port, keep facing)
+    const sl_p=neighbour(c,r,(f+5)%6);
+    if(inBounds(sl_p.col,sl_p.row)){
+      const nf=neighbour(sl_p.col,sl_p.row,f);
+      if(inBounds(nf.col,nf.row)){
+        const k=`${nf.col},${nf.row},${f}`;
+        if(!visited.has(k)){visited.add(k);result.push({col:nf.col,row:nf.row});queue.push({col:nf.col,row:nf.row,facing:f,rem:rem-1});}
+      }
+    }
+    // turn (change facing costs 1, can still move in new facing with remaining)
+    [1,-1].forEach(turn=>{
+      const nf=((f+turn)+6)%6;
+      const k=`${c},${r},${nf}`;
+      if(!visited.has(k)){visited.add(k);queue.push({col:c,row:r,facing:nf,rem:rem-1});}
+    });
+  }
+  // deduplicate
+  const seen=new Set();
+  return result.filter(h=>{
+    const k=`${h.col},${h.row}`;
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  }).filter(h=>!(h.col===col&&h.row===row));
+}
+
+let playerMovePts=0;
+let reachable=[];
+
+// ── COMBAT EFFECTS — stored in HEX SPACE, converted to canvas each frame ──
+// fx.sc/tc = {col,row} hex coords for beam/torp
+// fx.hx/hy = hex coords for point effects
+let FX=[];
+function addBeamFX(scHex,tcHex,col){
+  FX.push({type:'beam',life:1.0,dec:.035,sc:scHex,tc:tcHex,col});
+}
+function addTorpFX(scHex,tcHex){
+  FX.push({type:'torp',life:1.0,dec:.018,sc:scHex,tc:tcHex,prog:0,col:'#ffcc44'});
+}
+function addExplosionFX(hx,hy,sizeU,col){
+  FX.push({type:'expl',life:1.0,dec:.025,hx,hy,sizeU,col});
+}
+function addShieldFX(hx,hy,sizeU,col){
+  FX.push({type:'shield',life:1.0,dec:.05,hx,hy,sizeU,col});
+}
+function tickFX(){
+  for(let i=FX.length-1;i>=0;i--){
+    const f=FX[i];
+    f.life-=f.dec;
+    if(f.type==='torp') f.prog=Math.min(1,f.prog+f.dec*2.2);
+    if(f.life<=0) FX.splice(i,1);
+  }
+}
+function drawFX(g,ts,ox,oy){
+  FX.forEach(f=>{
+    g.save();
+    g.shadowBlur=0; // reset before setting
+    const al=Math.max(0,f.life);
+
+    if(f.type==='beam'){
+      // Convert hex coords to canvas coords each frame
+      const sp=hexCen(f.sc.col,f.sc.row);
+      const tp=hexCen(f.tc.col,f.tc.row);
+      const sx=sp.x*ts+ox, sy=sp.y*ts+oy;
+      const tx=tp.x*ts+ox, ty=tp.y*ts+oy;
+      if(Math.hypot(sx-tx,sy-ty)<1){g.restore();return;}
+      // Outer glow
+      g.globalAlpha=al*.85;
+      g.shadowColor=f.col;g.shadowBlur=18;
+      g.strokeStyle=f.col;g.lineWidth=5;g.lineCap='round';
+      g.beginPath();g.moveTo(sx,sy);g.lineTo(tx,ty);g.stroke();
+      // Mid layer
+      g.strokeStyle='rgba(255,240,200,.7)';g.lineWidth=2.5;g.shadowBlur=8;
+      g.beginPath();g.moveTo(sx,sy);g.lineTo(tx,ty);g.stroke();
+      // Bright core
+      g.strokeStyle='#ffffff';g.lineWidth=1;g.shadowBlur=4;
+      g.globalAlpha=al;
+      g.beginPath();g.moveTo(sx,sy);g.lineTo(tx,ty);g.stroke();
+
+    } else if(f.type==='torp'){
+      const sp=hexCen(f.sc.col,f.sc.row);
+      const tp=hexCen(f.tc.col,f.tc.row);
+      const sx=sp.x*ts+ox, sy=sp.y*ts+oy;
+      const tx=tp.x*ts+ox, ty=tp.y*ts+oy;
+      const px=sx+(tx-sx)*f.prog;
+      const py=sy+(ty-sy)*f.prog;
+      const trailProg=Math.max(0,f.prog-.28);
+      const trx=sx+(tx-sx)*trailProg, tr_y=sy+(ty-sy)*trailProg;
+      g.globalAlpha=al;
+      g.shadowColor=f.col;g.shadowBlur=12;
+      if(Math.hypot(px-trx,py-tr_y)>1){
+        g.strokeStyle=f.col;g.lineWidth=3;g.lineCap='round';
+        g.beginPath();g.moveTo(trx,tr_y);g.lineTo(px,py);g.stroke();
+        // fade-out trail
+        g.strokeStyle='rgba(255,255,200,.3)';g.lineWidth=1.5;
+        g.beginPath();g.moveTo(trx,tr_y);g.lineTo(px,py);g.stroke();
+      }
+      // Head glow
+      const hR=Math.max(4,HR*ts*.12);
+      const hg=g.createRadialGradient(px,py,0,px,py,hR);
+      hg.addColorStop(0,'#ffffff');hg.addColorStop(.35,f.col);hg.addColorStop(1,'transparent');
+      g.fillStyle=hg;g.beginPath();safeArc(g,px,py,hR,0,Math.PI*2);g.fill();
+
+    } else if(f.type==='expl'){
+      const ep=hexCen(f.hx,f.hy);
+      const ex=ep.x*ts+ox, ey=ep.y*ts+oy;
+      const maxR=Math.max(8,f.sizeU*ts);
+      const r=maxR*(1-f.life);
+      // Outer ring
+      g.globalAlpha=al*.9;
+      g.shadowColor=f.col;g.shadowBlur=20;
+      g.strokeStyle=f.col;g.lineWidth=Math.max(1,3*al);
+      g.beginPath();safeArc(g,ex,ey,Math.max(.1,r),0,Math.PI*2);g.stroke();
+      // Secondary ring
+      if(r>6){
+        g.strokeStyle='rgba(255,255,200,.4)';g.lineWidth=1;g.shadowBlur=6;
+        g.beginPath();safeArc(g,ex,ey,Math.max(.1,r*.6),0,Math.PI*2);g.stroke();
+      }
+      // Central flash (first 40% of life)
+      if(f.life>.6){
+        const flashA=(f.life-.6)/.4;
+        g.globalAlpha=flashA*.9;
+        const ig=g.createRadialGradient(ex,ey,0,ex,ey,Math.max(.1,maxR*.45));
+        ig.addColorStop(0,'#ffffff');ig.addColorStop(.4,f.col);ig.addColorStop(1,'transparent');
+        g.fillStyle=ig;g.beginPath();safeArc(g,ex,ey,Math.max(.1,maxR*.45),0,Math.PI*2);g.fill();
+      }
+
+    } else if(f.type==='shield'){
+      const sp=hexCen(f.hx,f.hy);
+      const sx=sp.x*ts+ox, sy=sp.y*ts+oy;
+      const r=Math.max(4,f.sizeU*ts)*(1.1+.3*(1-f.life));
+      g.globalAlpha=al*.7;
+      g.shadowColor=f.col;g.shadowBlur=10;
+      g.strokeStyle=f.col;g.lineWidth=2.5;
+      g.beginPath();safeArc(g,sx,sy,r,0,Math.PI*2);g.stroke();
+      g.strokeStyle='rgba(255,255,255,.3)';g.lineWidth=1;
+      g.beginPath();safeArc(g,sx,sy,r*.75,0,Math.PI*2);g.stroke();
+    }
+    g.restore();
+  });
+}
+// hexToCanvas kept for potential future use
+function hexToCanvas(col,row,ts,ox,oy){
+  const{x,y}=hexCen(col,row);return{x:x*ts+ox,y:y*ts+oy};
+}
+// Trigger visual + sound for weapon fire — stores HEX coords, canvas conversion in drawFX
+function triggerWeaponFX(shooter,target,weapon,hit){
+  const scHex={col:shooter.col,row:shooter.row};
+  const tcHex={col:target.col,row:target.row};
+  if(weapon.type==='beam'){
+    const col=shooter.faction==='fed'?'#66bbff':'#ffaa22';
+    addBeamFX(scHex,tcHex,col);
+    snd('phaser');
+    if(hit){
+      setTimeout(()=>{addExplosionFX(target.col,target.row,HR*.9,'#ff8844');snd('shieldhit');},220);
+    } else {
+      setTimeout(()=>{addShieldFX(target.col,target.row,HR*.8,'#88aaff');},220);
+    }
+  } else if(weapon.type==='missile'){
+    addTorpFX(scHex,tcHex);
+    snd('torpedo');
+    const travelMs=Math.max(400, hexDist(shooter.col,shooter.row,target.col,target.row)*90);
+    if(hit){
+      setTimeout(()=>{addExplosionFX(target.col,target.row,HR*1.2,'#ffcc44');snd('explosion');},travelMs);
+    } else {
+      setTimeout(()=>{addShieldFX(target.col,target.row,HR*.9,'#ffee88');},travelMs);
+    }
+  }
+}
+
+function highlightMoveHexes(clearHist){
+  const s=GS.player;
+  const idx=GS.subPhaseIdx;
+  const pts=s.movePts[idx]-s.movePtsUsed[idx];
+  reachable=reachableHexes(s.col,s.row,s.facing,pts);
+  playerMovePts=pts;
+  if(clearHist) clearMoveHistory();
+  renderTac();
+}
+
+// Movement history for undo — stack of {col,row,facing,used} snapshots
+let moveHistory=[];
+
+function saveMoveSnapshot(){
+  const s=GS.player;const idx=GS.subPhaseIdx;
+  moveHistory.push({col:s.col,row:s.row,facing:s.facing,used:s.movePtsUsed[idx]});
+}
+
+function playerMoveTo(col,row){
+  const s=GS.player;
+  const idx=GS.subPhaseIdx;
+  if(!MOVE_PHASES.includes(GS.phase)) return;
+  if(!reachable.find(h=>h.col===col&&h.row===row)) return;
+  const dist=hexDist(s.col,s.row,col,row);
+  const cost=Math.max(1,dist);
+  const avail=s.movePts[idx]-s.movePtsUsed[idx];
+  if(cost>avail){log('Not enough move points','warn');return;}
+  saveMoveSnapshot();
+  s.movePtsUsed[idx]+=cost;
+  s.col=col; s.row=row;
+  log(`${s.name}: Moved to ${col},${row} (${cost}pt) — click Undo to take back`,'info');
+  snd('move');
+  showUndoBtn(true);
+  highlightMoveHexes();
+  updateSidebar();
+  renderTac();
+  // Update weapon buttons — range changes as ships move
+  if(FIRE_PHASES.includes(GS.phase)) refreshWpnFireBtns();
+}
+
+function playerRotate(dir){ // dir: +1 or -1
+  const s=GS.player;
+  const idx=GS.subPhaseIdx;
+  if(!MOVE_PHASES.includes(GS.phase)) return;
+  const avail=s.movePts[idx]-s.movePtsUsed[idx];
+  if(avail<1){log('No move points left for rotation','warn');return;}
+  saveMoveSnapshot();
+  s.movePtsUsed[idx]+=1;
+  s.facing=((s.facing+dir)+6)%6;
+  log(`${s.name}: Rotated to facing ${s.facing} (1pt) — Undo available`,'info');
+  snd('move');
+  showUndoBtn(true);
+  highlightMoveHexes();
+  renderTac();
+  if(FIRE_PHASES.includes(GS.phase)) refreshWpnFireBtns();
+}
+
+function playerUndoMove(){
+  if(!moveHistory.length){log('Nothing to undo','warn');return;}
+  const snap=moveHistory.pop();
+  const s=GS.player;const idx=GS.subPhaseIdx;
+  s.col=snap.col;s.row=snap.row;s.facing=snap.facing;s.movePtsUsed[idx]=snap.used;
+  log(`${s.name}: Move undone`,'info');
+  snd('move');
+  if(!moveHistory.length) showUndoBtn(false);
+  highlightMoveHexes();
+  updateSidebar();
+  renderTac();
+}
+
+function showUndoBtn(show){
+  const btn=document.getElementById('btn-undo');
+  if(btn) btn.style.display=show?'block':'none';
+}
+
+// Clear history at start of each sub-phase
+function clearMoveHistory(){moveHistory=[];showUndoBtn(false);}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIRING & COMBAT RESOLUTION
+// ═══════════════════════════════════════════════════════════════════════════
+function highlightFiringArcs(){
+  renderTac(); // arc overlay drawn in renderTac when in fire phase
+}
+
+function weaponArcCoversTarget(weapon, shooter, target){
+  // Get the direction from shooter to target in hex-facing terms
+  // Approximate: use cube coord direction
+  function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
+  const sc=toCube(shooter.col,shooter.row),tc=toCube(target.col,target.row);
+  const dx=tc.x-sc.x,dz=tc.z-sc.z;
+  // Find closest hex facing
+  const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]]; // NE,E,SE,SW,W,NW
+  let bestDir=0,bestDot=-99;
+  CUBE_DIRS.forEach(([ex,ey,ez],i)=>{
+    const dot=dx*ex+dz*ez;
+    if(dot>bestDot){bestDot=dot;bestDir=i;}
+  });
+  // Relative arc from shooter's facing
+  const relDir=((bestDir-shooter.facing)+6)%6;
+  return weapon.arcs.includes(relDir);
+}
+
+function resolveShipFiring(shooter, target, subPhase) {
+  const weapons = shooter.weapons.filter(w=>w.armed&&w.alive&&!w.fired);
+  if(weapons.length===0){log(`${shooter.name}: No armed weapons to fire`,'info');return;}
+  const range=hexDist(shooter.col,shooter.row,target.col,target.row);
+  log(`${shooter.name} fires at range ${range}:`,'hit');
+
+  weapons.forEach(w=>{
+    if(!weaponArcCoversTarget(w,shooter,target)){
+      log(`  ${w.name}: Target not in arc [${w.arcs.map(a=>ARC_NAMES[a]).join('/')}]`,'miss');
+      return;
+    }
+    w.fired=true;
+    shooter.ai?GS.turn_stats.enemyShotsFired++:GS.turn_stats.playerShotsFired++;
+    // To-hit
+    const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
+    const rangeKey=Math.min(range,15);
+    const [minR,maxR]=chart[rangeKey]||[0,0];
+    const roll=d10();
+    const hit=roll>=minR&&roll<=maxR&&maxR>0;
+    log(`  ${w.name}: Chart <span class="chart">${w.chart}</span> Range ${rangeKey} → need <span class="die">1-${maxR}</span>, rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
+    if(!hit){snd('miss');return;}
+    shooter.ai?GS.turn_stats.enemyShotsHit++:GS.turn_stats.playerShotsHit++;
+
+    // Damage
+    let dmg=0;
+    if(w.type==='beam'){
+      dmg=w.poweredWith;
+      if(w.dmgMod&&range<=w.dmgMod.maxRange) dmg+=w.dmgMod.bonus;
+    } else {
+      dmg=w.fixedDmg||20;
+    }
+    log(`  Damage: <b>${dmg}</b> pts`,'dmg');
+
+    // Shield facing hit — which face is shooter relative to target?
+    function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
+    const sc=toCube(shooter.col,shooter.row),tc=toCube(target.col,target.row);
+    const dx=tc.x-sc.x,dz=tc.z-sc.z; // vector FROM target TO shooter (incoming direction)
+    const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]];
+    let hitFaceAbs=0,bestDot=-99;
+    CUBE_DIRS.forEach(([ex,ey,ez],i)=>{
+      const dot=(-dx)*ex+(-dz)*ez;
+      if(dot>bestDot){bestDot=dot;hitFaceAbs=i;}
+    });
+    // Relative to target's facing
+    const hitFace=((hitFaceAbs-target.facing)+6)%6;
+    const faceName=SHIELD_NAMES[hitFace];
+    log(`  Hits ${faceName} shield (face ${hitFace})`,'info');
+    triggerWeaponFX(shooter,target,w,hit);
+
+    // Shield absorption
+    if(target.shieldGenAlive[hitFace]&&target.shields[hitFace]>0){
+      const absorbed=Math.min(target.shields[hitFace],dmg);
+      target.shields[hitFace]-=absorbed;
+      dmg-=absorbed;
+      log(`  ${faceName} shield absorbs ${absorbed} → ${dmg} penetrates`,'info');
+    } else if(!target.shieldGenAlive[hitFace]){
+      log(`  ${faceName} shield generator DEAD — full damage penetrates`,'warn');
+    }
+
+    if(dmg<=0){log('  No damage penetrates','ok');snd('shieldhit');return;}
+    snd('explosion');
+    // Damage location
+    const locRoll=d10();
+    const loc=DMG_LOCATION[locRoll];
+    log(`  Damage location roll <span class="die">${locRoll}</span> → <b>${loc}</b>`,'roll');
+    applyDamage(target,dmg,loc,hitFace);
+  });
+  updateSidebar();
+  renderDmgView();
+  renderTac();
+}
+
+function applyDamage(ship,dmg,loc,hitFace){
+  if(loc==='shieldGen'){
+    if(ship.shieldGenAlive[hitFace]){
+      ship.shieldGenAlive[hitFace]=false;
+      ship.shields[hitFace]=0;
+      const msg=`${ship.name}: ${SHIELD_NAMES[hitFace]} shield generator DESTROYED`;
+      log(msg,'dmg');addDmgLog(msg,'crit');snd('explosion');
+    } else {
+      // cascade to superstructure at half
+      const sd=Math.ceil(dmg/2);
+      ship.superstructure=Math.max(0,ship.superstructure-sd);
+      log(`${ship.name}: Cascade hit — superstructure −${sd} (${ship.superstructure} left)`,'dmg');
+      addDmgLog(`Superstructure cascade −${sd}`,'crit');
+    }
+  } else if(loc==='beam'){
+    const alive=ship.weapons.filter(w=>w.type==='beam'&&w.alive);
+    if(alive.length){ alive[0].alive=false; addDmgLog(`${alive[0].name} DESTROYED`,'crit'); log(`${ship.name}: ${alive[0].name} DESTROYED`,'dmg'); }
+    else { ship.superstructure=Math.max(0,ship.superstructure-Math.ceil(dmg/2)); addDmgLog('Weapon cascade → superstructure','warn'); }
+  } else if(loc==='missile'){
+    const alive=ship.weapons.filter(w=>w.type==='missile'&&w.alive);
+    if(alive.length){ alive[0].alive=false; addDmgLog(`${alive[0].name} DESTROYED`,'crit'); log(`${ship.name}: ${alive[0].name} DESTROYED`,'dmg'); }
+    else { ship.superstructure=Math.max(0,ship.superstructure-Math.ceil(dmg/2)); addDmgLog('Weapon cascade → superstructure','warn'); }
+  } else if(loc==='engine'){
+    ship.currentPower=Math.max(0,ship.currentPower-dmg);
+    addDmgLog(`Engine hit — power −${dmg} (${ship.currentPower} left)`,'crit');
+    log(`${ship.name}: Engine hit — total power reduced to ${ship.currentPower}`,'dmg');
+    snd('explosion');
+  } else if(loc==='superstructure'){
+    ship.superstructure=Math.max(0,ship.superstructure-dmg);
+    addDmgLog(`Superstructure −${dmg} (${ship.superstructure}/${ship.superstructureMax})`,'crit');
+    log(`${ship.name}: Superstructure hit −${dmg} → ${ship.superstructure} boxes remain`,'dmg');
+    snd('explosion');
+  } else if(loc==='sensors'){
+    ship.sensors=Math.max(0,ship.sensors-dmg*3);
+    addDmgLog(`Sensors degraded → ${ship.sensors}%`,'warn');
+    log(`${ship.name}: Sensors hit → ${ship.sensors}%`,'dmg');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VICTORY CHECK
+// ═══════════════════════════════════════════════════════════════════════════
+function checkVictory(){
+  const pd=GS.player.superstructure<=0, ed=GS.enemy.superstructure<=0;
+  if(pd||ed){
+    GS.over=true;
+    stopAllAmb(1.5);
+    setHumLevel(0);
+    const win=!pd&&ed;
+    const vs=document.getElementById('victory-screen');
+    vs.style.display='flex';
+    const vt=document.getElementById('vic-title');
+    vt.textContent=win?'VICTORY':'DEFEAT';
+    vt.className='vic-title '+(win?'win':'lose');
+    document.getElementById('vic-sub').textContent=win?`${GS.enemy.name} destroyed`:`${GS.player.name} destroyed`;
+    const st=GS.turn_stats;
+    document.getElementById('vic-stats').innerHTML=
+      `Turns: ${GS.turn}<br>Shots fired: ${st.playerShotsFired} · Hits: ${st.playerShotsHit}<br>Enemy shots: ${st.enemyShotsFired} · Enemy hits: ${st.enemyShotsHit}`;
+    snd(win?'victory':'defeat');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AI SYSTEM — difficulty 1-5
+// ═══════════════════════════════════════════════════════════════════════════
+function aiAllocatePower(){
+  const s=GS.enemy, p=GS.player;
+  const D=aiDifficulty;
+  const tot=s.currentPower;
+  let move,shields,weapPwr;
+
+  if(D===1){ // Cadet: random-ish
+    move=Math.floor(Math.random()*16)+4;
+    shields=Math.floor(Math.random()*12)+4;
+    weapPwr=Math.min(tot-move-shields, s.weapons.filter(w=>w.alive).reduce((a,w)=>a+w.maxPower,0));
+  } else if(D===2){ // Ensign: basic balance
+    move=8; shields=10; weapPwr=tot-move-shields;
+  } else if(D===3){ // Lt Cmdr: range-aware
+    const range=hexDist(s.col,s.row,p.col,p.row);
+    move=range>6?12:6;
+    shields=12;
+    weapPwr=tot-move-shields;
+  } else if(D===4){ // Captain: optimised
+    const range=hexDist(s.col,s.row,p.col,p.row);
+    // Target optimal range 4-6 for beams
+    move=range>6?Math.min(16,range*2):range<3?4:8;
+    // Shield toward player facing
+    shields=Math.floor(tot*0.35);
+    weapPwr=tot-move-shields;
+  } else { // Admiral: full optimisation
+    const range=hexDist(s.col,s.row,p.col,p.row);
+    const hullPct=p.superstructure/p.superstructureMax;
+    // Aggressive if player low hull
+    if(hullPct<0.4){move=6;weapPwr=Math.floor(tot*0.55);shields=tot-move-weapPwr;}
+    else{move=range>5?14:6;weapPwr=Math.floor(tot*0.45);shields=tot-move-weapPwr;}
+  }
+
+  weapPwr=Math.max(0,weapPwr);
+  const mp=Math.floor(move/s.moveRatio);
+  const [p1,p2,p3]=movePtsPerPhase(mp);
+  s.movePts=[p1,p2,p3]; s.movePtsUsed=[0,0,0];
+  const spts=Math.floor(shields/s.shieldRatio);
+  const perFace=Math.min(s.maxShieldPerFace,Math.floor(spts/6)||0);
+  const bonus=spts-(perFace*6);
+  // D>=4: concentrate shields toward player
+  const dist=[0,1,2,3,4,5].map(i=>Math.min(s.maxShieldPerFace,perFace+(i<bonus?1:0)));
+  if(D>=4){
+    // Boost forward shield (face 0) with spare
+    const spare=shields-dist.reduce((a,b)=>a+b,0);
+    dist[0]=Math.min(s.maxShieldPerFace,dist[0]+spare);
+  }
+  s.alloc={move,shields,shieldDist:dist,weapons:{}};
+
+  // Arm weapons
+  let remaining=weapPwr;
+  s.weapons.filter(w=>w.alive).forEach(w=>{
+    const p=Math.min(w.maxPower||w.armCost||6,remaining);
+    if(p>0){w.armed=true;w.poweredWith=p;remaining-=p;s.alloc.weapons[w.id]=p;}
+  });
+  log(`AI allocated: Move ${move}→${mp}pts, Shields ${shields}→${spts}pts, Weapons ${weapPwr}`,'ai');
+}
+
+function aiDoMove(subPhaseIdx){
+  const s=GS.enemy, p=GS.player;
+  const D=aiDifficulty;
+  const pts=s.movePts[subPhaseIdx]-s.movePtsUsed[subPhaseIdx];
+  if(pts<=0) return;
+
+  let movesLeft=pts;
+  let col=s.col,row=s.row,facing=s.facing;
+
+  function tryMove(){
+    const range=hexDist(col,row,p.col,p.row);
+    const targetRange=D>=4?4:D>=3?5:6;
+
+    if(D===1){ // Cadet: random walk
+      const dirs=[0,1,-1,null]; // fwd, turn r, turn l, hold
+      const choice=dirs[Math.floor(Math.random()*dirs.length)];
+      if(choice===0){const nb=neighbour(col,row,facing);if(inBounds(nb.col,nb.row)){col=nb.col;row=nb.row;}}
+      else if(choice!==null){facing=((facing+choice)+6)%6;}
+      movesLeft--;
+    } else {
+      // Move toward or maintain optimal range
+      if(range>targetRange){
+        // Move forward
+        const nb=neighbour(col,row,facing);
+        if(inBounds(nb.col,nb.row)){col=nb.col;row=nb.row;movesLeft--;}
+        else{facing=(facing+1)%6;movesLeft--;} // turn if blocked
+      } else if(range<targetRange-1&&D>=3){
+        // Back off — turn away
+        facing=(facing+3)%6; movesLeft--;
+      } else {
+        // Rotate toward player (D>=2)
+        function toCube(c,r){const x=c-(r-(r&1))/2;const z=r;return{x,y:-x-z,z};}
+        const sc=toCube(col,row),tc=toCube(p.col,p.row);
+        const dx=tc.x-sc.x,dz=tc.z-sc.z;
+        const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]];
+        let bestDir=0,bestDot=-99;
+        CUBE_DIRS.forEach(([ex,ey,ez],i)=>{const dot=dx*ex+dz*ez;if(dot>bestDot){bestDot=dot;bestDir=i;}});
+        const relDir=((bestDir-facing)+6)%6;
+        if(relDir!==0){facing=((facing+(relDir>3?-1:1))+6)%6;movesLeft--;}
+        else{const nb=neighbour(col,row,facing);if(inBounds(nb.col,nb.row)){col=nb.col;row=nb.row;}movesLeft--;}
+      }
+    }
+  }
+
+  while(movesLeft>0) tryMove();
+  s.col=col; s.row=row; s.facing=facing;
+  s.movePtsUsed[subPhaseIdx]=pts;
+  log(`AI ${s.name}: Moved to ${col},${row} facing ${facing}`,'ai');
+  updateSidebar();
+  renderTac();
+}
+
+function aiDecideFire(){
+  const s=GS.enemy, p=GS.player;
+  const D=aiDifficulty;
+  const range=hexDist(s.col,s.row,p.col,p.row);
+  let willFire=false;
+  if(D===1) willFire=Math.random()>.4;
+  else if(D===2) willFire=range<=10&&s.weapons.some(w=>w.armed&&w.alive);
+  else if(D===3) willFire=range<=8&&s.weapons.some(w=>w.armed&&w.alive&&weaponArcCoversTarget(w,s,p));
+  else if(D>=4){
+    // Fire if any weapon covers target and expected hit chance >30%
+    willFire=s.weapons.some(w=>{
+      if(!w.armed||!w.alive||!weaponArcCoversTarget(w,s,p)) return false;
+      const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
+      const rk=Math.min(range,15);
+      const [,maxR]=chart[rk]||[0,0];
+      return maxR/10>0.3;
+    });
+  }
+  GS.enemyFireDeclared=willFire;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DICE
+// ═══════════════════════════════════════════════════════════════════════════
+function d10(){ return Math.floor(Math.random()*10)+1; }
+function d100(){ return Math.floor(Math.random()*100)+1; }
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SOUND ENGINE — Web Audio API, procedural
+// ═══════════════════════════════════════════════════════════════════════════
+let AC=null;
+function getAC(){
+  if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+  if(AC&&AC.state==='suspended'){AC.resume();}
+  return AC;
+}
+// Unlock audio on first user gesture
+document.addEventListener('click',()=>{const ac=getAC();if(ac&&ac.state==='suspended')ac.resume();},{once:true});
+document.addEventListener('keydown',()=>{const ac=getAC();if(ac&&ac.state==='suspended')ac.resume();},{once:true});
+
+// ── POWER HUM — continuous drone scaled to power allocated ───────────
+let humOsc=null,humGain=null,humOsc2=null;
+function initHum(){
+  const ac=getAC();if(!ac)return;
+  if(humOsc)return;
+  try{
+    // Low rumble — warp core base tone
+    humOsc=ac.createOscillator();
+    humOsc.type='sine';
+    humOsc.frequency.value=48; // sub bass
+    humGain=ac.createGain();
+    humGain.gain.value=0;
+    humOsc.connect(humGain);humGain.connect(ac.destination);
+    humOsc.start();
+    // Higher harmonic — impulse whine
+    humOsc2=ac.createOscillator();
+    humOsc2.type='sine';
+    humOsc2.frequency.value=180;
+    const hg2=ac.createGain();hg2.gain.value=0;
+    humOsc2.connect(hg2);hg2.connect(ac.destination);
+    humOsc2.start();
+    humOsc._hg2=hg2;
+  }catch(e){}
+}
+function setHumLevel(powerFraction){
+  // powerFraction: 0-1 where 1=all power allocated
+  initHum();
+  const ac=getAC();if(!ac||!humGain)return;
+  // Guard against NaN/Infinity — clamp to clean 0-1
+  const pf=Number.isFinite(powerFraction)?Math.max(0,Math.min(1,powerFraction)):0;
+  const t=ac.currentTime;
+  const baseVol=Math.pow(pf,.7)*.055;
+  const hum2Vol=Math.pow(pf,1.2)*.018;
+  const baseFreq=44+pf*12;
+  const hum2Freq=160+pf*80;
+  // Must call setValueAtTime before any ramp or the ramp throws
+  try{
+    humGain.gain.cancelScheduledValues(t);
+    humGain.gain.setValueAtTime(humGain.gain.value,t);
+    humGain.gain.linearRampToValueAtTime(baseVol,t+.1);
+    humOsc.frequency.cancelScheduledValues(t);
+    humOsc.frequency.setValueAtTime(humOsc.frequency.value,t);
+    humOsc.frequency.linearRampToValueAtTime(baseFreq,t+.1);
+    if(humOsc._hg2){
+      humOsc._hg2.gain.cancelScheduledValues(t);
+      humOsc._hg2.gain.setValueAtTime(humOsc._hg2.gain.value,t);
+      humOsc._hg2.gain.linearRampToValueAtTime(hum2Vol,t+.1);
+      humOsc2.frequency.cancelScheduledValues(t);
+      humOsc2.frequency.setValueAtTime(humOsc2.frequency.value,t);
+      humOsc2.frequency.linearRampToValueAtTime(hum2Freq,t+.1);
+    }
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AMBIENT SOUND SYSTEM — tab-contextual background audio
+// ═══════════════════════════════════════════════════════════════════════════
+let ambTab=null; // currently active ambient tab
+let ambNodes=[]; // all running ambient nodes {osc/src, gain} to stop cleanly
+
+function stopAllAmb(fadeT){
+  const ac=getAC();if(!ac)return;
+  const t=ac.currentTime;
+  ambNodes.forEach(n=>{
+    try{
+      n.gain.gain.cancelScheduledValues(t);
+      n.gain.gain.setValueAtTime(n.gain.gain.value,t);
+      n.gain.gain.linearRampToValueAtTime(0,t+(fadeT||0.6));
+      if(n.osc) setTimeout(()=>{try{n.osc.stop();}catch(e){}},((fadeT||0.6)+0.1)*1000);
+      if(n.src) setTimeout(()=>{try{n.src.stop();}catch(e){}},((fadeT||0.6)+0.1)*1000);
+    }catch(e){}
+  });
+  ambNodes=[];
+}
+
+// Create a looping oscillator node attached to a gain, registered for cleanup
+function mkAmbOsc(freq,type,vol,detune){
+  const ac=getAC();if(!ac)return null;
+  try{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    if(detune) o.detune.value=detune;
+    g.gain.value=0;
+    o.connect(g);g.connect(ac.destination);
+    o.start();
+    const n={osc:o,gain:g};ambNodes.push(n);
+    // Fade in
+    const t=ac.currentTime;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+1.5);
+    return n;
+  }catch(e){return null;}
+}
+
+// Fade a node to a target vol
+function fadeAmbNode(n,vol,dur){
+  if(!n)return;const ac=getAC();if(!ac)return;
+  const t=ac.currentTime;
+  try{
+    n.gain.gain.cancelScheduledValues(t);
+    n.gain.gain.setValueAtTime(n.gain.gain.value,t);
+    n.gain.gain.linearRampToValueAtTime(Math.max(0,vol),t+(dur||0.8));
+  }catch(e){}
+}
+
+// ── TACTICAL MAP AMBIENT ─────────────────────────────────────────────
+// Fed: classic TOS bridge — steady sensor sweep ping + low hum
+// Kli: growling dissonant drone + irregular blip
+let tacPingTimer=null;
+
+function startTacAmbFed(){
+  // Steady deep hull hum (warp engines at rest)
+  mkAmbOsc(42,'sine',.038);
+  mkAmbOsc(84,'sine',.022,1.2);   // harmonic
+  mkAmbOsc(126,'sine',.010,-0.8); // 3rd harmonic
+  // Periodic sensor sweep ping — the iconic TOS sound
+  function doSweep(){
+    if(ambTab!=='tac'){return;}
+    const ac=getAC();if(!ac)return;
+    const t=ac.currentTime;
+    try{
+      // Main ping — descending tone
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(1400,t);
+      o.frequency.exponentialRampToValueAtTime(320,t+0.18);
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(.07,t+.01);
+      g.gain.exponentialRampToValueAtTime(.001,t+0.22);
+      o.start(t);o.stop(t+0.25);
+      // Short echo
+      const o2=ac.createOscillator(),g2=ac.createGain();
+      o2.connect(g2);g2.connect(ac.destination);
+      o2.frequency.setValueAtTime(700,t+.12);
+      o2.frequency.exponentialRampToValueAtTime(200,t+.28);
+      g2.gain.setValueAtTime(0,t+.12);
+      g2.gain.linearRampToValueAtTime(.032,t+.13);
+      g2.gain.exponentialRampToValueAtTime(.001,t+.32);
+      o2.start(t+.12);o2.stop(t+.35);
+    }catch(e){}
+    tacPingTimer=setTimeout(doSweep, 2200+Math.random()*800);
+  }
+  doSweep();
+}
+
+function startTacAmbKli(){
+  // Guttural Klingon engine growl — lower, rougher harmonics
+  mkAmbOsc(36,'sawtooth',.018);
+  mkAmbOsc(72,'sawtooth',.012,3);
+  mkAmbOsc(54,'square',.006,-2);
+  // Klingon sensor — irregular blip, harsher tone
+  function doKliBlip(){
+    if(ambTab!=='tac'){return;}
+    const ac=getAC();if(!ac)return;
+    const t=ac.currentTime;
+    try{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sawtooth';o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(280,t);
+      o.frequency.linearRampToValueAtTime(180,t+.14);
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(.055,t+.01);
+      g.gain.exponentialRampToValueAtTime(.001,t+.18);
+      o.start(t);o.stop(t+.2);
+      // Secondary growl click
+      const o2=ac.createOscillator(),g2=ac.createGain();
+      o2.type='square';o2.connect(g2);g2.connect(ac.destination);
+      o2.frequency.setValueAtTime(90,t+.05);
+      g2.gain.setValueAtTime(0,t+.05);
+      g2.gain.linearRampToValueAtTime(.03,t+.06);
+      g2.gain.exponentialRampToValueAtTime(.001,t+.12);
+      o2.start(t+.05);o2.stop(t+.14);
+    }catch(e){}
+    tacPingTimer=setTimeout(doKliBlip, 1600+Math.random()*2200);
+  }
+  doKliBlip();
+}
+
+// ── DAMAGE CONTROL AMBIENT ───────────────────────────────────────────
+// Background "crew chatter" — synthesised voice-like formant wobble
+// that escalates as hull damage increases.
+// Also: alert klaxon overtones when critical.
+let dmgAmbNodes={}; // keyed nodes so we can scale them
+
+function startDmgAmb(){
+  // Low-frequency structural groan
+  dmgAmbNodes.groan=mkAmbOsc(58,'sine',.0);
+  // Mid formant — "voice" quality band
+  dmgAmbNodes.form1=mkAmbOsc(280,'sine',.0);
+  dmgAmbNodes.form2=mkAmbOsc(340,'sine',.0);
+  dmgAmbNodes.form3=mkAmbOsc(420,'triangle',.0);
+  // High overtone — electrical buzz
+  dmgAmbNodes.buzz=mkAmbOsc(880,'sawtooth',.0);
+  // Alert tone base (silent until critical)
+  dmgAmbNodes.alert=mkAmbOsc(660,'square',.0);
+  dmgAmbNodes.alert2=mkAmbOsc(880,'square',.0);
+  // "chatter" LFO — modulate formant gain to simulate voice rhythm
+  startDmgLFO();
+}
+
+let dmgLFOHandle=null;
+function startDmgLFO(){
+  // Fake voice cadence — random bursts of the formant oscillators
+  function lfoTick(){
+    if(ambTab!=='dmg'){return;}
+    const hullPct=GS?GS.player.superstructure/GS.player.superstructureMax:1;
+    const dmgLvl=1-hullPct; // 0=undamaged, 1=destroyed
+    updateDmgAmb(dmgLvl);
+    dmgLFOHandle=setTimeout(lfoTick, 80+Math.random()*120);
+  }
+  lfoTick();
+}
+
+let dmgPhase=0;
+function updateDmgAmb(dmgLvl){
+  if(!GS)return;
+  const ac=getAC();if(!ac)return;
+  const t=ac.currentTime;
+  dmgPhase+=0.04+dmgLvl*.06;
+  // Structural groan — constant low moan, louder with damage
+  if(dmgAmbNodes.groan) fadeAmbNode(dmgAmbNodes.groan, dmgLvl*.038, .15);
+  // Voice-like formant chatter — modulated by sine to give speech rhythm
+  // Multiple overlapping sine waves that create a "crowd talking" texture
+  const chatRate=0.3+dmgLvl*.7; // chatter gets faster when damaged
+  const chatVol=dmgLvl*.028*(0.5+0.5*Math.abs(Math.sin(dmgPhase*1.3)));
+  const chat2Vol=dmgLvl*.022*(0.5+0.5*Math.abs(Math.sin(dmgPhase*.9+1.1)));
+  const chat3Vol=dmgLvl*.018*(0.5+0.5*Math.abs(Math.sin(dmgPhase*1.7+0.5)));
+  if(dmgAmbNodes.form1) fadeAmbNode(dmgAmbNodes.form1, chatVol, .12);
+  if(dmgAmbNodes.form2) fadeAmbNode(dmgAmbNodes.form2, chat2Vol, .12);
+  if(dmgAmbNodes.form3) fadeAmbNode(dmgAmbNodes.form3, chat3Vol, .12);
+  // Formant frequency wobble — gives "speech" quality
+  try{
+    if(dmgAmbNodes.form1){
+      dmgAmbNodes.form1.osc.frequency.setValueAtTime(270+Math.sin(dmgPhase*1.1)*30,t);
+    }
+    if(dmgAmbNodes.form2){
+      dmgAmbNodes.form2.osc.frequency.setValueAtTime(350+Math.sin(dmgPhase*.8+.8)*40,t);
+    }
+    if(dmgAmbNodes.form3){
+      dmgAmbNodes.form3.osc.frequency.setValueAtTime(430+Math.sin(dmgPhase*1.4+.3)*35,t);
+    }
+  }catch(e){}
+  // Electrical buzz — sparks/shorts, only when damaged
+  if(dmgAmbNodes.buzz){
+    const buzzVol=Math.max(0,dmgLvl-.3)*.022*(Math.random()>.7?1:0);
+    fadeAmbNode(dmgAmbNodes.buzz, buzzVol, .06);
+  }
+  // Alert klaxon overtones — only when critical (<30% hull)
+  if(dmgAmbNodes.alert){
+    const alertVol=Math.max(0,dmgLvl-.7)*.04*(0.5+0.5*Math.sin(dmgPhase*6));
+    fadeAmbNode(dmgAmbNodes.alert, alertVol, .05);
+    fadeAmbNode(dmgAmbNodes.alert2, alertVol*.6, .05);
+  }
+}
+
+// ── POWER ALLOCATION AMBIENT ─────────────────────────────────────────
+// Already handled by setHumLevel() — no additional startup needed.
+// Add a subtle background pad so silence doesn't feel dead.
+let pwrPadNode=null;
+function startPwrAmb(){
+  pwrPadNode=mkAmbOsc(36,'sine',.015);
+  mkAmbOsc(108,'sine',.006);
+}
+
+// ── MASTER TAB SWITCHER ──────────────────────────────────────────────
+function setAmbTab(tab){
+  if(ambTab===tab) return;
+  if(tacPingTimer){clearTimeout(tacPingTimer);tacPingTimer=null;}
+  if(dmgLFOHandle){clearTimeout(dmgLFOHandle);dmgLFOHandle=null;}
+  stopAllAmb(0.7);
+  dmgAmbNodes={};
+  ambTab=tab;
+  setTimeout(()=>{
+    if(ambTab!==tab) return; // tab changed again during fade
+    const ac=getAC();if(!ac)return;
+    if(tab==='tac'){
+      if(GS&&GS.player.faction==='kli') startTacAmbKli();
+      else startTacAmbFed();
+    } else if(tab==='dmg'){
+      startDmgAmb();
+    } else if(tab==='pwr'){
+      startPwrAmb();
+    }
+    // log tab — silence, just the hum
+  },750);
+}
+
+function snd(type){
+  const ac=getAC();if(!ac)return;
+  const t=ac.currentTime;
+  try{
+    if(type==='phaser'){
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(800,t);o.frequency.exponentialRampToValueAtTime(200,t+.3);
+      g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);
+      o.start(t);o.stop(t+.35);
+    } else if(type==='torpedo'){
+      const o=ac.createOscillator(),g=ac.createGain();
+      const o2=ac.createOscillator();
+      o.connect(g);o2.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(80,t+.5);
+      o2.frequency.setValueAtTime(150,t);o2.frequency.exponentialRampToValueAtTime(60,t+.5);
+      o2.type='sawtooth';
+      g.gain.setValueAtTime(.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);
+      o.start(t);o.stop(t+.6);o2.start(t);o2.stop(t+.6);
+    } else if(type==='explosion'){
+      const buf=ac.createBuffer(1,ac.sampleRate*.6,ac.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.5);
+      const src=ac.createBufferSource(),g=ac.createGain(),f=ac.createBiquadFilter();
+      src.buffer=buf;f.type='lowpass';f.frequency.value=600;
+      src.connect(f);f.connect(g);g.connect(ac.destination);
+      g.gain.setValueAtTime(.8,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);
+      src.start(t);
+    } else if(type==='shieldhit'){
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sawtooth';o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(150,t+.2);
+      g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);
+      o.start(t);o.stop(t+.25);
+    } else if(type==='miss'){
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(220,t);
+      g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);
+      o.start(t);o.stop(t+.15);
+    } else if(type==='move'){
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(880,t+.08);
+      g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.1);
+      o.start(t);o.stop(t+.1);
+    } else if(type==='phase'){
+      // LCARS-ish two-tone
+      [330,440].forEach((freq,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(.12,t+i*.12);g.gain.exponentialRampToValueAtTime(.001,t+i*.12+.1);
+        o.start(t+i*.12);o.stop(t+i*.12+.12);
+      });
+    } else if(type==='tactical'){
+      [220,330,440].forEach((freq,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(.1,t+i*.1);g.gain.exponentialRampToValueAtTime(.001,t+i*.1+.09);
+        o.start(t+i*.1);o.stop(t+i*.1+.11);
+      });
+    } else if(type==='victory'){
+      [330,440,550,660].forEach((freq,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(.18,t+i*.15);g.gain.exponentialRampToValueAtTime(.001,t+i*.15+.3);
+        o.start(t+i*.15);o.stop(t+i*.15+.35);
+      });
+    } else if(type==='defeat'){
+      [440,330,220,165].forEach((freq,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.type='sawtooth';o.connect(g);g.connect(ac.destination);
+        o.frequency.value=freq;
+        g.gain.setValueAtTime(.15,t+i*.18);g.gain.exponentialRampToValueAtTime(.001,t+i*.18+.35);
+        o.start(t+i*.18);o.stop(t+i*.18+.4);
+      });
+    }
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CANVAS RENDERER — Tactical Map
+// ═══════════════════════════════════════════════════════════════════════════
+let tacT=0,tacLT=0,tacRunning=false;
+const terrain={};
+for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+  const v=Math.abs((Math.sin(c*13.7+r*7.3)*43758.5453)%1);
+  terrain[`${c},${r}`]=v<0.06?'N':v<0.10?'A':v<0.12?'G':'S';
+}
+// Clear ship start zones
+['4,9','5,9','19,9','18,9'].forEach(k=>terrain[k]='S');
+
+function safeArc(g,x,y,r,a1,a2){if(r>0)g.arc(x,y,r,a1,a2);}
+function safeEllipse(g,x,y,rx,ry,rot,a1,a2){if(rx>0&&ry>0)g.ellipse(x,y,rx,ry,rot,a1,a2);}
+
+function hpath(g,cx,cy,r){
+  if(r<=0)return;
+  g.beginPath();
+  for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);i?g.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):g.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
+  g.closePath();
+}
+
+function getTsc(){
+  const w=document.getElementById('tac-wrap');
+  const mw=HR*Math.sqrt(3)*(COLS+.5),mh=HR*1.5*(ROWS+.333);
+  return Math.min((w.clientWidth-20)/mw,(w.clientHeight-20)/mh)*.92;
+}
+
+function drawFedShip(g,sz,T,damaged){
+  if(sz<2)return;
+  const U=sz*.028;
+  // FASA ink-art style: thick outlines, panel lines, hatch fill — no gradients
+  const ink=damaged?'rgba(200,180,140,.95)':'rgba(230,230,220,.98)';
+  const inkDk=damaged?'rgba(120,100,70,.9)':'rgba(160,160,150,.85)';
+  const outline=damaged?'rgba(255,200,140,1)':'rgba(255,255,240,1)';
+  const fill=damaged?'rgba(30,22,10,0.92)':'rgba(18,18,22,0.93)';
+  const hatch=damaged?'rgba(180,140,80,.18)':'rgba(200,210,230,.12)';
+
+  // ── NACELLES ─────────────────────────────────────────────────────
+  const nacW=3*U,nacL=20*U,nacX=14*U,nacYc=8*U;
+  [-1,1].forEach(side=>{
+    const nx=side*nacX;
+    // Nacelle body — solid fill + thick outline
+    g.fillStyle=fill;
+    g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.55);
+    g.beginPath();g.roundRect(nx-nacW/2,nacYc-nacL/2,nacW,nacL,nacW*.3);
+    g.fill();g.stroke();
+    // Panel line down center
+    g.strokeStyle=inkDk;g.lineWidth=Math.max(.5,U*.2);
+    g.beginPath();g.moveTo(nx,nacYc-nacL*.44);g.lineTo(nx,nacYc+nacL*.44);g.stroke();
+    // Hatch marks on nacelle body
+    for(let hi=0;hi<5;hi++){
+      const hy=nacYc-nacL*.35+hi*nacL*.17;
+      g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.15);
+      g.beginPath();g.moveTo(nx-nacW*.38,hy);g.lineTo(nx+nacW*.38,hy);g.stroke();
+    }
+    // Bussard collector — filled circle at nacelle forward tip
+    const bY=nacYc-nacL/2;
+    const ba=.6+Math.abs(Math.sin(T*2.4+side))*.35;
+    // Outer ring
+    g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.5);g.fillStyle=fill;
+    g.beginPath();safeArc(g,nx,bY,nacW*.85,0,Math.PI*2);g.fill();g.stroke();
+    // Inner collector glow — only dot when damaged
+    const bfill=damaged?`rgba(160,60,5,${ba*.5})`:`rgba(220,35,5,${ba})`;
+    g.fillStyle=bfill;
+    g.beginPath();safeArc(g,nx,bY,nacW*.5,0,Math.PI*2);g.fill();
+    // Spoke marks — 4 lines from center (FASA style detail)
+    if(!damaged){
+      g.strokeStyle=`rgba(255,80,10,${ba*.6})`;g.lineWidth=Math.max(.5,U*.18);
+      for(let si=0;si<4;si++){const a=T*1.8+si*Math.PI/2;g.beginPath();g.moveTo(nx,bY);g.lineTo(nx+Math.cos(a)*nacW*.45,bY+Math.sin(a)*nacW*.45);g.stroke();}
+    }
+  });
+
+  // ── PYLONS ───────────────────────────────────────────────────────
+  g.strokeStyle=outline;g.lineWidth=Math.max(1.2,U*.5);g.lineCap='round';
+  g.beginPath();
+  g.moveTo(-4*U,14*U);g.lineTo(-nacX,nacYc+4*U);
+  g.moveTo( 4*U,14*U);g.lineTo( nacX,nacYc+4*U);
+  g.stroke();
+  // Pylon cross-brace lines (FASA detail)
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.4,U*.18);
+  g.beginPath();
+  g.moveTo(-2.5*U,18*U);g.lineTo(-nacX*.7,nacYc+1*U);
+  g.moveTo( 2.5*U,18*U);g.lineTo( nacX*.7,nacYc+1*U);
+  g.stroke();
+
+  // ── SECONDARY HULL ───────────────────────────────────────────────
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.55);
+  g.beginPath();
+  g.moveTo(-4.5*U,4*U);
+  g.bezierCurveTo(-5*U,6*U,-5*U,16*U,-3.5*U,20*U);
+  g.bezierCurveTo(-2*U,23*U,2*U,23*U,3.5*U,20*U);
+  g.bezierCurveTo(5*U,16*U,5*U,6*U,4.5*U,4*U);
+  g.closePath();g.fill();g.stroke();
+  // Center spine line
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.5,U*.22);
+  g.beginPath();g.moveTo(0,5*U);g.lineTo(0,21.5*U);g.stroke();
+  // Horizontal ribs
+  for(let ri=0;ri<4;ri++){
+    const ry=8*U+ri*3*U;const rw=4.2*U-ri*.5*U;
+    g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.15);
+    g.beginPath();g.moveTo(-rw,ry);g.lineTo(rw,ry);g.stroke();
+  }
+
+  // ── DORSAL NECK ──────────────────────────────────────────────────
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(.8,U*.4);
+  g.beginPath();g.moveTo(-2.2*U,-4.5*U);g.lineTo(-2.2*U,4.5*U);g.lineTo(2.2*U,4.5*U);g.lineTo(2.2*U,-4.5*U);g.closePath();g.fill();g.stroke();
+  // Neck panel line
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.14);
+  g.beginPath();g.moveTo(0,-4.2*U);g.lineTo(0,4.2*U);g.stroke();
+
+  // ── SAUCER SECTION ───────────────────────────────────────────────
+  const SR=Math.max(1,13*U),sY=-4*U;
+  // Main disc — solid fill
+  g.fillStyle=fill;
+  g.strokeStyle=outline;g.lineWidth=Math.max(1.2,U*.6);
+  g.beginPath();safeArc(g,0,sY,SR,0,Math.PI*2);g.fill();g.stroke();
+  // Concentric rings (FASA saucer detail)
+  [.80,.60,.40,.22].forEach((r,i)=>{
+    g.strokeStyle=i===0?inkDk:`rgba(180,185,200,${.08+i*.04})`;
+    g.lineWidth=Math.max(.4,i===0?U*.25:U*.15);
+    g.beginPath();safeArc(g,0,sY,Math.max(.1,SR*r),0,Math.PI*2);g.stroke();
+  });
+  // Radial panel lines — 8 spokes (FASA style)
+  for(let sp=0;sp<8;sp++){
+    const a=sp*Math.PI/4;
+    g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.12);
+    g.beginPath();
+    g.moveTo(Math.cos(a)*SR*.22,sY+Math.sin(a)*SR*.22);
+    g.lineTo(Math.cos(a)*SR*.78,sY+Math.sin(a)*SR*.78);
+    g.stroke();
+  }
+  // Rim highlight arc (top-left, FASA style)
+  g.strokeStyle=ink;g.lineWidth=Math.max(1,U*.4);
+  g.beginPath();safeArc(g,0,sY,SR-.5,-Math.PI*.9,-Math.PI*.15);g.stroke();
+  // Impulse engine block — aft of saucer (rectangular, hatched)
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(.8,U*.38);
+  g.beginPath();g.roundRect(-3*U,sY+SR*.62,6*U,3.2*U,U*.3);g.fill();g.stroke();
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.14);
+  for(let ii=0;ii<3;ii++){g.beginPath();g.moveTo(-2.6*U,sY+SR*.68+ii*U);g.lineTo(2.6*U,sY+SR*.68+ii*U);g.stroke();}
+  // Impulse glow
+  const ig=damaged?.15:.5+Math.abs(Math.sin(T*1.8))*.4;
+  g.fillStyle=`rgba(255,80,20,${ig})`;
+  g.beginPath();g.roundRect(-2*U,sY+SR*.64,4*U,1.4*U,U*.2);g.fill();
+  // Bridge dome
+  g.fillStyle=ink;g.strokeStyle=outline;g.lineWidth=Math.max(.5,U*.25);
+  g.beginPath();safeEllipse(g,0,sY-SR*.83,Math.max(.1,2.4*U),Math.max(.1,1.5*U),0,0,Math.PI*2);g.fill();g.stroke();
+  // Phaser banks — small rectangles on saucer rim
+  if(!damaged){
+    [-0.6,0.6].forEach(ang=>{
+      const px=Math.cos(ang)*SR*.91,py=sY+Math.sin(ang)*SR*.91;
+      g.fillStyle=ink;g.strokeStyle=outline;g.lineWidth=Math.max(.4,U*.2);
+      g.save();g.translate(px,py);g.rotate(ang);
+      g.beginPath();g.roundRect(-2.2*U,-.8*U,4.4*U,1.6*U,U*.15);g.fill();g.stroke();
+      g.restore();
+    });
+  }
+  // Damage scorch marks (hatch-style)
+  if(damaged){
+    g.save();
+    g.strokeStyle='rgba(255,140,30,.55)';g.lineWidth=Math.max(.5,U*.2);
+    const scX=-SR*.3,scY=sY-SR*.18;
+    for(let di=0;di<6;di++){g.beginPath();g.moveTo(scX-SR*.14+di*SR*.06,scY-SR*.12);g.lineTo(scX-SR*.18+di*SR*.06,scY+SR*.12);g.stroke();}
+    g.restore();
+  }
+  // Running lights
+  const blA=Math.sin(T*2.4)>0;
+  if(blA){g.fillStyle='rgba(255,20,10,.95)';g.beginPath();safeArc(g,-SR*.97,sY,Math.max(.1,1.6*U),0,Math.PI*2);g.fill();}
+  else{g.fillStyle='rgba(20,240,20,.95)';g.beginPath();safeArc(g,SR*.97,sY,Math.max(.1,1.6*U),0,Math.PI*2);g.fill();}
+  // Aft nav light
+  g.fillStyle='rgba(255,255,255,.6)';g.beginPath();safeArc(g,0,23*U,Math.max(.1,1.3*U),0,Math.PI*2);g.fill();
+}
+
+function drawKliShip(g,sz,T,damaged){
+  if(sz<2)return;
+  const U=sz*.028;
+  const ink=damaged?'rgba(200,170,120,.9)':'rgba(220,210,180,.95)';
+  const inkDk=damaged?'rgba(100,80,50,.8)':'rgba(140,130,100,.8)';
+  const outline=damaged?'rgba(240,190,120,1)':'rgba(230,220,190,1)';
+  const fill=damaged?'rgba(25,18,8,.93)':'rgba(14,12,6,.94)';
+
+  // ── NECK / SPINE ─────────────────────────────────────────────────
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.5);
+  g.beginPath();
+  g.moveTo(-2.5*U,-10*U);g.lineTo(-4*U,2*U);g.lineTo(-5*U,12*U);
+  g.lineTo(5*U,12*U);g.lineTo(4*U,2*U);g.lineTo(2.5*U,-10*U);
+  g.closePath();g.fill();g.stroke();
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.4,U*.18);
+  g.beginPath();g.moveTo(0,-9*U);g.lineTo(0,11.5*U);g.stroke();
+  [-6*U,-2*U,4*U,9*U].forEach(ry=>{
+    const hw=ry<0?2.2*U:ry<5*U?3.5*U:4.8*U;
+    g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.14);
+    g.beginPath();g.moveTo(-hw,ry);g.lineTo(hw,ry);g.stroke();
+  });
+
+  // ── WINGS ────────────────────────────────────────────────────────
+  [-1,1].forEach(side=>{
+    g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.52);
+    g.beginPath();
+    g.moveTo(side*4*U,0*U);g.lineTo(side*17*U,8*U);g.lineTo(side*19*U,14*U);
+    g.lineTo(side*14*U,16*U);g.lineTo(side*5*U,12*U);g.closePath();g.fill();g.stroke();
+    g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.14);
+    for(let wi=0;wi<4;wi++){
+      const wx1=side*(6*U+wi*2.8*U),wy1=2*U+wi*2.5*U;
+      const wx2=side*(9*U+wi*2.2*U),wy2=wy1+5*U;
+      g.beginPath();g.moveTo(wx1,wy1);g.lineTo(wx2,wy2);g.stroke();
+    }
+    g.strokeStyle=ink;g.lineWidth=Math.max(.5,U*.22);
+    g.beginPath();g.moveTo(side*4*U,0*U);g.lineTo(side*17*U,8*U);g.stroke();
+    // Disruptor at wingtip
+    const dcX=side*18.5*U,dcY=11*U;
+    g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(.7,U*.32);
+    g.beginPath();g.roundRect(side===1?15*U:-19.5*U,9.5*U,4.5*U,3*U,U*.3);g.fill();g.stroke();
+    const da=.4+Math.abs(Math.sin(T*1.9+side))*.5;
+    const dcol=damaged?`rgba(180,80,5,${da*.5})`:`rgba(255,140,20,${da})`;
+    g.fillStyle=dcol;g.beginPath();safeEllipse(g,dcX,dcY,U*.9,U*.65,0,0,Math.PI*2);g.fill();
+  });
+
+  // ── AFT ENGINE ───────────────────────────────────────────────────
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(1,U*.5);
+  g.beginPath();
+  g.moveTo(-5*U,12*U);g.bezierCurveTo(-6*U,14*U,-6*U,19*U,-4*U,22*U);
+  g.bezierCurveTo(-2*U,24*U,2*U,24*U,4*U,22*U);g.bezierCurveTo(6*U,19*U,6*U,14*U,5*U,12*U);
+  g.closePath();g.fill();g.stroke();
+  for(let ei=0;ei<4;ei++){g.strokeStyle=inkDk;g.lineWidth=Math.max(.3,U*.14);g.beginPath();g.moveTo(-4.5*U,13.5*U+ei*2*U);g.lineTo(4.5*U,13.5*U+ei*2*U);g.stroke();}
+  const eg=.5+Math.abs(Math.sin(T*1.6))*.4;
+  g.fillStyle=damaged?`rgba(120,50,5,${eg*.4})`:`rgba(80,160,255,${eg*.3})`;
+  g.beginPath();safeArc(g,0,22*U,Math.max(.1,3.5*U),0,Math.PI*2);g.fill();
+
+  // ── COMMAND POD ──────────────────────────────────────────────────
+  const cpR=Math.max(1,5.5*U),cpY=-13*U;
+  g.fillStyle=fill;g.strokeStyle=outline;g.lineWidth=Math.max(1.2,U*.6);
+  g.beginPath();safeArc(g,0,cpY,cpR,0,Math.PI*2);g.fill();g.stroke();
+  [.7,.45].forEach(r=>{g.strokeStyle=inkDk;g.lineWidth=Math.max(.4,U*.18);g.beginPath();safeArc(g,0,cpY,Math.max(.1,cpR*r),0,Math.PI*2);g.stroke();});
+  g.strokeStyle=inkDk;g.lineWidth=Math.max(.35,U*.16);
+  g.beginPath();g.moveTo(-cpR*.9,cpY);g.lineTo(cpR*.9,cpY);g.stroke();
+  g.beginPath();g.moveTo(0,cpY-cpR*.9);g.lineTo(0,cpY+cpR*.9);g.stroke();
+  // Forward torpedo tube
+  g.fillStyle=ink;g.strokeStyle=outline;g.lineWidth=Math.max(.5,U*.24);
+  g.beginPath();safeEllipse(g,0,cpY-cpR*.85,Math.max(.1,U*.85),Math.max(.1,U*.6),0,0,Math.PI*2);g.fill();g.stroke();
+  const tg=.6+Math.abs(Math.sin(T*2.1))*.35;
+  g.fillStyle=damaged?`rgba(150,100,20,${tg*.5})`:`rgba(220,200,50,${tg})`;
+  g.beginPath();safeEllipse(g,0,cpY-cpR*.85,Math.max(.1,U*.5),Math.max(.1,U*.35),0,0,Math.PI*2);g.fill();
+  if(damaged){
+    g.strokeStyle='rgba(255,140,30,.45)';g.lineWidth=Math.max(.4,U*.18);
+    for(let di=0;di<4;di++){const a=.8+di*.5;g.beginPath();g.moveTo(Math.cos(a)*cpR*.3,cpY+Math.sin(a)*cpR*.3);g.lineTo(Math.cos(a)*cpR*.85,cpY+Math.sin(a)*cpR*.85);g.stroke();}
+  }
+  const klA=Math.sin(T*2.1)>0;
+  if(klA){g.fillStyle='rgba(255,140,0,.9)';g.beginPath();safeArc(g,-cpR*.95,cpY,Math.max(.1,1.3*U),0,Math.PI*2);g.fill();}
+  else{g.fillStyle='rgba(200,30,10,.9)';g.beginPath();safeArc(g,cpR*.95,cpY,Math.max(.1,1.3*U),0,Math.PI*2);g.fill();}
+  g.fillStyle='rgba(255,200,100,.5)';g.beginPath();safeArc(g,0,23*U,Math.max(.1,1.2*U),0,Math.PI*2);g.fill();
+}
+
+
+const TC={S:'#010a18',N:'#160828',A:'#181008',G:'#081408'};
+
+function renderTac(){
+  const cv=document.getElementById('tac-cv');if(!cv)return;
+  const wrap=document.getElementById('tac-wrap');
+  const W=cv.width=wrap.clientWidth,H=cv.height=wrap.clientHeight;
+  if(W<10||H<10)return;
+  const g=cv.getContext('2d');
+  g.clearRect(0,0,W,H);g.fillStyle='#010508';g.fillRect(0,0,W,H);
+  // Stars
+  for(let i=0;i<250;i++){const bx=(Math.sin(i*137.5)*.5+.5)*W,by=(Math.cos(i*97.3)*.5+.5)*H;const bri=.07+Math.abs(Math.sin(tacT*.3+i))*.16;g.fillStyle=`rgba(200,215,255,${bri.toFixed(2)})`;g.fillRect(bx,by,i%17===0?1.5:1,i%17===0?1.5:1);}
+  const ts=getTsc();
+  const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
+  const ox=(W-mw)/2,oy=(H-mh)/2;
+  // Draw hexes
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const{x,y}=hexCen(c,r);const sx=x*ts+ox,sy=y*ts+oy;
+    const t=terrain[`${c},${r}`]||'S';const hr=Math.max(.5,HR*ts-1);
+    hpath(g,sx,sy,hr);g.fillStyle=TC[t];g.fill();
+    g.strokeStyle='rgba(38,98,158,.35)';g.lineWidth=.8;g.stroke();
+    if(t==='N'){const ng=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,hr));ng.addColorStop(0,'rgba(110,28,190,.2)');ng.addColorStop(1,'transparent');g.fillStyle=ng;hpath(g,sx,sy,hr);g.fill();}
+    if(t==='G'){const gg=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,hr));gg.addColorStop(0,'rgba(18,72,18,.18)');gg.addColorStop(1,'transparent');g.fillStyle=gg;hpath(g,sx,sy,hr);g.fill();}
+    // Stars inside open space hexes
+    if(t==='S'){
+      // 3-5 tiny stars per hex, seeded from hex coords so they're stable
+      const nStars=((c*7+r*13)%3)+3;
+      for(let si=0;si<nStars;si++){
+        const seed1=Math.sin(c*31.7+r*17.3+si*91.1)*43758.5;
+        const seed2=Math.sin(c*41.3+r*23.7+si*73.9)*43758.5;
+        const seed3=Math.sin(c*11.1+r*53.3+si*37.7)*43758.5;
+        const stx=sx+(seed1%1-.5)*hr*1.4;
+        const sty=sy+(seed2%1-.5)*hr*1.4;
+        // Only draw if inside the hex (approx circle check)
+        if(Math.hypot(stx-sx,sty-sy)>hr*.85) continue;
+        const bri=.12+Math.abs(seed3%1)*.22;
+        const twinkle=.7+Math.abs(Math.sin(tacT*(1.2+Math.abs(seed1%1))+si+c*0.3))*.3;
+        g.fillStyle=`rgba(210,225,255,${(bri*twinkle).toFixed(2)})`;
+        const stsz=si===0?1.2:.7;
+        g.fillRect(stx,sty,stsz,stsz);
+      }
+    }
+    // Stars inside open space hexes — seeded per-hex for stability
+    if(t==='S'){
+      const nStars=((c*7+r*13)%3)+3;
+      for(let si=0;si<nStars;si++){
+        const s1=Math.sin(c*31.7+r*17.3+si*91.1)*43758.5;
+        const s2=Math.sin(c*41.3+r*23.7+si*73.9)*43758.5;
+        const s3=Math.sin(c*11.1+r*53.3+si*37.7)*43758.5;
+        const stx=sx+(s1%1-.5)*hr*1.3;
+        const sty=sy+(s2%1-.5)*hr*1.3;
+        if(Math.hypot(stx-sx,sty-sy)>hr*.82) continue;
+        const bri=.10+Math.abs(s3%1)*.20;
+        const twinkle=.7+Math.abs(Math.sin(tacT*(1.1+Math.abs(s1%1)*.5)+si+c*.4))*.3;
+        g.fillStyle=`rgba(210,225,255,${(bri*twinkle).toFixed(2)})`;
+        g.fillRect(stx,sty,si===0?1.2:.7,si===0?1.2:.7);
+      }
+    }
+    g.fillStyle='rgba(55,105,165,.14)';g.font=`${Math.max(6,hr*.26)}px Courier New`;g.textAlign='center';g.textBaseline='middle';g.fillText(`${c},${r}`,sx,sy);
+  }
+
+  if(!GS) return;
+  // Reachable hex highlights (move phase)
+  if(MOVE_PHASES.includes(GS.phase)&&reachable.length>0){
+    reachable.forEach(h=>{
+      const{x,y}=hexCen(h.col,h.row);const sx=x*ts+ox,sy=y*ts+oy;const hr=Math.max(.5,HR*ts-2);
+      hpath(g,sx,sy,hr);g.fillStyle='rgba(40,120,40,.22)';g.fill();
+      g.strokeStyle='rgba(60,180,60,.5)';g.lineWidth=1.2;g.stroke();
+    });
+  }
+
+  // Firing arc highlights (fire phase)
+  if(FIRE_PHASES.includes(GS.phase)){
+    const s=GS.player;
+    s.weapons.filter(w=>w.armed&&w.alive).forEach(w=>{
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+        const range=hexDist(s.col,s.row,c,r);
+        if(range===0||range>15) continue;
+        const fakeTarget={col:c,row:r};
+        if(weaponArcCoversTarget(w,s,fakeTarget)){
+          const{x,y}=hexCen(c,r);const sx=x*ts+ox,sy=y*ts+oy;const hr2=Math.max(.5,HR*ts-2);
+          hpath(g,sx,sy,hr2);g.fillStyle='rgba(160,30,0,.15)';g.fill();
+          g.strokeStyle='rgba(200,50,0,.3)';g.lineWidth=.8;g.stroke();
+        }
+      }
+    });
+  }
+
+  // Ships
+  [GS.player,GS.enemy].forEach(s=>{
+    const{x,y}=hexCen(s.col,s.row);const sx=x*ts+ox,sy=y*ts+oy;const sz=HR*ts;
+    const damaged=s.superstructure<s.superstructureMax*.6;
+    const isFed=s.faction==='fed';
+    // Glow
+    const gl=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,sz*.85));
+    gl.addColorStop(0,isFed?'rgba(38,96,255,.16)':'rgba(190,76,18,.16)');gl.addColorStop(1,'transparent');
+    g.fillStyle=gl;g.beginPath();safeArc(g,sx,sy,Math.max(.1,sz*.85),0,Math.PI*2);g.fill();
+    // Shield bubble if shields up
+    const totalShields=s.shields.reduce((a,b)=>a+b,0);
+    if(totalShields>0){
+      const maxShld=s.shieldGenAlive.filter(x=>x).length*s.maxShieldPerFace;
+      const shldPct=totalShields/(maxShld||1);
+      const shieldsR=Math.max(.1,sz*.95);
+      g.strokeStyle=isFed?`rgba(60,120,255,${shldPct*.4})`:`rgba(255,80,20,${shldPct*.4})`;
+      g.lineWidth=1.5;g.beginPath();safeArc(g,sx,sy,shieldsR,0,Math.PI*2);g.stroke();
+    }
+    g.save();g.translate(sx,sy);g.rotate(s.facing*Math.PI/3);
+    isFed?drawFedShip(g,sz,tacT,damaged):drawKliShip(g,sz,tacT,damaged);
+    g.restore();
+    // Selection ring
+    if(s===GS.player){hpath(g,sx,sy,Math.max(.5,sz-1));g.strokeStyle='rgba(255,165,0,.7)';g.lineWidth=1.5;g.stroke();}
+    // Name
+    g.fillStyle=isFed?'#3366aa':'#884422';
+    g.font=`bold ${Math.max(8,sz*.22)}px Courier New`;g.textAlign='center';g.textBaseline='top';
+    g.fillText(s.name,sx,sy+sz*.9);
+    // Heading indicator — bright arrowhead showing ship's forward direction
+    const arrowAng=s.facing*Math.PI/3-Math.PI/2;
+    const arrowTip=sz*1.05; // tip of arrow beyond hex edge
+    const arrowBase=sz*.72;
+    const tipX=sx+Math.cos(arrowAng)*arrowTip, tipY=sy+Math.sin(arrowAng)*arrowTip;
+    const baseX=sx+Math.cos(arrowAng)*arrowBase, baseY=sy+Math.sin(arrowAng)*arrowBase;
+    const perpAng=arrowAng+Math.PI/2;
+    const wingW=sz*.12;
+    const col=isFed?'#4499ff':'#ff6633';
+    // Arrowhead fill
+    g.fillStyle=col;
+    g.globalAlpha=0.85;
+    g.beginPath();
+    g.moveTo(tipX,tipY);
+    g.lineTo(baseX+Math.cos(perpAng)*wingW, baseY+Math.sin(perpAng)*wingW);
+    g.lineTo(baseX-Math.cos(perpAng)*wingW, baseY-Math.sin(perpAng)*wingW);
+    g.closePath();g.fill();
+    // Shaft
+    g.strokeStyle=col;g.lineWidth=1.5;g.globalAlpha=0.5;
+    g.beginPath();g.moveTo(sx,sy);g.lineTo(baseX,baseY);g.stroke();
+    g.globalAlpha=1.0;
+  });
+
+  // Combat effects
+  tickFX();
+  drawFX(g,ts,ox,oy);
+
+  // Range line
+  const ps=GS.player,es=GS.enemy;
+  const pxy=hexCen(ps.col,ps.row),exy=hexCen(es.col,es.row);
+  g.strokeStyle='rgba(100,100,100,.2)';g.lineWidth=.8;g.setLineDash([4,4]);
+  g.beginPath();g.moveTo(pxy.x*ts+ox,pxy.y*ts+oy);g.lineTo(exy.x*ts+ox,exy.y*ts+oy);g.stroke();g.setLineDash([]);
+  // Range label at midpoint
+  const midx=(pxy.x+exy.x)/2*ts+ox,midy=(pxy.y+exy.y)/2*ts+oy;
+  const range=hexDist(ps.col,ps.row,es.col,es.row);
+  g.fillStyle='rgba(150,150,150,.6)';g.font='9px Courier New';g.textAlign='center';g.textBaseline='middle';
+  g.fillText(`R${range}`,midx,midy);
+
+  // Vignette
+  if(W>10&&H>10){const vg=g.createRadialGradient(W/2,H/2,H*.22,W/2,H/2,Math.max(H*.22+.1,H*.72));vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');g.fillStyle=vg;g.fillRect(0,0,W,H);}
+  g.fillStyle='rgba(0,0,0,.04)';for(let y=0;y<H;y+=3)g.fillRect(0,y,W,1);
+
+  // Update range display
+  document.getElementById('sb-range').textContent=`${range} hexes`;
+  const mi=document.getElementById('sb-move-info');
+  if(mi&&MOVE_PHASES.includes(GS.phase)){
+    const idx=GS.subPhaseIdx;
+    const avail=GS.player.movePts[idx]-GS.player.movePtsUsed[idx];
+    mi.textContent=`Sub-phase ${idx+1}: ${avail} pts remaining\nTotal: ${GS.player.movePts.join('/')}`;
+  }
+}
+
+function initTac(){
+  if(tacRunning)return;tacRunning=true;
+  const wrap=document.getElementById('tac-wrap');
+  const cv=document.getElementById('tac-cv');
+  function rsz(){cv.width=wrap.clientWidth;cv.height=wrap.clientHeight;renderTac();}
+  rsz();window.addEventListener('resize',rsz);
+  cv.addEventListener('click',e=>{
+    if(!GS||!MOVE_PHASES.includes(GS.phase))return;
+    const ts=getTsc();const W=cv.width,H=cv.height;
+    const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
+    const ox=(W-mw)/2,oy=(H-mh)/2;
+    const rect=cv.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    const h=hexAt((cx-ox)/ts,(cy-oy)/ts);
+    if(h.col>=0&&h.col<COLS&&h.row>=0&&h.row<ROWS) playerMoveTo(h.col,h.row);
+  });
+  cv.addEventListener('mousemove',e=>{
+    const ts=getTsc();const W=cv.width,H=cv.height;
+    const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
+    const ox=(W-mw)/2,oy=(H-mh)/2;
+    const rect=cv.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    const h=hexAt((cx-ox)/ts,(cy-oy)/ts);
+    if(h.col>=0&&h.col<COLS&&h.row>=0&&h.row<ROWS){
+      document.getElementById('tac-hex').textContent=`HEX ${h.col},${h.row}`;
+    }
+  });
+  wrap.addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='q') playerRotate(-1);
+    else if(e.key==='ArrowRight'||e.key==='d'||e.key==='e') playerRotate(1);
+    else return;
+    e.preventDefault();
+  });
+  // Document-level fallback so keys work even if wrap loses focus
+  document.addEventListener('keydown',e=>{
+    if(document.activeElement===wrap) return; // already handled
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='q') playerRotate(-1);
+    else if(e.key==='ArrowRight'||e.key==='d'||e.key==='e') playerRotate(1);
+    else return;
+    e.preventDefault();
+  });
+  function frame(ts2){
+    const dt=Math.min((ts2-tacLT)/16.67,3);tacLT=ts2;tacT+=.016*dt;
+    renderTac();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DAMAGE VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+let dmgRunning=false,dmgT=0,dmgLT=0;
+const PS=[];
+function spSpark(x,y,n,s){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=.5+Math.random()*s*2.2;PS.push({k:'s',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-Math.random()*1.4,life:1,dec:.03+Math.random()*.04,r:255,g:Math.floor(100+Math.random()*140),b:Math.floor(Math.random()*40),sz:.8+Math.random()*1.4});}}
+function spSmoke(x,y,sz){PS.push({k:'sm',x,y,vx:(Math.random()-.5)*.3,vy:-(0.2+Math.random()*.55),life:1,dec:.003+Math.random()*.004,sz:sz*(.7+Math.random()*.5),r:55,g:48,b:45});}
+function tickPS(){for(let i=PS.length-1;i>=0;i--){const p=PS[i];p.x+=p.vx;p.y+=p.vy;p.life-=p.dec;if(p.k==='s')p.vy+=.07;if(p.k==='sm'){p.sz*=1.012;p.vx*=.985;}if(p.life<=0)PS.splice(i,1);}}
+function drawPS(g){for(const p of PS){g.save();g.globalAlpha=Math.max(0,p.life);if(p.k==='s'){g.strokeStyle=`rgb(${p.r},${p.g},${p.b})`;g.lineWidth=p.sz;g.lineCap='round';g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x-p.vx*3,p.y-p.vy*3);g.stroke();}else{g.fillStyle=`rgb(${p.r},${p.g},${p.b})`;g.globalAlpha=Math.max(0,p.life*.16);g.beginPath();safeArc(g,p.x,p.y,Math.max(.1,p.sz),0,Math.PI*2);g.fill();}g.restore();}}
+
+function renderDmgView(){
+  if(!GS) return;
+  const s=GS.player;
+  // Update system rows
+  const rows=document.getElementById('sys-rows');
+  if(!rows) return;
+  rows.innerHTML='';
+  const hull=Math.round(s.superstructure/s.superstructureMax*100);
+  const rows_data=[
+    ['Superstructure', hull, hull>60?'#336633':hull>30?'#886600':'#992200'],
+    ...SHIELD_NAMES.map((nm,i)=>{
+      const alive=s.shieldGenAlive[i];
+      const maxS=s.maxShieldPerFace;
+      const pct=alive?Math.round(s.shields[i]/maxS*100):0;
+      return ['Shield '+nm, pct, alive?(pct>50?'#1a44aa':'#885500'):'#441100',alive?null:'DEAD'];
+    }),
+    ['Warp Core', Math.round(s.currentPower/s.totalPower*100), '#886600'],
+    ['Sensors', Math.round(s.sensors), s.sensors>60?'#336633':'#886600'],
+    ...s.weapons.map(w=>[w.name, w.alive?100:0, w.alive?'#1a3888':'#441100', w.alive?'OK':'DEAD']),
+  ];
+  rows_data.forEach(([nm,pct,col,label])=>{
+    const div=document.createElement('div');div.className='sys-row';
+    div.innerHTML=`<div class="sys-nm">${nm}</div><div class="sys-tr"><div class="sys-fi" style="width:${pct}%;background:${col}"></div></div><div class="sys-pc" style="color:${col}">${label||pct+'%'}</div>`;
+    rows.appendChild(div);
+  });
+}
+
+// ── DAMAGE VIEW — particle helpers ────────────────────────────────────
+function dmgDrawShip(g,W,H,dmgT,hullPct,dmgSystems){
+  if(W<10||H<10) return;
+  // FASA-style damage control — large annotated silhouette
+  const shipH=36, shipW=32;
+  const U=Math.min(W*.78/shipW, H*.78/shipH)*1.0125;
+  const cx=W/2, cy=H/2-0.5*U;
+  g.save();g.translate(cx,cy);
+  // Draw the ship in FASA ink style
+  const isFed=!GS||GS.player.faction==='fed';
+  if(isFed) drawFedShip(g, U/0.028, dmgT, hullPct<0.7);
+  else       drawKliShip(g, U/0.028, dmgT, hullPct<0.7);
+
+  // ── SHIELD FACE LABELS (FASA ship sheet style) ────────────────────
+  const SR=13*U, sY=-4*U, nacX=14*U;
+  const faceLabels=[
+    {name:'FWD', x:0,          y:sY-SR*1.28},
+    {name:'F-P', x:-SR*1.25,   y:sY-SR*.68},
+    {name:'F-S', x: SR*1.25,   y:sY-SR*.68},
+    {name:'AFT', x:0,           y:22*U+SR*.35},
+    {name:'A-P', x:-nacX-4.5*U, y:13*U},
+    {name:'A-S', x: nacX+4.5*U, y:13*U},
+  ];
+  g.font=`bold ${Math.max(7,U*1.15)}px Courier New`;
+  g.textAlign='center';g.textBaseline='middle';
+  faceLabels.forEach((fl,i)=>{
+    const sdead=dmgSystems.shields&&dmgSystems.shields[i];
+    g.fillStyle=sdead?'rgba(255,50,20,.95)':(hullPct>0.6?'rgba(200,215,180,.8)':'rgba(210,185,130,.8)');
+    g.fillText(fl.name,fl.x,fl.y);
+    if(sdead){
+      // X mark — dead shield generator
+      g.strokeStyle='rgba(255,30,10,.9)';g.lineWidth=Math.max(1,U*.38);
+      const bs=U*1.15;
+      g.beginPath();g.moveTo(fl.x-bs,fl.y-bs*.6);g.lineTo(fl.x+bs,fl.y+bs*.6);g.stroke();
+      g.beginPath();g.moveTo(fl.x+bs,fl.y-bs*.6);g.lineTo(fl.x-bs,fl.y+bs*.6);g.stroke();
+    }
+  });
+
+  // ── SUPERSTRUCTURE BOX TRACK (FASA engineering display) ──────────
+  const boxTotal=GS?GS.player.superstructureMax:24;
+  const boxFilled=Math.round(hullPct*boxTotal);
+  const bW=Math.max(4,U*.92),bH=Math.max(4,U*.68);
+  const bGap=Math.max(1,U*.16);
+  const bStartX=-(boxTotal/2)*(bW+bGap);
+  const bY2=sY+SR*1.85;
+  g.font=`${Math.max(6,U*.82)}px Courier New`;g.textAlign='center';g.textBaseline='middle';
+  g.fillStyle='rgba(190,200,165,.65)';
+  g.fillText('SUPERSTRUCTURE',0,bY2-U*1.5);
+  for(let bi=0;bi<boxTotal;bi++){
+    const bx=bStartX+bi*(bW+bGap), by=bY2;
+    const alive=bi<boxFilled;
+    g.fillStyle=alive?(hullPct>.5?'rgba(50,190,60,.5)':'rgba(220,130,20,.5)'):'rgba(180,25,10,.3)';
+    g.strokeStyle=alive?(hullPct>.5?'rgba(100,220,110,.7)':'rgba(240,160,40,.7)'):'rgba(220,50,30,.55)';
+    g.lineWidth=Math.max(.5,U*.22);
+    g.fillRect(bx,by,bW,bH);g.strokeRect(bx,by,bW,bH);
+  }
+
+  // ── SYSTEM STATUS TEXT ────────────────────────────────────────────
+  const dmgPct=1-hullPct;
+  if(dmgPct>.12){
+    g.font=`bold ${Math.max(8,U*1.1)}px Courier New`;
+    g.textAlign='left';g.textBaseline='middle';
+    const statusItems=[];
+    if(dmgSystems.engine<80) statusItems.push(`ENGINES: ${dmgSystems.engine}%`);
+    if(dmgSystems.sensors<80) statusItems.push(`SENSORS: ${dmgSystems.sensors}%`);
+    if(dmgSystems.shields&&dmgSystems.shields.some(d=>d)) statusItems.push('SHIELD GEN: OFFLINE');
+    if(hullPct<0.35) statusItems.push('*** HULL BREACH ***');
+    statusItems.forEach((txt,i)=>{
+      g.fillStyle=txt.includes('***')?'rgba(255,40,10,.95)':'rgba(255,110,30,.85)';
+      g.fillText(txt,-W*.38, sY+SR*1.35+i*U*1.9);
+    });
+  }
+  g.restore();
+}
+
+
+function initDmg(){
+  if(dmgRunning)return;dmgRunning=true;
+  const wrap=document.getElementById('dmg-wrap');const cv=document.getElementById('dmg-cv');
+  function rsz(){
+    const nw=wrap.clientWidth||wrap.offsetWidth;
+    const nh=wrap.clientHeight||wrap.offsetHeight;
+    if(nw>0&&nh>0){cv.width=nw;cv.height=nh;}
+  }
+  rsz();window.addEventListener('resize',rsz);
+
+  // Damage particle spawn points in unit-space (relative to ship centre)
+  // Populated based on damage state each frame
+  function spawnDmgParticles(cx,cy,W,H,dmgPct,dmgSystems){
+    if(dmgPct<.2) return;
+    const U=Math.min(W*0.75/31,H*0.75/35)*0.984375;
+    const rate=dmgPct;
+    const SR=13*U;
+    const sY=-4*U;
+    // Breach 1 — port saucer
+    if(dmgPct>.4&&Math.random()<rate*.5){
+      const bx=cx-SR*.35,by=cy+sY-SR*.2;
+      spSpark(bx+(Math.random()-.5)*SR*.12,by+(Math.random()-.5)*SR*.08,2,1.2+dmgPct);
+      if(Math.random()<.2) spSmoke(bx,by,SR*.08+Math.random()*SR*.04);
+    }
+    // Breach 2 — stbd secondary hull
+    if(dmgPct>.55&&Math.random()<rate*.35){
+      const bx=cx+SR*.25,by=cy+sY+SR*.28;
+      spSpark(bx+(Math.random()-.5)*SR*.1,by+(Math.random()-.5)*SR*.07,1,1.0+dmgPct);
+      if(Math.random()<.15) spSmoke(bx,by,SR*.07+Math.random()*SR*.03);
+    }
+    // Breach 3 — port aft
+    if(dmgPct>.65&&Math.random()<rate*.25){
+      const bx=cx-SR*.5,by=cy+sY+SR*.08;
+      spSpark(bx+(Math.random()-.5)*SR*.08,by+(Math.random()-.5)*SR*.06,1,.9+dmgPct*.8);
+    }
+    // Nacelle sparks if engines damaged
+    if(dmgSystems.engine<40&&Math.random()<.3){
+      const nacX=14*U,nacYc=8*U;
+      [-1,1].forEach(side=>{
+        if(Math.random()<.4)
+          spSpark(cx+side*nacX+(Math.random()-.5)*3*U,cy+nacYc+(Math.random()-.5)*8*U,1,.8);
+      });
+    }
+  }
+
+  function frame(ts2){
+    const dt=Math.min((ts2-dmgLT)/16.67,3);dmgLT=ts2;dmgT+=.016*dt;
+    // Resize canvas to its actual rendered size every frame while it's small
+    // (the tab may have been hidden at initDmg time giving 0×0)
+    const nw=wrap.offsetWidth, nh=wrap.offsetHeight;
+    if(nw>10&&nh>10&&(cv.width!==nw||cv.height!==nh)){cv.width=nw;cv.height=nh;}
+    const W=cv.width,H=cv.height;const g=cv.getContext('2d');
+    if(W<10||H<10){requestAnimationFrame(frame);return;}
+    // U matches dmgDrawShip exactly
+    const U=Math.min(W*0.75/31,H*0.75/35)*0.984375;
+    const cx=W/2, cy=H/2-0.5*U;
+    g.clearRect(0,0,W,H);g.fillStyle='#010408';g.fillRect(0,0,W,H);
+    // Background stars
+    for(let i=0;i<180;i++){
+      const bx=(Math.sin(i*137.5)*.5+.5)*W,by=(Math.cos(i*97.3)*.5+.5)*H;
+      g.fillStyle=`rgba(200,215,255,${(.03+Math.abs(Math.sin(dmgT*.25+i))*.11).toFixed(2)})`;
+      g.fillRect(bx,by,1,1);
+    }
+    // Collect damage state
+    let dmgSystems={superstructure:100,engine:100,shields:null};
+    let hullPct=1,dmgPct=0;
+    if(GS){
+      const s=GS.player;
+      hullPct=s.superstructure/s.superstructureMax;
+      dmgPct=1-hullPct;
+      dmgSystems={
+        superstructure:Math.round(hullPct*100),
+        engine:Math.round(s.currentPower/s.totalPower*100),
+        shields:s.shieldGenAlive.map(a=>!a), // true = dead
+      };
+      spawnDmgParticles(cx,cy,W,H,dmgPct,dmgSystems);
+    }
+    tickPS();
+    // Draw ship
+    if(GS) dmgDrawShip(g,W,H,dmgT,hullPct,dmgSystems);
+    // Draw particles on top
+    drawPS(g);
+    // Vignette
+    if(W>10&&H>10){
+      const vg=g.createRadialGradient(cx,cy,H*.22,cx,cy,Math.max(H*.22+.1,H*.7));
+      vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.6)');
+      g.fillStyle=vg;g.fillRect(0,0,W,H);
+    }
+    g.fillStyle='rgba(0,0,0,.04)';for(let y=0;y<H;y+=3)g.fillRect(0,y,W,1);
+    // Critical damage red alert pulse
+    if(GS&&GS.player.superstructure<GS.player.superstructureMax*.35){
+      const ap=Math.max(0,Math.sin(dmgT*4)*.07);
+      g.fillStyle=`rgba(200,0,0,${ap})`;g.fillRect(0,0,W,H);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function sw(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('v-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='dmg'){
+    const cv=document.getElementById('dmg-cv');
+    const wrap=document.getElementById('dmg-wrap');
+    if(wrap&&cv){
+      const nw=wrap.offsetWidth,nh=wrap.offsetHeight;
+      if(nw>10&&nh>10){cv.width=nw;cv.height=nh;}
+    }
+  }
+  setAmbTab(id);
+}
+
+function showHint(txt){document.getElementById('tac-hint').textContent=txt;}
+
+function showButtons(show, hideOthers){
+  const btns=['endphase','hold','nofire','fire'];
+  btns.forEach(id=>{
+    const el=document.getElementById('btn-'+id);
+    if(!el) return;
+    el.style.display=show.includes(id)?'block':'none';
+  });
+  // Weapon fire panel — hide unless it's a fire phase
+  const panel=document.getElementById('wpn-fire-panel');
+  if(panel&&!show.includes('nofire')) panel.style.display='none';
+  // Undo is managed separately via showUndoBtn
+  if(!show.includes('undo')){showUndoBtn(false);}
+}
+
+function updatePhaseUI(){
+  if(!GS) return;
+  const p=GS.phase;
+  const name=PHASE_NAMES[p]||p;
+  document.getElementById('hdr-phase').textContent=p.toUpperCase();
+  document.getElementById('sb-phase').textContent=name;
+  document.getElementById('hdr-title').textContent=`Tactical Command — Turn ${GS.turn} — ${name}`;
+  const pips=['pwr','m1','f1','m2','f2','m3','f3','rp'];
+  const phases=['power','move1','fire1','move2','fire2','move3','fire3','repower'];
+  const cur=phases.indexOf(p);
+  pips.forEach((pid,i)=>{
+    const el=document.getElementById('pip-'+pid);if(!el)return;
+    el.className='pip'+(i<cur?' done':i===cur?' now':'');
+  });
+}
+
+function updateSidebar(){
+  if(!GS) return;
+  const upd=(pfx,s)=>{
+    const hull=Math.round(s.superstructure/s.superstructureMax*100);
+    const hcol=hull>60?'#336633':hull>30?'#886600':'#aa2200';
+    const hb=document.getElementById(pfx+'b-hull');if(hb){hb.style.width=hull+'%';hb.style.background=hcol;}
+    const hv=document.getElementById(pfx+'v-hull');if(hv){hv.textContent=hull+'%';hv.style.color=hcol;}
+    const totShlds=s.shields.reduce((a,b)=>a+b,0);
+    const maxShlds=s.shieldGenAlive.filter(x=>x).length*s.maxShieldPerFace||1;
+    const sp=Math.round(totShlds/maxShlds*100);
+    const sb=document.getElementById(pfx+'b-shld');if(sb){sb.style.width=sp+'%';}
+    const sv=document.getElementById(pfx+'v-shld');if(sv)sv.textContent=totShlds+' pts';
+    const pp=Math.round(s.currentPower/s.totalPower*100);
+    const pb=document.getElementById(pfx+'b-pwr');if(pb){pb.style.width=pp+'%';}
+    const pv=document.getElementById(pfx+'v-pwr');if(pv)pv.textContent=s.currentPower;
+    // Status bar (player only)
+    if(pfx==='p'){
+      const sfh=document.getElementById('sbf-hull');if(sfh){sfh.style.width=hull+'%';sfh.style.background=hcol;}
+      const svh=document.getElementById('sbv-hull');if(svh){svh.textContent=hull+'%';svh.style.color=hcol;}
+      const fwdShld=s.shields[0];const fwdMax=s.maxShieldPerFace;
+      const fsp=Math.round(fwdShld/fwdMax*100);
+      const sfs=document.getElementById('sbf-shld');if(sfs){sfs.style.width=fsp+'%';sfs.style.background='#1a44aa';}
+      const svs=document.getElementById('sbv-shld');if(svs)svs.textContent=fwdShld+'pts';
+      const wpp=Math.round(s.currentPower/s.totalPower*100);
+      const sfw=document.getElementById('sbf-warp');if(sfw){sfw.style.width=wpp+'%';sfw.style.background='#886600';}
+      const svw=document.getElementById('sbv-warp');if(svw)svw.textContent=s.currentPower;
+      const armedWpn=s.weapons.filter(w=>w.alive).length;const totalWpn=s.weapons.length;
+      const swf=document.getElementById('sbf-wpn');if(swf){swf.style.width=Math.round(armedWpn/totalWpn*100)+'%';swf.style.background='#1a3888';}
+      const svwp=document.getElementById('sbv-wpn');if(svwp)svwp.textContent=armedWpn+'/'+totalWpn;
+      const ssf=document.getElementById('sbf-sens');if(ssf){ssf.style.width=s.sensors+'%';ssf.style.background=s.sensors>50?'#336633':'#886600';}
+      const svse=document.getElementById('sbv-sens');if(svse)svse.textContent=s.sensors+'%';
+    }
+  };
+  upd('p',GS.player);upd('e',GS.enemy);
+}
+
+function buildWpnFireBtns(){
+  const panel=document.getElementById('wpn-fire-panel');
+  if(!panel||!GS) return;
+  panel.innerHTML='';
+  GS.player.weapons.forEach(w=>{
+    const btn=document.createElement('button');
+    btn.className='wpn-fire-btn';
+    btn.id='wfb-'+w.id;
+    btn.onclick=()=>fireWeapon(w.id);
+    updateWpnFireBtn(w,btn);
+    panel.appendChild(btn);
+  });
+}
+
+function getWeaponBlockReason(w){
+  // Returns a short reason string if the weapon cannot fire right now, or null if fireable.
+  if(!GS||!FIRE_PHASES.includes(GS.phase)) return null;
+  if(!w.alive) return 'DESTROYED';
+  if(w.fired) return 'FIRED THIS PHASE';
+  if(!w.armed) return 'NOT ARMED';
+  const shooter=GS.player, target=GS.enemy;
+  // Range check first — most visible reason
+  const range=hexDist(shooter.col,shooter.row,target.col,target.row);
+  const maxR=w.maxRange||15;
+  if(range>maxR) return `OUT OF RANGE — ${range} hexes (max ${maxR})`;
+  // Power check for beams
+  if(w.type==='beam'&&(!w.poweredWith||w.poweredWith<=0)) return 'NO POWER ALLOCATED';
+  // Arc check
+  if(!weaponArcCoversTarget(w,shooter,target)){
+    const arcNames=['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+    return `NOT IN ARC — rotate to: ${w.arcs.map(a=>arcNames[a]).join('/')}`;
+  }
+  // Terrain info (doesn't block, just warns)
+  const sTerrain=terrain[`${shooter.col},${shooter.row}`]||'S';
+  if(sTerrain==='N') return 'NEBULA — SENSORS DEGRADED';
+  return null; // clear to fire
+}
+
+function updateWpnFireBtn(w,btn){
+  if(!btn) btn=document.getElementById('wfb-'+w.id);
+  if(!btn) return;
+  const arcNames=['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+  const arcs=w.arcs.map(a=>arcNames[a]).join('/');
+  const dmgStr=w.type==='missile'?`DMG:${w.fixedDmg}`:`DMG:${w.poweredWith||0}`;
+  const pwrStr=w.type==='missile'?`ARM:${w.armCost||6}pwr`:`${w.poweredWith||0}pwr`;
+  const inFirePhase=!!GS&&FIRE_PHASES.includes(GS.phase);
+  const blockReason=inFirePhase?getWeaponBlockReason(w):null;
+  const canFire=inFirePhase&&!blockReason&&w.alive&&w.armed&&!w.fired;
+  // Terrain context badges
+  const sTerrain=GS?terrain[`${GS.player.col},${GS.player.row}`]||'S':'S';
+  const tTerrain=GS?terrain[`${GS.enemy.col},${GS.enemy.row}`]||'S':'S';
+  const terrainBadge=inFirePhase&&sTerrain!=='S'?`<span class="wpn-terrain-badge">${
+    sTerrain==='N'?'⚠ IN NEBULA':sTerrain==='A'?'⚠ IN ASTEROID':sTerrain==='G'?'⚠ GRAV WELL':''
+  }</span>`:'';
+  const tgtBadge=inFirePhase&&tTerrain!=='S'&&w.type==='beam'?`<span class="wpn-terrain-badge tgt">${
+    tTerrain==='N'?'⚠ TGT NEBULA':tTerrain==='A'?'⚠ TGT ASTEROID':''
+  }</span>`:'';
+  btn.innerHTML=`
+    <div class="wfb-name">${w.alive?'':'[DEAD] '}${w.name}${terrainBadge}${tgtBadge}</div>
+    <div class="wfb-info">Arc:${arcs} · ${pwrStr} · ${dmgStr}</div>
+    ${blockReason&&!w.fired&&w.alive?`<div class="wfb-block">⊘ ${blockReason}</div>`:''}
+  `;
+  btn.disabled=!canFire;
+  btn.classList.toggle('charged', canFire);
+  btn.classList.toggle('fired', !!w.fired);
+  btn.classList.toggle('blocked', !canFire&&w.alive&&w.armed&&!w.fired&&inFirePhase);
+  if(!w.alive) btn.style.opacity='.3';
+  else btn.style.opacity='';
+}
+
+function refreshWpnFireBtns(){
+  if(!GS) return;
+  GS.player.weapons.forEach(w=>updateWpnFireBtn(w));
+  // If all armed weapons fired, auto-advance hint
+  const armed=GS.player.weapons.filter(w=>w.armed&&w.alive);
+  const allFired=armed.length>0&&armed.every(w=>w.fired);
+  if(allFired) showHint('All armed weapons fired. Click End Phase or No Fire.');
+}
+
+function fireWeapon(wid){
+  if(!GS||!FIRE_PHASES.includes(GS.phase)) return;
+  const w=GS.player.weapons.find(x=>x.id===wid);
+  if(!w||!w.alive||!w.armed||w.fired){
+    log('Weapon not available','warn');return;
+  }
+  // Fire this specific weapon at the enemy
+  const shooter=GS.player, target=GS.enemy;
+  const range=hexDist(shooter.col,shooter.row,target.col,target.row);
+  // Check beam weapons have power allocated
+  if(w.type==='beam' && (!w.poweredWith || w.poweredWith<=0)){
+    log(`${w.name}: No power allocated — go to Power Allocation tab and set power for this weapon`,'warn');
+    return;
+  }
+  // Check range
+  const maxRange=w.maxRange||15;
+  if(range>maxRange){
+    log(`${w.name}: Target out of range (range ${range}, max ${maxRange})`,'warn');
+    return;
+  }
+  // Check firing arc
+  if(!weaponArcCoversTarget(w,shooter,target)){
+    log(`${w.name}: Target not in arc [${w.arcs.map(a=>['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'][a]).join('/')}] — rotate ship to bring target into arc`,'warn');
+    return;
+  }
+  // Check terrain modifiers
+  const shooterTerrain=terrain[`${shooter.col},${shooter.row}`]||'S';
+  const targetTerrain=terrain[`${target.col},${target.row}`]||'S';
+  if(shooterTerrain==='N'){
+    log(`⚠ You are in a NEBULA — sensors degraded, firing accuracy reduced`,'warn');
+  }
+  if(targetTerrain==='N'){
+    log(`⚠ Target is in a NEBULA — sensor lock degraded, +1 to required roll`,'warn');
+  }
+  if(targetTerrain==='A'&&w.type==='beam'){
+    log(`⚠ Target in ASTEROID FIELD — +1 cover, beam weapons partially deflected`,'warn');
+  }
+  // To-hit roll
+  GS.turn_stats.playerShotsFired++;
+  const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
+  const rk=Math.min(range,15);
+  const [,maxR]=chart[rk]||[0,0];
+  const roll=d10();
+  const hit=roll>=1&&roll<=maxR&&maxR>0;
+  log(`${w.name} at range ${range}: Chart <span class="chart">${w.chart}</span> need <span class="die">1-${maxR}</span> rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
+  w.fired=true;
+  triggerWeaponFX(shooter,target,w,hit);
+  if(hit){
+    GS.turn_stats.playerShotsHit++;
+    let dmg=0;
+    if(w.type==='beam'){
+      dmg=w.poweredWith;
+      if(w.dmgMod&&range<=w.dmgMod.maxRange) dmg+=w.dmgMod.bonus;
+    } else { dmg=w.fixedDmg||20; }
+    log(`Damage: <b>${dmg}</b> pts`,'dmg');
+    // Determine hit face
+    function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
+    const sc2=toCube(shooter.col,shooter.row),tc2=toCube(target.col,target.row);
+    const dx=tc2.x-sc2.x,dz=tc2.z-sc2.z;
+    const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]];
+    let hitFaceAbs=0,bestDot=-99;
+    CUBE_DIRS.forEach(([ex,ey,ez],i)=>{const dot=(-dx)*ex+(-dz)*ez;if(dot>bestDot){bestDot=dot;hitFaceAbs=i;}});
+    const hitFace=((hitFaceAbs-target.facing)+6)%6;
+    log(`Hits ${SHIELD_NAMES[hitFace]} shield (face ${hitFace})`,'info');
+    // Shield absorption
+    if(target.shieldGenAlive[hitFace]&&target.shields[hitFace]>0){
+      const absorbed=Math.min(target.shields[hitFace],dmg);
+      target.shields[hitFace]-=absorbed;dmg-=absorbed;
+      log(`Shield absorbs ${absorbed} → ${dmg} penetrates`,'info');
+    } else if(!target.shieldGenAlive[hitFace]){
+      log(`${SHIELD_NAMES[hitFace]} shield generator DEAD — full damage penetrates`,'warn');
+    }
+    if(dmg>0){
+      snd('explosion');
+      const locRoll=d10();
+      const loc=DMG_LOCATION[locRoll];
+      log(`Location roll <span class="die">${locRoll}</span> → <b>${loc}</b>`,'roll');
+      applyDamage(target,dmg,loc,hitFace);
+    } else { snd('shieldhit'); }
+    checkVictory();
+  } else { snd('miss'); }
+  // Mark player as having declared fire this phase
+  GS.playerFireDeclared=true;
+  refreshWpnFireBtns();
+  updateSidebar();
+  renderDmgView();
+}
+
+function declareNoFire(){
+  GS.playerFireDeclared=false;
+  log('You: NO FIRE this phase','info');
+  // Reveal AI fire and advance
+  const efired=GS.enemyFireDeclared;
+  log(`--- Fire phase: You=no fire · Enemy=${efired?'FIRE':'no fire'} ---`,'phase');
+  if(efired) resolveShipFiring(GS.enemy,GS.player,GS.subPhaseIdx);
+  checkVictory();
+  if(!GS.over){
+    const seq=['move1','fire1','move2','fire2','move3','fire3','repower'];
+    const ci=seq.indexOf(GS.phase);
+    if(ci>=0&&ci<seq.length-1) enterPhase(seq[ci+1]);
+    else enterPhase('repower');
+  }
+}
+
+function initUI(){
+  if(!GS) return;
+  const s=GS.player;
+  const tmpl=SHIP_REGISTRY[s.key];
+  document.getElementById('pwr-ship-name').textContent=s.name.toUpperCase();
+  document.getElementById('pwr-ship-sub').textContent=`${s.reg} · ${s.cls}`;
+  document.getElementById('pwr-total').textContent=s.totalPower;
+  document.getElementById('shld-ratio-lbl').textContent=`Ratio ${s.shieldRatio===0.5?'1/2':s.shieldRatio}`;
+  document.getElementById('shld-max-lbl').textContent=s.maxShieldPerFace;
+  document.getElementById('shld-center').textContent=s.reg;
+  document.getElementById('sb-id').textContent=`${s.name} · ${s.reg}`;
+  document.getElementById('p-name').textContent=s.name;
+  document.getElementById('p-class').textContent=`${s.cls} · ${s.reg}`;
+  document.getElementById('e-name').textContent=GS.enemy.name;
+  document.getElementById('e-class').textContent=GS.enemy.cls;
+  // Ship stats panel
+  const sp=document.getElementById('ship-stats-panel');
+  sp.innerHTML=`<div>Total Power: <span style="color:#ff9900">${s.totalPower}</span></div><div>Move Ratio: <span style="color:#bb7700">${s.moveRatio}/1</span></div><div>Shield Ratio: <span style="color:#1a44aa">1/${1/s.shieldRatio}</span></div><div>Max Shld/Face: <span style="color:#1a44aa">${s.maxShieldPerFace}</span></div><div>Superstructure: <span style="color:#336633">${s.superstructureMax} boxes</span></div>`;
+  // Slider max
+  document.getElementById('sl-mv').max=s.totalPower;
+  document.getElementById('sl-sh').max=s.totalPower;
+  // Weapon rows
+  const wr=document.getElementById('wpn-rows');wr.innerHTML='';
+  s.weapons.forEach(w=>{
+    const row=document.createElement('div');row.className='wpn-row';
+    const isMissile=w.type==='missile';
+    row.innerHTML=`<div class="wpn-arm" data-wid="${w.id}" onclick="togArm(this,'${w.id}')"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><input type="number" class="wpn-in" id="wi-${w.id}" value="0" min="0" max="${isMissile?w.armCost||6:w.maxPower}" ${isMissile?'disabled':''} oninput="clampWeaponInput('${w.id}');updPwr()"><div class="wpn-dmg">${isMissile?`DMG ${w.fixedDmg}`:`MAX ${w.maxPower}`}</div>`;
+    wr.appendChild(row);
+  });
+  // Build weapon fire buttons for the fire phase
+  buildWpnFireBtns();
+  // Set slider defaults
+  document.getElementById('sl-mv').value=0;
+  document.getElementById('sl-sh').value=0;
+  // Update faction header
+  const pill=document.getElementById('hdr-faction');
+  if(pill) pill.textContent=s.faction==='fed'?'STARFLEET':'EMPIRE';
+  // Reset shield mode to auto on new game
+  shieldMode='auto';shieldManualPts=[0,0,0,0,0,0];
+  const modeBtn=document.getElementById('shld-mode-btn');
+  if(modeBtn){modeBtn.textContent='MANUAL';modeBtn.style.color='#3366cc';modeBtn.style.borderColor='#1a3366';}
+  const autoP=document.getElementById('shld-auto-panel');
+  const manP=document.getElementById('shld-manual-panel');
+  if(autoP) autoP.style.display='block';
+  if(manP) manP.style.display='none';
+  updPwr();
+  updateSidebar();
+}
+
+function log(msg,cls='info'){
+  if(!GS) return;
+  GS.combatLog.push({msg,cls});
+  const el=document.getElementById('combat-log');
+  if(el){
+    const d=document.createElement('div');d.className='log-entry '+cls;d.innerHTML=msg;
+    // tac-log-entries uses flex column-reverse so new entries appear at top visually
+    el.appendChild(d);
+    // Trim to last 200 entries to prevent memory growth
+    while(el.children.length>200) el.removeChild(el.firstChild);
+  }
+}
+function logPhase(msg){log(msg,'phase');}
+function addPlog(msg,cls){
+  const el=document.getElementById('p-log');if(!el)return;
+  const d=document.createElement('div');d.className='plog-e '+cls;d.textContent=msg;el.prepend(d);
+  while(el.children.length>15)el.removeChild(el.lastChild);
+}
+function addDmgLog(msg,cls){
+  if(!GS)return;GS.dmgLog.push({msg,cls});
+  const el=document.getElementById('dmg-log');if(!el)return;
+  const d=document.createElement('div');d.className='dlog-e '+cls;d.textContent=msg;el.prepend(d);
+}
+
+function updDiffLabel(){
+  const v=document.getElementById('diff-slider').value;
+  document.getElementById('diff-label').textContent=DIFF_NAMES[parseInt(v)].toUpperCase();
+}
+
+let playerFaction='fed'; // 'fed' or 'kli'
+function chooseFaction(f){
+  playerFaction=f;
+  document.getElementById('fb-fed').classList.toggle('active',f==='fed');
+  document.getElementById('fb-kli').classList.toggle('active',f==='kli');
+  // Swap ship selectors to match faction
+  const pSel=document.getElementById('player-ship');
+  const eSel=document.getElementById('enemy-ship');
+  if(f==='fed'){
+    pSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option>';
+    eSel.innerHTML='<option value="D7">IKS Kronos — D-7 Class</option>';
+  } else {
+    pSel.innerHTML='<option value="D7">IKS Kronos — D-7 Class</option>';
+    eSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STARTUP
+// ═══════════════════════════════════════════════════════════════════════════
+updDiffLabel();
+// Pre-init canvases so they resize correctly
+initTac();
+initDmg();
+</script>
+</body>
+</html>
