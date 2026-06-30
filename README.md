@@ -7,11 +7,11 @@ A single-file browser implementation of the FASA Starship Tactical Combat Simula
 ## Quick Start
 
 1. Open `StarTrek_TacticalCommand_GAME.html` in any modern browser (Chrome, Firefox, Edge, Safari)
-2. Choose your faction — **Federation** or **Klingon Empire**
+2. Choose your faction — **Federation**, **Klingon Empire**, or **Romulan Star Empire**
 3. Set the AI difficulty (1 = Cadet, 5 = Admiral)
 4. Click **Launch Mission**
 
-That's it. The game runs entirely in your browser.
+That's it. The game runs entirely in your browser. The whole interface re-themes to match your chosen faction's colors — Federation blue, Klingon red-orange, or Romulan green.
 
 ---
 
@@ -26,6 +26,33 @@ The game has four tabs across the top:
 | **Damage Control** | Real-time ship silhouette showing hull integrity and shield status. |
 
 The **status bar** below the tabs shows the current turn, current phase, and your ship's remaining hull percentage at all times.
+
+---
+
+## Reading the Tactical Map
+
+Every ship on the hex grid shows four small letters around it marking its orientation:
+
+| Letter | Meaning |
+|--------|---------|
+| **F** | Forward — the direction the bow is pointing |
+| **A** | Aft — directly behind the ship |
+| **S** | Starboard — to the right of forward |
+| **P** | Port — to the left of forward |
+
+A bright arrowhead also points in the Forward direction, color-matched to your faction. Use these together with the firing arc info on each weapon button to judge whether a target is in range and arc before committing power.
+
+### Navigating the Map
+
+| Action | Result |
+|--------|--------|
+| Scroll wheel | Zoom in/out, anchored to your cursor position (50%–500%) |
+| Click your own ship | Centers the view on your ship |
+| `F` key | Snap-center the view on your ship |
+| Double-click anywhere | Reset zoom to 100% and re-center |
+| Click a green hex (move phase) | Move your ship there |
+
+If text or hex details are hard to read at the default zoom, scroll in — the map redraws at any zoom level.
 
 ---
 
@@ -62,14 +89,18 @@ The budget bar at the top of the power tab shows how much of your total power is
 
 ### Movement Phases
 
-During Move 1, Move 2, and Move 3:
+Movement happens in **three independent phases** per turn — Move 1, Move 2, Move 3 — not one long move. The move points you committed in Power Allocation are split across the three phases (shown as `Ph.1:2 / Ph.2:1 / Ph.3:1` in the Power tab). **Unused points from one phase do not carry over to the next** — if you don't spend Move 1's points, they're gone when Move 2 starts.
 
-- **Click a green hex** to move your ship there. Reachable hexes are highlighted green.
-- Green hex cost is shown as a number in each hex based on terrain.
+During each move phase:
+
+- **Click a green hex** to move your ship there. Reachable hexes — within *this phase's* remaining points only — are highlighted green.
+- Each green hex shows a small number: the movement point cost to enter it (1 for open space, more for difficult terrain).
+- A label in the corner of the map shows `Phase 2/3 · 1 pts` so you always know which phase you're in and how many points are left in it.
+- The sidebar also breaks down all three phases at once, with the current one marked `▶`.
 - You can rotate before or after moving.
-- Click **Undo Last Move** to take back your last move within the current sub-phase.
+- Click **Undo Last Move** to take back your last move within the current phase.
 - Click **Hold Station** to stay in place (still uses a movement action).
-- Click **End Phase** when done moving.
+- Click **End Phase** when done moving — unspent points in this phase are lost.
 
 **Keyboard controls during movement:**
 
@@ -80,21 +111,27 @@ During Move 1, Move 2, and Move 3:
 | `E` | Rotate 60° starboard (clockwise) |
 | `A` | Sideslip port |
 | `D` | Sideslip starboard |
+| `F` | Center the view on your ship |
 
 > The tactical map must have focus for keyboard controls to work. Click anywhere on the map hex grid first.
 
 ### Fire Phases
 
-During Fire 1, Fire 2, and Fire 3 your armed weapons appear as individual buttons in the right sidebar.
+Fire 1, Fire 2, and Fire 3 follow each move phase. Your armed weapons appear as individual buttons in the right sidebar, each showing live targeting information:
 
-- **Glowing red button** = weapon is charged and ready to fire. Click it to fire.
-- **Amber button with reason text** = weapon is blocked. The reason is shown directly on the button:
-  - `OUT OF RANGE — 12 hexes (max 8)` — close the distance
-  - `NO POWER ALLOCATED` — go back to Power Allocation next turn
-  - `NOT IN ARC — rotate to: F/F-Stbd` — rotate your ship to bring target into arc
-  - `NEBULA — SENSORS DEGRADED` — you are in a nebula, accuracy reduced
+- **Arc status** — `Arc: F/F-Stbd/F-Port  ✓ TARGET IN ARC` or `✗ NOT IN ARC`, so you know immediately whether the enemy is within this weapon's firing arc.
+- **Range status** — `Range: 4 hexes (max 6)  ✓ IN RANGE` or `✗ OUT OF RANGE`.
+- **Power/damage** — shows current power committed and expected damage (or `DMG:rng-vary` for plasma weapons, whose damage falls off with range).
+- **Glowing button** = weapon is charged and ready to fire. Click it to fire.
+- **Blocked button** with a reason — block reasons are now specific and actionable:
+  - `OUT OF RANGE — 12 hexes (max 8) — close distance`
+  - `NO POWER — set power in Power tab before committing` — power must be committed in the Power tab *before* the fire phase; setting the slider alone isn't enough
+  - `NOT IN ARC — covers F/F-Port — rotate ship`
+  - `CLOAKED — disengage cloak to fire` (Romulan ships only)
 - **No Fire** — skip this fire phase without firing any weapons
 - **End Phase** — advance to the next phase (unfired weapons are skipped)
+
+On the tactical map itself, all hexes covered by your armed weapons' firing arcs are tinted teal. The enemy's hex glows bright green when it's a valid target (in arc and in range) or red when it currently isn't.
 
 You can fire weapons in any order across the three fire phases. A weapon can only fire once per turn.
 
@@ -122,16 +159,27 @@ At the end of each turn, power is automatically restored. All weapon charges res
 - Damage equals the power you put in, plus range bonuses at close range
 - Can fire in any fire phase
 
-### Missile Weapons (Photon Torpedoes / Plasma)
+### Missile Weapons (Photon Torpedoes / Plasma Bolts)
 
 - Arm the weapon using the arm button — this reserves the arm cost from your power budget
 - No additional power input needed
-- Fixed damage regardless of range
-- Romulan plasma weapons deal degrading damage the further the target is
+- Photon torpedoes deal fixed damage regardless of range
+- **Plasma bolts (Romulan)** deal degrading damage the further the target is — heaviest near point-blank, falling off sharply at long range. The fire button shows `DMG:rng-vary` instead of a fixed number, and the combat log reports the exact damage rolled for that range each time it fires.
 
 ### Accelerator Cannons (Orion)
 
 - Treated as missiles — fixed arm cost, fixed damage
+
+---
+
+## Cloaking (Romulan)
+
+Ships equipped with a cloaking device show an **⬡ ENGAGE CLOAK** button at the bottom of the Power Allocation tab, below the weapons list. This only appears for ships that have the device — Federation and Klingon ships in this version do not.
+
+- Engaging the cloak costs power (shown on the button, e.g. "cost: 15 pwr") and **disarms all weapons** — you cannot fire while cloaked.
+- While cloaked your ship renders at low visibility on the tactical map with a `[CLOAKED]` label in place of its name.
+- Click **⬡ DISENGAGE CLOAK** to drop the cloak and restore weapons access starting next turn.
+- The cloak toggle only works during the Power Allocation phase, before you commit.
 
 ---
 
@@ -174,14 +222,26 @@ The combat log is the left panel on the Tactical Map tab. It shows every dice ro
 
 ---
 
+## Victory and Defeat
+
+When either ship's superstructure reaches zero, the battle ends immediately and a results screen appears with:
+
+- **VICTORY** or **DEFEAT** in large text
+- A short narrative paragraph describing how the finishing blow landed — which weapon fired, where it struck, and whether the target's shields had already failed or simply weren't enough. This is generated from what actually happened in that exchange, not a generic message, so a torpedo kill reads differently from a disruptor kill or a plasma bolt kill.
+- Turn count and shot accuracy stats for both sides
+- A pulsing **"press any key to continue"** prompt — press any key, or click anywhere on the screen other than the New Mission button, to return to the start menu. There's a brief pause before this activates so a key still held down from the heat of combat doesn't skip past the result instantly.
+
+---
+
 ## Ship Roster (v1)
 
 | Ship | Faction | Power | Move Ratio | Superstructure |
 |------|---------|-------|-----------|---------------|
 | Constitution class | Federation | 38 | 4/1 | 24 |
 | D-7 class | Klingon Empire | 34 | 4/1 | 20 |
+| V-8 Bird of Prey | Romulan Star Empire | 26 | 3/1 | 15 |
 
-Additional ships from the FASA Ship Recognition Manuals will be added in subsequent versions.
+The V-8 carries a forward/port/starboard disruptor and a forward-only plasma bolt launcher, plus a cloaking device — see **Cloaking** above. Additional ships from the FASA Ship Recognition Manuals will be added in subsequent versions.
 
 ---
 
@@ -199,12 +259,15 @@ Additional ships from the FASA Ship Recognition Manuals will be added in subsequ
 
 ## Factions
 
-| Faction | Beam Weapon | Missile | Shield Ratio |
-|---------|------------|---------|-------------|
-| United Federation of Planets | Phaser (Chart W) | Photon Torpedo (Chart O) | 1/2 |
-| Klingon Empire | Disruptor (Chart S) | Photon Torpedo (Chart O) | 1/2 |
+| Faction | Beam Weapon | Missile | Shield Ratio | Cloak |
+|---------|------------|---------|-------------|-------|
+| United Federation of Planets | Phaser (Chart W) | Photon Torpedo (Chart O) | 1/2 | No |
+| Klingon Empire | Disruptor (Chart S) | Photon Torpedo (Chart O) | 1/2 | No |
+| Romulan Star Empire | Disruptor (Chart J) | Plasma Bolt (Chart M, range-decaying damage) | 1/2 | Yes |
 
-Romulan, Orion, and Gorn factions are data-complete and will become selectable in a future version.
+The whole interface re-themes to your chosen faction's color scheme at launch — tabs, the commit button, power bars, weapon-armed indicators, and the header pill all switch from Federation blue to Klingon red-orange or Romulan green automatically.
+
+Orion and Gorn factions are data-complete and will become selectable in a future version.
 
 ---
 
@@ -216,6 +279,8 @@ Romulan, Orion, and Gorn factions are data-complete and will become selectable i
 - **Nebulas are double-edged.** Moving into one hides you from precise sensor lock but also degrades your own weapons.
 - **The undo button is your friend.** You can take back moves within a sub-phase. Use it to explore positioning before committing.
 - **Manual shield allocation** lets you stack points forward when closing on an enemy, or rear-weight shields when breaking off. Switching back to AUTO resets all faces to even distribution.
+- **Cloaking is an all-or-nothing trade.** You can't fire while cloaked, so use it to reposition or break contact, not as a free defense while attacking.
+- **Zoom in on tight engagements.** Scroll to zoom and click your own ship to center the view — useful once ships close to short range and the hex grid gets crowded.
 
 ---
 
