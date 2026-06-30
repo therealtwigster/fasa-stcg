@@ -53,6 +53,7 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .faction-btn:hover{background:#070f1e;}
 .faction-btn.fed.active{border-color:#2255aa;background:#030c1a;}
 .faction-btn.kli.active{border-color:#882200;background:#140600;}
+.faction-btn.rom.active{border-color:#228844;background:#021408;}
 .sc-launch:hover{background:#2a1200;box-shadow:0 0 20px rgba(255,153,0,.25);}
 
 /* ── VICTORY SCREEN ── */
@@ -61,6 +62,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .vic-title.win{color:#ff9900;}.vic-title.lose{color:#cc2200;}
 .vic-sub{font-size:12px;letter-spacing:3px;color:#556677;}
 .vic-stats{background:#030810;border:1px solid #334455;padding:16px 28px;font-size:10px;color:#8899aa;letter-spacing:2px;line-height:2.2;}
+.vic-narrative{max-width:560px;padding:0 28px;font-size:13px;line-height:1.8;color:#cfd8e2;text-align:center;font-style:italic;letter-spacing:.5px;}
+.vic-prompt{font-size:9px;letter-spacing:3px;color:#445566;text-transform:uppercase;animation:vicPulse 1.6s ease-in-out infinite;}
+@keyframes vicPulse{0%,100%{opacity:.35;}50%{opacity:.9;}}
 .vic-btn{padding:11px 40px;background:#030810;border:2px solid #ff9900;color:#ff9900;font-family:'Courier New',monospace;font-size:12px;letter-spacing:4px;cursor:pointer;text-transform:uppercase;border-radius:3px;transition:all .15s;}
 .vic-btn:hover{background:#1a0800;}
 
@@ -117,6 +121,12 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .pwr-sl{flex:1;-webkit-appearance:none;height:4px;background:#0a1522;border-radius:2px;outline:none;}
 .pwr-sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:#ff9900;border-radius:50%;cursor:pointer;box-shadow:0 0 5px rgba(255,153,0,.45);}
 .pwr-sl.shld::-webkit-slider-thumb{background:#3366cc;}
+.pwr-sl-wrap{flex:1;position:relative;min-height:24px;display:flex;align-items:center;}
+.tick-row{position:absolute;left:0;right:0;top:11px;height:14px;font-size:7px;color:#28405a;letter-spacing:0;user-select:none;pointer-events:none;}
+.tick-row .tick{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap;}
+.tick-row .tick::before{content:'';display:block;width:1px;height:4px;background:#28405a;margin:0 auto 1px;}
+.tick-row .tick.major{color:#3a5a7a;font-weight:bold;}
+.tick-row .tick.major::before{height:6px;background:#3a5a7a;}
 .pwr-val{width:38px;text-align:right;font-size:11px;color:#cc8800;letter-spacing:1px;}
 .pwr-val.sv{color:#3366cc;}
 .shld-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:360px;margin-bottom:10px;}
@@ -217,6 +227,10 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
           <div style="font-size:11px;letter-spacing:2px;color:#cc5522;margin-bottom:3px">⬡ KLINGON</div>
           <div style="font-size:9px;color:#442211;letter-spacing:1px">IKS Kronos · D-7 Class</div>
         </div>
+        <div class="faction-btn rom" id="fb-rom" onclick="chooseFaction('rom')">
+          <div style="font-size:11px;letter-spacing:2px;color:#33bb66;margin-bottom:3px">⬡ ROMULAN</div>
+          <div style="font-size:9px;color:#1a4428;letter-spacing:1px">RIS Talon · V-8 Bird of Prey</div>
+        </div>
       </div>
     </div>
     <div class="sc-row">
@@ -250,8 +264,10 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 <div id="victory-screen">
   <div class="vic-title" id="vic-title">VICTORY</div>
   <div class="vic-sub" id="vic-sub">Enemy vessel destroyed</div>
+  <div class="vic-narrative" id="vic-narrative"></div>
   <div class="vic-stats" id="vic-stats"></div>
-  <button class="vic-btn" onclick="location.reload()">⬡ New Mission</button>
+  <div class="vic-prompt" id="vic-prompt">— press any key to continue —</div>
+  <button class="vic-btn" id="vic-btn" onclick="location.reload()">⬡ New Mission</button>
 </div>
 
 <!-- HEADER -->
@@ -393,13 +409,18 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     </div>
     <div style="padding:2px 10px 10px;font-size:9px;color:#283040;letter-spacing:1px">
       → <span id="mv-pts" style="color:#bb7700">2 move pts</span> · Phase split: <span id="mv-spl" style="color:#445566">1/1/0</span>
+      <div style="color:#1e2e3e;margin-top:2px">Move/Fire repeats 3×. Each phase gets its own pts — unused pts don't carry over.</div>
     </div>
     <div class="pwr-sec">Shields — <span id="shld-ratio-lbl" style="color:#3366cc">Ratio 1/2</span>
       <span style="float:right;cursor:pointer;font-size:8px;letter-spacing:1px;color:#3366cc;border:1px solid #1a3366;padding:1px 6px;border-radius:2px" id="shld-mode-btn" onclick="toggleShieldMode()">MANUAL</span>
     </div>
     <div class="pwr-row" id="pwr-sh-row">
       <div class="pwr-lbl">Power to Shields</div>
-      <input type="range" class="pwr-sl shld" id="sl-sh" min="0" max="30" value="0" oninput="clampSlider('sl-sh');updPwr()">
+      <div class="pwr-sl-wrap">
+        <input type="range" class="pwr-sl shld" id="sl-sh" min="0" max="30" value="0" step="1" list="sh-ticks" oninput="clampSlider('sl-sh');updPwr()">
+        <datalist id="sh-ticks"></datalist>
+        <div id="sh-tick-row" class="tick-row"></div>
+      </div>
       <div class="pwr-val sv" id="v-sh">0</div>
     </div>
     <div style="padding:2px 10px 6px;font-size:9px;color:#283040;letter-spacing:1px">
@@ -407,17 +428,19 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     </div>
     <!-- AUTO mode: even distribution display -->
     <div id="shld-auto-panel">
+      <div style="font-size:8px;letter-spacing:2px;color:#1e3a52;text-transform:uppercase;padding:0 2px 3px">Forward Arc</div>
       <div class="shld-grid" id="shld-grid">
         <div class="sf"><div class="sf-l">F-Port</div><div class="sf-v" id="sf-fp">0</div><div class="sf-p">pts</div></div>
         <div class="sf"><div class="sf-l">Forward</div><div class="sf-v" id="sf-fw">0</div><div class="sf-p">pts</div></div>
         <div class="sf"><div class="sf-l">F-Stbd</div><div class="sf-v" id="sf-fs">0</div><div class="sf-p">pts</div></div>
-        <div class="sf"><div class="sf-l">A-Port</div><div class="sf-v" id="sf-ap">0</div><div class="sf-p">pts</div></div>
-        <div style="display:flex;align-items:center;justify-content:center;font-size:9px;color:#1a2a3a;letter-spacing:1px" id="shld-center">AUTO</div>
-        <div class="sf"><div class="sf-l">A-Stbd</div><div class="sf-v" id="sf-as">0</div><div class="sf-p">pts</div></div>
-        <div style="visibility:hidden"></div>
-        <div class="sf"><div class="sf-l">Aft</div><div class="sf-v" id="sf-aft">0</div><div class="sf-p">pts</div></div>
-        <div style="visibility:hidden"></div>
       </div>
+      <div style="font-size:8px;letter-spacing:2px;color:#1e3a52;text-transform:uppercase;padding:6px 2px 3px;border-top:1px solid #0d1e2c;margin-top:4px">Aft Arc</div>
+      <div class="shld-grid">
+        <div class="sf"><div class="sf-l">A-Port</div><div class="sf-v" id="sf-ap">0</div><div class="sf-p">pts</div></div>
+        <div class="sf"><div class="sf-l">Aft</div><div class="sf-v" id="sf-aft">0</div><div class="sf-p">pts</div></div>
+        <div class="sf"><div class="sf-l">A-Stbd</div><div class="sf-v" id="sf-as">0</div><div class="sf-p">pts</div></div>
+      </div>
+      <div style="text-align:center;font-size:8px;color:#1a2a3a;letter-spacing:1px;margin-top:4px" id="shld-center">AUTO — distributed evenly</div>
       <div style="padding:2px 10px 4px;font-size:8px;color:#283040;letter-spacing:1px">Points distributed evenly across all faces</div>
     </div>
     <!-- MANUAL mode: per-face sliders -->
@@ -427,6 +450,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     </div>
     <div class="pwr-sec">Weapons</div>
     <div id="wpn-rows"></div>
+    <div id="cloak-row" style="display:none;margin:8px 0 4px;">
+      <button id="cloak-btn" onclick="toggleCloak()" style="width:100%;padding:7px 0;background:#021408;border:1px solid #228844;color:#33bb66;font-family:Courier New;font-size:10px;letter-spacing:2px;cursor:pointer;border-radius:2px;">⬡ ENGAGE CLOAK  (cost: <span id="cloak-cost-lbl">15</span> pwr)</button>
+    </div>
     <button class="commit" id="commit-btn" onclick="commitPwr()">⬡ Commit Power Allocation</button>
   </div>
   <div class="pwr-right">
@@ -498,8 +524,18 @@ const SHIP_REGISTRY = {
       {id:'db',name:'Disruptor Bank B',type:'beam',arcs:[0,2,3],chart:'S',maxPower:8,dmgMod:{bonus:2,maxRange:8}},
       {id:'dt',name:'Photon Torpedo',type:'missile',arcs:[0],chart:'O',armCost:6,fixedDmg:18,maxRange:15},
     ]
+  },
+  V8BirdOfPrey: {
+    name:'RIS Talon', reg:'N/A', cls:'V-8 Bird of Prey', faction:'rom',
+    totalPower:26, moveRatio:3, shieldRatio:0.5, maxShieldPerFace:8,
+    superstructureMax:15,
+    enginePower:{warp:12,impulse:14},
+    cloakCost:15,
+    weapons:[
+      {id:'rd',name:'Disruptor RB-4',type:'beam',arcs:[1,0,5],chart:'J',maxPower:6,dmgMod:{bonus:2,maxRange:6}},
+      {id:'rp',name:'RPL-2 Plasma Bolt',type:'plasma',arcs:[0],chart:'M',armCost:15,plasmaDmgChart:'RL-2',maxRange:14},
+    ]
   }
-  // FUTURE SHIPS: Excelsior, Miranda, K'tinga, BirdOfPrey, Warbird, etc.
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1043,6 +1079,9 @@ function mkShip(key, col, row, facing) {
     weapons: tmpl.weapons.map(w=>({...w,
       armed:false, poweredWith:0, fired:false, alive:true
     })),
+    // Cloak device (Romulan/Klingon)
+    cloakCost: tmpl.cloakCost||0,
+    cloaked: false,
     // Allocation this turn
     alloc: { move:0, shields:0, shieldDist:[0,0,0,0,0,0], weapons:{} },
     movePts:[0,0,0],      // per sub-phase
@@ -1053,18 +1092,69 @@ function mkShip(key, col, row, facing) {
   };
 }
 
+function applyFactionTheme(faction){
+  // Inject/replace a <style id="faction-theme"> block with faction colors
+  const themes={
+    fed:{
+      accent:'#2255aa', accentBright:'#4499ff', accentDim:'#0d2244',
+      pill:'#ff9900', pillText:'#000',
+      hdrBorder:'#0d1e33', hdrBg:'#020810',
+      commit:'#0d1e33', commitBorder:'#2255aa', commitText:'#4499ff',
+      tabActive:'#2255aa', tabActiveBg:'#030c1a',
+    },
+    kli:{
+      accent:'#882200', accentBright:'#ff6622', accentDim:'#331000',
+      pill:'#cc3300', pillText:'#fff',
+      hdrBorder:'#220800', hdrBg:'#0a0200',
+      commit:'#1a0800', commitBorder:'#882200', commitText:'#ff6622',
+      tabActive:'#882200', tabActiveBg:'#140600',
+    },
+    rom:{
+      accent:'#1a5c33', accentBright:'#33bb66', accentDim:'#0a2014',
+      pill:'#228844', pillText:'#fff',
+      hdrBorder:'#0a1e10', hdrBg:'#020a04',
+      commit:'#021408', commitBorder:'#228844', commitText:'#33bb66',
+      tabActive:'#1a5c33', tabActiveBg:'#021408',
+    }
+  };
+  const t=themes[faction]||themes.fed;
+  let s=document.getElementById('faction-theme');
+  if(!s){s=document.createElement('style');s.id='faction-theme';document.head.appendChild(s);}
+  s.textContent=`
+    .hdr-pill{background:${t.pill}!important;color:${t.pillText}!important;}
+    .tab.active{border-bottom-color:${t.accentBright}!important;color:${t.accentBright}!important;}
+    .tab:hover{color:${t.accentBright}!important;}
+    .commit{background:${t.commit}!important;border-color:${t.commitBorder}!important;color:${t.commitText}!important;}
+    .commit:hover{background:${t.accentDim}!important;}
+    .pwr-sec{color:${t.accentBright}!important;border-bottom-color:${t.accentDim}!important;}
+    .wpn-arm.on{background:${t.accent}!important;border-color:${t.accentBright}!important;}
+    #p-rem{color:${t.accentBright}!important;}
+    .wfb-block{color:#ff6644!important;}
+    .wpn-fire-btn.charged{border-color:${t.accentBright}!important;box-shadow:0 0 6px ${t.accentBright}44!important;}
+    .budget-track .bseg:nth-child(1){background:${t.accent}!important;}
+    #sb-range{color:${t.accentBright}!important;}
+    #hdr-faction{background:${t.pill}!important;color:${t.pillText}!important;}
+    #cloak-btn{border-color:${t.commitBorder}!important;color:${t.commitText}!important;background:${t.commit}!important;}
+  `;
+}
+
 function launchGame() {
   const pk = document.getElementById('player-ship').value;
   const ek = document.getElementById('enemy-ship').value;
   aiDifficulty = parseInt(document.getElementById('diff-slider').value);
   document.getElementById('hdr-diff').textContent = DIFF_NAMES[aiDifficulty];
+  applyFactionTheme(playerFaction);
+  // Reset zoom/pan for new game
+  userZoom=1.0; tacPanX=0; tacPanY=0;
+  const zl=document.getElementById('tac-zoom');
+  if(zl) zl.textContent='TACTICAL VIEW';
 
   // Place ships: left side faces right (facing 1=E), right side faces left (facing 4=W)
   const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
-  // If player chose Klingon, flip sides so visual layout is correct
-  if(playerFaction==='kli'){
+  // Flip sides for Klingon or Romulan so visual layout is correct
+  if(playerFaction==='kli'||playerFaction==='rom'){
     ps.col=19; ps.row=9; ps.facing=4;
     es.col=4;  es.row=9; es.facing=1;
   }
@@ -1075,6 +1165,7 @@ function launchGame() {
     subPhaseIdx: 0, // 0,1,2 for move/fire cycles
     player: ps,
     enemy: es,
+    killBlow: null, // narrative info about the finishing hit, set just before a lethal applyDamage
     tacAdvWinner: null, // 'player'|'enemy'
     playerFireDeclared: null, // null|true|false
     enemyFireDeclared: null,
@@ -1249,38 +1340,19 @@ function endTurn() {
   });
   document.getElementById('hdr-turn').textContent='TURN '+GS.turn;
   document.getElementById('sb-turn').textContent='TURN '+GS.turn;
-  // Reset ALL power UI to zero
-  const mvEl=document.getElementById('sl-mv');
-  const shEl=document.getElementById('sl-sh');
-  if(mvEl) mvEl.value=0;
-  if(shEl) shEl.value=0;
-  document.querySelectorAll('.wpn-arm').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.wpn-in').forEach(i=>{i.disabled=true;i.value=0;});
-  // Reset shield face display to zero
-  ['fw','fp','fs','ap','as','aft'].forEach(id=>{
-    const el=document.getElementById('sf-'+id);
-    if(el) el.textContent='0';
-  });
-  // Reset budget bar
-  ['bs-mv','bs-sh','bs-wp','bs-rm'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.width='0%';
-  });
-  const remEl=document.getElementById('p-rem');
-  if(remEl){
-    remEl.textContent=GS.player.currentPower;
-    remEl.style.color='#44cc88';
-    remEl.classList.remove('zero','over');
-  }
-  const track=document.getElementById('bs-mv')?.parentElement;
-  if(track) track.classList.remove('full');
-  setHumLevel(0);
-  unlockPowerUI();
-  reachable=[];
   // Reset shield manual state
   shieldManualPts=[0,0,0,0,0,0];
-  const sfrows=document.getElementById('shld-face-rows');
-  if(sfrows) sfrows.innerHTML='';
+  reachable=[];
+  // Rebuild the weapon rows and fire buttons from scratch so every input's
+  // max/value/disabled state and the cloak button reflect a clean slate —
+  // hand-patching individual DOM nodes here drifted out of sync over multiple
+  // turns (stuck max attributes, leftover armed states, etc).
+  initUI();
+  // initUI sets sliders to 0 already; explicitly re-run updPwr to recompute
+  // the budget bars, remaining-power readout, and shield display from zero.
+  updPwr();
+  setHumLevel(0);
+  unlockPowerUI();
   // Reset fire panel
   const fp=document.getElementById('wpn-fire-panel');
   if(fp){fp.style.display='none';fp.innerHTML='';}
@@ -1303,10 +1375,12 @@ function getWpnPowerUsed(){
   // Count all weapon power committed — missiles use fixed armCost when armed
   if(!GS) return 0;
   let wp=0;
+  // Cloak cost if engaged
+  if(GS.player.cloaked) wp+=GS.player.cloakCost||0;
   GS.player.weapons.forEach(w=>{
     const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
     const isArmed=armBtn&&armBtn.classList.contains('on');
-    if(w.type==='missile'){
+    if(w.type==='missile'||w.type==='plasma'){
       if(isArmed) wp+=w.armCost||6;
     } else {
       const el=document.getElementById('wi-'+w.id);
@@ -1318,29 +1392,37 @@ function getWpnPowerUsed(){
 
 function clampWeaponInput(wid){
   // Called before updPwr on weapon number input change.
-  // Clamps this weapon's input to the remaining budget after mv+sh+other weapons.
+  // Clamps this weapon's CURRENT VALUE to the remaining budget after mv+sh+other weapons.
+  // Important: never permanently shrink the input's max attribute — that would
+  // lock the weapon below its true maxPower even after other power frees up later.
   if(!GS) return;
   const s=GS.player;
+  const w=s.weapons.find(x=>x.id===wid);
   const tot=s.currentPower;
   const mv=parseInt(document.getElementById('sl-mv').value)||0;
   const sh=parseInt(document.getElementById('sl-sh').value)||0;
-  // Sum all OTHER armed beam weapons (not this one) + missiles
+  // Sum all OTHER armed beam/missile/plasma weapons (not this one)
   let otherWp=0;
-  s.weapons.forEach(w=>{
-    if(w.id===wid) return; // skip self
-    const armBtn=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);
+  s.weapons.forEach(ow=>{
+    if(ow.id===wid) return; // skip self
+    const armBtn=document.querySelector(`.wpn-arm[data-wid="${ow.id}"]`);
     const isArmed=armBtn&&armBtn.classList.contains('on');
     if(!isArmed) return;
-    if(w.type==='missile') otherWp+=w.armCost||6;
-    else{const el=document.getElementById('wi-'+w.id);if(el&&!el.disabled) otherWp+=parseInt(el.value)||0;}
+    if(ow.type==='missile'||ow.type==='plasma') otherWp+=ow.armCost||6;
+    else{const el=document.getElementById('wi-'+ow.id);if(el&&!el.disabled) otherWp+=parseInt(el.value)||0;}
   });
-  const available=Math.max(0, tot-mv-sh-otherWp);
+  const cloakPwr=s.cloaked?(s.cloakCost||0):0;
+  const available=Math.max(0, tot-mv-sh-otherWp-cloakPwr);
   const el=document.getElementById('wi-'+wid);
   if(el&&!el.disabled){
+    const trueMax=w?w.maxPower:(parseInt(el.getAttribute('data-truemax'))||parseInt(el.max)||99);
+    // Cache the true max so we can always restore it (max attribute itself stays mutable per-keystroke)
+    if(!el.getAttribute('data-truemax')) el.setAttribute('data-truemax', trueMax);
     const v=parseInt(el.value)||0;
-    const maxAllowed=Math.min(parseInt(el.max)||v, available);
+    const maxAllowed=Math.min(trueMax, available);
     if(v>maxAllowed) el.value=maxAllowed;
-    // Update the visual max so the up-arrow won't go past budget
+    // The max attribute reflects only the CURRENT budget situation — it is
+    // recomputed fresh every call from trueMax, never compounded/shrunk permanently.
     el.max=maxAllowed;
   }
 }
@@ -1377,6 +1459,40 @@ let shieldMode='auto';
 // Manual per-face allocations (in points, not power)
 let shieldManualPts=[0,0,0,0,0,0]; // [Fwd, F-Stbd, A-Stbd, Aft, A-Port, F-Port]
 const SHIELD_FACE_IDS=['Fwd','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+// Display order groups the forward trio together, then the aft trio together,
+// rather than the raw clockwise face-index order. Each entry maps display
+// position -> the real face index used everywhere else (shields[], shieldGenAlive[], etc).
+const SHIELD_DISPLAY_ORDER=[5,0,1, 4,3,2]; // F-Port,Fwd,F-Stbd | A-Port,Aft,A-Stbd
+
+function buildShieldTicks(maxPower){
+  // Build both the native <datalist> (for snap/visual notches in supporting
+  // browsers) and a custom labeled tick row beneath the slider, scaled to
+  // the current ship's total power. Ticks land on sensible round increments.
+  const dl=document.getElementById('sh-ticks');
+  const row=document.getElementById('sh-tick-row');
+  if(!dl||!row) return;
+  dl.innerHTML='';
+  row.innerHTML='';
+  if(maxPower<=0) return;
+  // Pick a tick step that gives roughly 5-8 ticks total
+  const rawStep=maxPower/6;
+  const niceSteps=[1,2,5,10];
+  let step=niceSteps[0];
+  for(const ns of niceSteps){ if(rawStep<=ns){ step=ns; break; } step=ns; }
+  const ticks=[];
+  for(let v=0; v<=maxPower; v+=step) ticks.push(v);
+  if(ticks[ticks.length-1]!==maxPower) ticks.push(maxPower);
+  ticks.forEach(v=>{
+    const opt=document.createElement('option');opt.value=v;dl.appendChild(opt);
+    const pct=(v/maxPower)*100;
+    const isMajor=(v===0||v===maxPower||v%(step*2)===0);
+    const t=document.createElement('div');
+    t.className='tick'+(isMajor?' major':'');
+    t.style.left=pct+'%';
+    t.textContent=v;
+    row.appendChild(t);
+  });
+}
 
 function toggleShieldMode(){
   shieldMode=shieldMode==='auto'?'manual':'auto';
@@ -1403,9 +1519,17 @@ function buildShieldFaceSliders(){
   const container=document.getElementById('shld-face-rows');
   if(!container) return;
   container.innerHTML='';
-  SHIELD_FACE_IDS.forEach((name,i)=>{
+  SHIELD_DISPLAY_ORDER.forEach((i,pos)=>{
+    const name=SHIELD_FACE_IDS[i];
     const alive=s.shieldGenAlive[i];
     const max=alive?s.maxShieldPerFace:0;
+    // Insert a small group divider/label right before the forward trio (pos 0) and aft trio (pos 3)
+    if(pos===0||pos===3){
+      const groupLbl=document.createElement('div');
+      groupLbl.style.cssText='grid-column:1/-1;font-size:8px;letter-spacing:2px;color:#1e3a52;text-transform:uppercase;margin-top:'+(pos===0?'0':'6px')+';border-top:'+(pos===0?'none':'1px solid #0d1e2c')+';padding-top:'+(pos===0?'0':'4px')+';';
+      groupLbl.textContent=pos===0?'Forward Arc':'Aft Arc';
+      container.appendChild(groupLbl);
+    }
     const row=document.createElement('div');
     row.className='sf-face-row';
     row.innerHTML=`
@@ -1464,7 +1588,7 @@ function updPwr() {
   const mp=Math.floor(mv/s.moveRatio);
   document.getElementById('mv-pts').textContent=mp+' move pt'+(mp!==1?'s':'');
   const [p1,p2,p3]=movePtsPerPhase(mp);
-  document.getElementById('mv-spl').textContent=`${p1}/${p2}/${p3}`;
+  document.getElementById('mv-spl').textContent=`Ph.1:${p1} / Ph.2:${p2} / Ph.3:${p3}`;
   document.getElementById('tac-p-mv').textContent=mp;
   // Shield display
   const spts=Math.floor(sh/s.shieldRatio);
@@ -1514,8 +1638,8 @@ function togArm(btn, wid) {
   btn.classList.toggle('on',on);
   const inp = document.getElementById('wi-'+wid);
   if(inp) {
-    if(w.type==='missile') {
-      // Missiles cost fixed armCost; input stays disabled but we track armed state
+    if(w.type==='missile'||w.type==='plasma') {
+      // Missiles/plasma cost fixed armCost; input stays disabled but we track armed state
       inp.disabled=true;
       inp.value=on?w.armCost||6:0;
     } else {
@@ -1538,7 +1662,7 @@ function commitPwr() {
     w.armed=armBtn&&armBtn.classList.contains('on');
     let pwr=0;
     if(w.armed){
-      if(w.type==='missile') pwr=w.armCost||6;
+      if(w.type==='missile'||w.type==='plasma') pwr=w.armCost||6;
       else pwr=inp?parseInt(inp.value)||0:0;
     }
     w.poweredWith=pwr;
@@ -1594,6 +1718,54 @@ function unlockPowerUI(){
   document.getElementById('commit-btn').disabled=false;
 }
 
+function initCloakUI(){
+  const s=GS.player;
+  const row=document.getElementById('cloak-row');
+  const lbl=document.getElementById('cloak-cost-lbl');
+  if(!row) return;
+  const hasCloakDevice=s.cloakCost&&s.cloakCost>0;
+  row.style.display=hasCloakDevice?'block':'none';
+  if(lbl) lbl.textContent=s.cloakCost||15;
+  updateCloakBtn();
+}
+
+function updateCloakBtn(){
+  if(!GS) return;
+  const s=GS.player;
+  const btn=document.getElementById('cloak-btn');
+  if(!btn) return;
+  if(s.cloaked){
+    btn.textContent='⬡ DISENGAGE CLOAK';
+    btn.style.borderColor='#88ff44';btn.style.color='#aaffaa';
+    btn.style.background='#0a2010';
+  } else {
+    btn.innerHTML=`⬡ ENGAGE CLOAK  (cost: <span id="cloak-cost-lbl">${s.cloakCost||15}</span> pwr)`;
+    btn.style.borderColor='#228844';btn.style.color='#33bb66';
+    btn.style.background='#021408';
+  }
+}
+
+function toggleCloak(){
+  if(!GS||GS.phase!=='power') return;
+  const s=GS.player;
+  if(!s.cloakCost) return;
+  s.cloaked=!s.cloaked;
+  if(s.cloaked){
+    log(`⬡ Cloak ENGAGED — power cost ${s.cloakCost}, weapons offline, sensors degraded`,'info');
+    // Cloak disarms all weapons
+    s.weapons.forEach(w=>{w.armed=false;w.poweredWith=0;});
+    // Reset weapon arm buttons
+    document.querySelectorAll('.wpn-arm').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.wpn-in').forEach(inp=>{inp.value=0;inp.disabled=true;});
+  } else {
+    log(`⬡ Cloak DISENGAGED — weapons available next turn`,'info');
+  }
+  updateCloakBtn();
+  updPwr();
+}
+
+
+
 // ═══════════════════════════════════════════════════════════════════════════
 // TACTICAL ADVANTAGE
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1630,8 +1802,10 @@ function hexDist(c1,r1,c2,r2){
 
 // Facing: 0=NE, 1=E, 2=SE, 3=SW, 4=W, 5=NW
 // Neighbour offsets [even row, odd row] for each facing
-const HEX_DIRS_EVEN = [[1,-1],[1,0],[1,1],[0,1],[-1,0],[0,-1]];
-const HEX_DIRS_ODD  = [[1,-1],[1,0],[0,1],[-1,1],[-1,0],[-1,-1]];
+// Corrected neighbor offset tables — direction index i points at screen angle i*60deg (0=East, clockwise).
+// Verified against hexCen() so every entry lands at exactly one hex-width distance from center.
+const HEX_DIRS_EVEN = [[1,0],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1]];
+const HEX_DIRS_ODD  = [[1,0],[1,1],[0,1],[-1,0],[0,-1],[1,-1]];
 function neighbour(col,row,dir){
   const d=(row%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD)[((dir%6)+6)%6];
   return{col:col+d[0],row:row+d[1]};
@@ -1803,7 +1977,7 @@ function triggerWeaponFX(shooter,target,weapon,hit){
   const scHex={col:shooter.col,row:shooter.row};
   const tcHex={col:target.col,row:target.row};
   if(weapon.type==='beam'){
-    const col=shooter.faction==='fed'?'#66bbff':'#ffaa22';
+    const col=shooter.faction==='fed'?'#66bbff':shooter.faction==='rom'?'#44ff88':'#ffaa22';
     addBeamFX(scHex,tcHex,col);
     snd('phaser');
     if(hit){
@@ -1909,21 +2083,31 @@ function highlightFiringArcs(){
 }
 
 function weaponArcCoversTarget(weapon, shooter, target){
-  // Get the direction from shooter to target in hex-facing terms
-  // Approximate: use cube coord direction
-  function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
-  const sc=toCube(shooter.col,shooter.row),tc=toCube(target.col,target.row);
-  const dx=tc.x-sc.x,dz=tc.z-sc.z;
-  // Find closest hex facing
-  const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]]; // NE,E,SE,SW,W,NW
-  let bestDir=0,bestDot=-99;
-  CUBE_DIRS.forEach(([ex,ey,ez],i)=>{
-    const dot=dx*ex+dz*ez;
-    if(dot>bestDot){bestDot=dot;bestDir=i;}
-  });
-  // Relative arc from shooter's facing
-  const relDir=((bestDir-shooter.facing)+6)%6;
-  return weapon.arcs.includes(relDir);
+  // Use pixel-space angle — matches the visual arrow exactly.
+  // bowAng = shooter.facing * PI/3 - PI/2 (facing 0 = arrow pointing up on canvas)
+  const {x:sx,y:sy}=hexCen(shooter.col,shooter.row);
+  const {x:tx,y:ty}=hexCen(target.col,target.row);
+  const dx=tx-sx, dy=ty-sy;
+  if(Math.abs(dx)<0.01&&Math.abs(dy)<0.01) return false;
+  const bowAng=shooter.facing*Math.PI/3;
+  const angToTarget=Math.atan2(dy,dx);
+  const diff=((angToTarget-bowAng)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  const arc=Math.floor((diff+Math.PI/6)/(Math.PI/3))%6;
+  return weapon.arcs.includes(arc);
+}
+
+function getHitFace(shooter, target){
+  // Which face of target is the shot hitting?
+  // = which arc of the TARGET does the shooter appear in (from target's perspective)
+  const {x:sx,y:sy}=hexCen(shooter.col,shooter.row);
+  const {x:tx,y:ty}=hexCen(target.col,target.row);
+  // Direction from target to shooter (incoming direction)
+  const dx=sx-tx, dy=sy-ty;
+  if(Math.abs(dx)<0.01&&Math.abs(dy)<0.01) return 0;
+  const bowAng=target.facing*Math.PI/3;
+  const angToShooter=Math.atan2(dy,dx);
+  const diff=((angToShooter-bowAng)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  return Math.floor((diff+Math.PI/6)/(Math.PI/3))%6;
 }
 
 function resolveShipFiring(shooter, target, subPhase) {
@@ -1954,33 +2138,30 @@ function resolveShipFiring(shooter, target, subPhase) {
     if(w.type==='beam'){
       dmg=w.poweredWith;
       if(w.dmgMod&&range<=w.dmgMod.maxRange) dmg+=w.dmgMod.bonus;
+    } else if(w.type==='plasma'){
+      const pChart=ROM_PLASMA_DMG[w.plasmaDmgChart];
+      const clampedRange=Math.max(1,Math.min(range,w.maxRange||14));
+      dmg=pChart?pChart[clampedRange]||0:0;
+      log(`  Plasma bolt range ${clampedRange}: <span class="chart">${w.plasmaDmgChart}</span> → <b>${dmg}</b> damage`,'info');
     } else {
       dmg=w.fixedDmg||20;
     }
     log(`  Damage: <b>${dmg}</b> pts`,'dmg');
 
-    // Shield facing hit — which face is shooter relative to target?
-    function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
-    const sc=toCube(shooter.col,shooter.row),tc=toCube(target.col,target.row);
-    const dx=tc.x-sc.x,dz=tc.z-sc.z; // vector FROM target TO shooter (incoming direction)
-    const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]];
-    let hitFaceAbs=0,bestDot=-99;
-    CUBE_DIRS.forEach(([ex,ey,ez],i)=>{
-      const dot=(-dx)*ex+(-dz)*ez;
-      if(dot>bestDot){bestDot=dot;hitFaceAbs=i;}
-    });
-    // Relative to target's facing
-    const hitFace=((hitFaceAbs-target.facing)+6)%6;
+    // Shield facing hit — which face of the TARGET is the shot coming FROM?
+    // Use pixel-angle: angle FROM shooter TO target, then find which face of target faces the shooter
+    const hitFace=getHitFace(shooter,target);
     const faceName=SHIELD_NAMES[hitFace];
     log(`  Hits ${faceName} shield (face ${hitFace})`,'info');
     triggerWeaponFX(shooter,target,w,hit);
 
     // Shield absorption
+    let absorbedAmt=0, genWasDead=!target.shieldGenAlive[hitFace];
     if(target.shieldGenAlive[hitFace]&&target.shields[hitFace]>0){
-      const absorbed=Math.min(target.shields[hitFace],dmg);
-      target.shields[hitFace]-=absorbed;
-      dmg-=absorbed;
-      log(`  ${faceName} shield absorbs ${absorbed} → ${dmg} penetrates`,'info');
+      absorbedAmt=Math.min(target.shields[hitFace],dmg);
+      target.shields[hitFace]-=absorbedAmt;
+      dmg-=absorbedAmt;
+      log(`  ${faceName} shield absorbs ${absorbedAmt} → ${dmg} penetrates`,'info');
     } else if(!target.shieldGenAlive[hitFace]){
       log(`  ${faceName} shield generator DEAD — full damage penetrates`,'warn');
     }
@@ -1991,6 +2172,16 @@ function resolveShipFiring(shooter, target, subPhase) {
     const locRoll=d10();
     const loc=DMG_LOCATION[locRoll];
     log(`  Damage location roll <span class="die">${locRoll}</span> → <b>${loc}</b>`,'roll');
+    // Record kill-blow narrative info if this hit will be lethal
+    if(loc==='superstructure'&&target.superstructure-dmg<=0){
+      GS.killBlow={
+        weaponName:w.name, weaponType:w.type, dmg, faceName,
+        shieldWasDown:genWasDead,
+        shieldAbsorbedSome:absorbedAmt>0,
+        targetName:target.name, targetCls:target.cls,
+        shooterName:shooter.name,
+      };
+    }
     applyDamage(target,dmg,loc,hitFace);
   });
   updateSidebar();
@@ -2040,6 +2231,35 @@ function applyDamage(ship,dmg,loc,hitFace){
 // ═══════════════════════════════════════════════════════════════════════════
 // VICTORY CHECK
 // ═══════════════════════════════════════════════════════════════════════════
+// Builds flavor text describing how the finishing blow landed, without
+// repeating exact numbers already shown in the stats line below it.
+function buildKillNarrative(kb, winnerWasPlayer){
+  if(!kb) return "The battle's final moments were lost in the chaos of combat — but the outcome speaks for itself.";
+  const victim=kb.targetName, victimCls=kb.targetCls, attacker=kb.shooterName;
+  const isPlasma=kb.weaponType==='plasma';
+  const isTorpedo=kb.weaponType==='missile'&&!isPlasma;
+  const isBeam=kb.weaponType==='beam';
+  const weaponFlavor = isPlasma
+    ? `a roiling bolt of superheated plasma`
+    : isTorpedo
+    ? `a single photon torpedo`
+    : `a sustained beam of disruptor fire`;
+  const faceFlavor = {
+    'Fwd':'across her bow', 'Aft':'into her stern', 'F-Stbd':'along her starboard flank',
+    'F-Port':'along her port flank', 'A-Stbd':'into her aft starboard quarter', 'A-Port':'into her aft port quarter'
+  }[kb.faceName] || 'amidships';
+  let shieldClause;
+  if(kb.shieldWasDown){
+    shieldClause = `The deflector grid on that facing had already failed, leaving the hull naked to whatever struck it next.`;
+  } else if(kb.shieldAbsorbedSome){
+    shieldClause = `Her shields flared and held for a fraction of a second before the field gave way entirely.`;
+  } else {
+    shieldClause = `Her shields, still raised, simply weren't enough to turn the blow aside.`;
+  }
+  const aftermath = `What followed was not a slow bleed of hull plating but a single catastrophic breach — internal bulkheads ruptured in sequence, environmental containment failed deck by deck, and ${victim} came apart in open space before her crew could fully grasp what had happened.`;
+  return `${attacker} answered with ${weaponFlavor}, striking ${victim} ${faceFlavor}. ${shieldClause} ${aftermath}`;
+}
+
 function checkVictory(){
   const pd=GS.player.superstructure<=0, ed=GS.enemy.superstructure<=0;
   if(pd||ed){
@@ -2053,10 +2273,18 @@ function checkVictory(){
     vt.textContent=win?'VICTORY':'DEFEAT';
     vt.className='vic-title '+(win?'win':'lose');
     document.getElementById('vic-sub').textContent=win?`${GS.enemy.name} destroyed`:`${GS.player.name} destroyed`;
+    document.getElementById('vic-narrative').textContent=buildKillNarrative(GS.killBlow,win);
     const st=GS.turn_stats;
     document.getElementById('vic-stats').innerHTML=
       `Turns: ${GS.turn}<br>Shots fired: ${st.playerShotsFired} · Hits: ${st.playerShotsHit}<br>Enemy shots: ${st.enemyShotsFired} · Enemy hits: ${st.enemyShotsHit}`;
     snd(win?'victory':'defeat');
+    // Press-any-key to dismiss to new mission, but only after a short grace
+    // period so an accidental key held over from combat doesn't instantly skip it.
+    setTimeout(()=>{
+      const dismiss=()=>{ location.reload(); };
+      document.addEventListener('keydown',dismiss,{once:true});
+      vs.addEventListener('click',e=>{ if(e.target.id!=='vic-btn') dismiss(); },{once:true});
+    },600);
   }
 }
 
@@ -2114,8 +2342,13 @@ function aiAllocatePower(){
   // Arm weapons
   let remaining=weapPwr;
   s.weapons.filter(w=>w.alive).forEach(w=>{
-    const p=Math.min(w.maxPower||w.armCost||6,remaining);
-    if(p>0){w.armed=true;w.poweredWith=p;remaining-=p;s.alloc.weapons[w.id]=p;}
+    if(w.type==='missile'||w.type==='plasma'){
+      const cost=w.armCost||6;
+      if(remaining>=cost){w.armed=true;w.poweredWith=cost;remaining-=cost;s.alloc.weapons[w.id]=cost;}
+    } else {
+      const p=Math.min(w.maxPower||6,remaining);
+      if(p>0){w.armed=true;w.poweredWith=p;remaining-=p;s.alloc.weapons[w.id]=p;}
+    }
   });
   log(`AI allocated: Move ${move}→${mp}pts, Shields ${shields}→${spts}pts, Weapons ${weapPwr}`,'ai');
 }
@@ -2390,6 +2623,43 @@ function startTacAmbKli(){
   doKliBlip();
 }
 
+// ── ROMULAN BRIDGE AMBIENT ────────────────────────────────────────────
+// Dark, resonant — lower drone than Fed, with slow sinister LFO sweep
+function startTacAmbRom(){
+  const ac=getAC();if(!ac)return;
+  // Dark resonant drone — sawtooth with sub bass
+  const droneNode=mkAmbOsc(48,'sawtooth',.045);
+  mkAmbOsc(36,'sine',.06);
+  mkAmbOsc(280,'sine',.018);
+  // LFO for slow sweep on the main drone
+  if(droneNode){
+    try{
+      const lfo=ac.createOscillator();const lfoG=ac.createGain();
+      lfo.frequency.value=0.07;lfo.type='sine';lfoG.gain.value=8;
+      lfo.connect(lfoG);lfoG.connect(droneNode.osc.frequency);
+      lfo.start();
+      ambNodes.push({osc:lfo,gain:lfoG});
+    }catch(e){}
+  }
+  // Occasional Romulan-style descending chirp
+  function doRomChirp(){
+    if(ambTab!=='tac'){return;}
+    const ac2=getAC();if(!ac2)return;
+    try{
+      const o=ac2.createOscillator(),g=ac2.createGain();
+      o.type='triangle';
+      o.frequency.setValueAtTime(360,ac2.currentTime);
+      o.frequency.exponentialRampToValueAtTime(180,ac2.currentTime+0.6);
+      g.gain.setValueAtTime(.025,ac2.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,ac2.currentTime+0.7);
+      o.connect(g);g.connect(ac2.destination);
+      o.start();o.stop(ac2.currentTime+0.7);
+    }catch(e){}
+    tacPingTimer=setTimeout(doRomChirp,4000+Math.random()*6000);
+  }
+  setTimeout(doRomChirp,2000+Math.random()*3000);
+}
+
 // ── DAMAGE CONTROL AMBIENT ───────────────────────────────────────────
 // Background "crew chatter" — synthesised voice-like formant wobble
 // that escalates as hull damage increases.
@@ -2489,6 +2759,7 @@ function setAmbTab(tab){
     const ac=getAC();if(!ac)return;
     if(tab==='tac'){
       if(GS&&GS.player.faction==='kli') startTacAmbKli();
+      else if(GS&&GS.player.faction==='rom') startTacAmbRom();
       else startTacAmbFed();
     } else if(tab==='dmg'){
       startDmgAmb();
@@ -2604,10 +2875,39 @@ function hpath(g,cx,cy,r){
   g.closePath();
 }
 
+// Zoom system: userZoom multiplies the base scale; panOffset centers on a point
+let userZoom=1.0;
+let tacPanX=0, tacPanY=0; // pixel offset from natural center
+let tacFocused=false; // whether player has clicked to focus on their ship
+
 function getTsc(){
   const w=document.getElementById('tac-wrap');
   const mw=HR*Math.sqrt(3)*(COLS+.5),mh=HR*1.5*(ROWS+.333);
-  return Math.min((w.clientWidth-20)/mw,(w.clientHeight-20)/mh)*.92;
+  const base=Math.min((w.clientWidth-20)/mw,(w.clientHeight-20)/mh)*.92;
+  return base*userZoom;
+}
+
+function getTacOrigin(){
+  // Returns {ox,oy} — the canvas pixel where hex (0,0) center would be
+  const cv=document.getElementById('tac-cv');
+  const W=cv?cv.width:800, H=cv?cv.height:600;
+  const ts=getTsc();
+  const mw=HR*Math.sqrt(3)*(COLS+.5)*ts, mh=HR*1.5*(ROWS+.333)*ts;
+  return {ox:(W-mw)/2+tacPanX, oy:(H-mh)/2+tacPanY};
+}
+
+function zoomToShip(ship){
+  if(!ship) return;
+  const cv=document.getElementById('tac-cv');
+  if(!cv) return;
+  const W=cv.width, H=cv.height;
+  const ts=getTsc();
+  const {x,y}=hexCen(ship.col,ship.row);
+  const {ox,oy}=getTacOrigin();
+  const shipScreenX=x*ts+ox, shipScreenY=y*ts+oy;
+  // Pan so ship is at center
+  tacPanX+=(W/2-shipScreenX);
+  tacPanY+=(H/2-shipScreenY);
 }
 
 function drawFedShip(g,sz,T,damaged){
@@ -2835,6 +3135,69 @@ function drawKliShip(g,sz,T,damaged){
   g.fillStyle='rgba(255,200,100,.5)';g.beginPath();safeArc(g,0,23*U,Math.max(.1,1.2*U),0,Math.PI*2);g.fill();
 }
 
+// ── ROMULAN V-8 BIRD OF PREY ─────────────────────────────────────────────
+function drawRomShip(g,sz,T,damaged){
+  const U=sz*.028;
+  const col={hull:'#3a6644',dark:'#1f3d28',glow:'rgba(60,180,100,.9)',dim:'rgba(40,120,70,.55)',wing:'#2d5238',stripe:'#4e8860'};
+  g.save();
+  // Main body — elongated forward hull pod
+  g.fillStyle=col.dark;g.strokeStyle=col.hull;g.lineWidth=Math.max(.3,U*.35);
+  g.beginPath();
+  g.moveTo(0,-16*U);  // bow
+  g.bezierCurveTo(3*U,-12*U, 3*U,0, 2.5*U,8*U);
+  g.lineTo(2.5*U,14*U);g.lineTo(0,16*U);g.lineTo(-2.5*U,14*U);
+  g.bezierCurveTo(-3*U,0, -3*U,-12*U, 0,-16*U);
+  g.fill();g.stroke();
+  // Aft engine pod
+  g.fillStyle=col.wing;
+  g.beginPath();g.moveTo(-2*U,10*U);g.lineTo(2*U,10*U);g.lineTo(3*U,18*U);g.lineTo(0,22*U);g.lineTo(-3*U,18*U);g.closePath();
+  g.fill();g.stroke();
+  // LEFT WING — sweeping delta
+  g.fillStyle=col.wing;g.strokeStyle=col.hull;
+  g.beginPath();
+  g.moveTo(-2.5*U,-4*U);
+  g.lineTo(-28*U,4*U);
+  g.lineTo(-26*U,10*U);
+  g.lineTo(-3*U,6*U);
+  g.closePath();
+  g.fill();g.stroke();
+  // RIGHT WING
+  g.beginPath();
+  g.moveTo(2.5*U,-4*U);
+  g.lineTo(28*U,4*U);
+  g.lineTo(26*U,10*U);
+  g.lineTo(3*U,6*U);
+  g.closePath();
+  g.fill();g.stroke();
+  // Wing leading edge highlight
+  g.strokeStyle=col.stripe;g.lineWidth=Math.max(.3,U*.2);
+  g.beginPath();g.moveTo(-2.5*U,-4*U);g.lineTo(-28*U,4*U);g.stroke();
+  g.beginPath();g.moveTo(2.5*U,-4*U);g.lineTo(28*U,4*U);g.stroke();
+  // Disruptor emitter — port wing tip
+  g.fillStyle='#60cc80';g.strokeStyle=col.glow;g.lineWidth=Math.max(.2,U*.2);
+  g.beginPath();safeArc(g,-27*U,5*U,Math.max(.1,1.3*U),0,Math.PI*2);g.fill();g.stroke();
+  // Plasma bolt emitter — bow
+  g.fillStyle='#80ffaa';g.strokeStyle='rgba(100,255,150,.9)';g.lineWidth=Math.max(.2,U*.25);
+  g.beginPath();safeArc(g,0,-17.5*U,Math.max(.1,1.8*U),0,Math.PI*2);g.fill();g.stroke();
+  // Bridge dome
+  g.fillStyle=col.stripe;g.strokeStyle=col.glow;g.lineWidth=Math.max(.2,U*.15);
+  g.beginPath();safeArc(g,0,-8*U,Math.max(.1,1.5*U),0,Math.PI*2);g.fill();g.stroke();
+  // Hull stripe across body
+  g.strokeStyle=col.stripe;g.lineWidth=Math.max(.3,U*.3);
+  g.beginPath();g.moveTo(-2.2*U,-2*U);g.lineTo(2.2*U,-2*U);g.stroke();
+  g.beginPath();g.moveTo(-2.2*U,2*U);g.lineTo(2.2*U,2*U);g.stroke();
+  // Engine glow — aft
+  g.fillStyle=damaged?'rgba(200,60,20,.7)':'rgba(60,220,120,.55)';
+  g.beginPath();safeArc(g,0,22*U,Math.max(.1,1.5*U),0,Math.PI*2);g.fill();
+  // Damage scorch
+  if(damaged){
+    g.save();g.strokeStyle='rgba(200,120,30,.5)';g.lineWidth=Math.max(.4,U*.18);
+    for(let i=0;i<3;i++){const rx=-15*U+i*12*U,ry=-4*U+i*5*U;g.beginPath();g.moveTo(rx-2*U,ry);g.lineTo(rx+2*U,ry+3*U);g.stroke();}
+    g.restore();
+  }
+  g.restore();
+}
+
 
 const TC={S:'#010a18',N:'#160828',A:'#181008',G:'#081408'};
 
@@ -2849,7 +3212,7 @@ function renderTac(){
   for(let i=0;i<250;i++){const bx=(Math.sin(i*137.5)*.5+.5)*W,by=(Math.cos(i*97.3)*.5+.5)*H;const bri=.07+Math.abs(Math.sin(tacT*.3+i))*.16;g.fillStyle=`rgba(200,215,255,${bri.toFixed(2)})`;g.fillRect(bx,by,i%17===0?1.5:1,i%17===0?1.5:1);}
   const ts=getTsc();
   const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
-  const ox=(W-mw)/2,oy=(H-mh)/2;
+  const ox=(W-mw)/2+tacPanX,oy=(H-mh)/2+tacPanY;
   // Draw hexes
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const{x,y}=hexCen(c,r);const sx=x*ts+ox,sy=y*ts+oy;
@@ -2899,28 +3262,52 @@ function renderTac(){
   if(!GS) return;
   // Reachable hex highlights (move phase)
   if(MOVE_PHASES.includes(GS.phase)&&reachable.length>0){
+    const idx=GS.subPhaseIdx;
+    const avail=GS.player.movePts[idx]-GS.player.movePtsUsed[idx];
     reachable.forEach(h=>{
       const{x,y}=hexCen(h.col,h.row);const sx=x*ts+ox,sy=y*ts+oy;const hr=Math.max(.5,HR*ts-2);
       hpath(g,sx,sy,hr);g.fillStyle='rgba(40,120,40,.22)';g.fill();
       g.strokeStyle='rgba(60,180,60,.5)';g.lineWidth=1.2;g.stroke();
+      // Show movement cost if space allows
+      if(HR*ts>14){
+        const cost=terrain[`${h.col},${h.row}`]==='A'||terrain[`${h.col},${h.row}`]==='G'?2:1;
+        g.fillStyle='rgba(100,220,100,.7)';g.font=`${Math.max(7,HR*ts*.22)}px Courier New`;
+        g.textAlign='center';g.textBaseline='middle';
+        g.fillText(cost,sx,sy);
+      }
     });
+    // Phase label overlay in corner
+    const phaseLabel=`Phase ${idx+1}/3 · ${avail} pts`;
+    g.fillStyle='rgba(0,0,0,.55)';g.fillRect(4,4,phaseLabel.length*6.5+8,16);
+    g.fillStyle='#88cc88';g.font='bold 10px Courier New';g.textAlign='left';g.textBaseline='top';
+    g.fillText(phaseLabel,8,6);
   }
 
   // Firing arc highlights (fire phase)
   if(FIRE_PHASES.includes(GS.phase)){
     const s=GS.player;
-    s.weapons.filter(w=>w.armed&&w.alive).forEach(w=>{
+    // First pass: show all armed weapon arcs (teal tint, light)
+    const armedWeapons=s.weapons.filter(w=>w.armed&&w.alive&&!w.fired);
+    if(armedWeapons.length>0){
       for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
         const range=hexDist(s.col,s.row,c,r);
-        if(range===0||range>15) continue;
+        if(range===0) continue;
         const fakeTarget={col:c,row:r};
-        if(weaponArcCoversTarget(w,s,fakeTarget)){
+        const inAnyArc=armedWeapons.some(w=>weaponArcCoversTarget(w,s,fakeTarget)&&range<=w.maxRange);
+        if(inAnyArc){
           const{x,y}=hexCen(c,r);const sx=x*ts+ox,sy=y*ts+oy;const hr2=Math.max(.5,HR*ts-2);
-          hpath(g,sx,sy,hr2);g.fillStyle='rgba(160,30,0,.15)';g.fill();
-          g.strokeStyle='rgba(200,50,0,.3)';g.lineWidth=.8;g.stroke();
+          hpath(g,sx,sy,hr2);g.fillStyle='rgba(30,120,100,.13)';g.fill();
+          g.strokeStyle='rgba(40,180,140,.25)';g.lineWidth=.7;g.stroke();
         }
       }
-    });
+      // Second pass: highlight enemy hex brightly if targetable
+      const eInArc=armedWeapons.some(w=>weaponArcCoversTarget(w,s,GS.enemy)&&hexDist(s.col,s.row,GS.enemy.col,GS.enemy.row)<=w.maxRange);
+      const{x:ex,y:ey}=hexCen(GS.enemy.col,GS.enemy.row);
+      const esx=ex*ts+ox,esy=ey*ts+oy;const ehr=Math.max(.5,HR*ts-2);
+      hpath(g,esx,esy,ehr);
+      g.fillStyle=eInArc?'rgba(60,220,120,.25)':'rgba(200,60,30,.18)';g.fill();
+      g.strokeStyle=eInArc?'rgba(60,255,140,.7)':'rgba(220,80,40,.5)';g.lineWidth=1.8;g.stroke();
+    }
   }
 
   // Ships
@@ -2928,9 +3315,10 @@ function renderTac(){
     const{x,y}=hexCen(s.col,s.row);const sx=x*ts+ox,sy=y*ts+oy;const sz=HR*ts;
     const damaged=s.superstructure<s.superstructureMax*.6;
     const isFed=s.faction==='fed';
+    const isRom=s.faction==='rom';
     // Glow
     const gl=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,sz*.85));
-    gl.addColorStop(0,isFed?'rgba(38,96,255,.16)':'rgba(190,76,18,.16)');gl.addColorStop(1,'transparent');
+    gl.addColorStop(0,isFed?'rgba(38,96,255,.16)':isRom?'rgba(40,160,80,.16)':'rgba(190,76,18,.16)');gl.addColorStop(1,'transparent');
     g.fillStyle=gl;g.beginPath();safeArc(g,sx,sy,Math.max(.1,sz*.85),0,Math.PI*2);g.fill();
     // Shield bubble if shields up
     const totalShields=s.shields.reduce((a,b)=>a+b,0);
@@ -2938,29 +3326,40 @@ function renderTac(){
       const maxShld=s.shieldGenAlive.filter(x=>x).length*s.maxShieldPerFace;
       const shldPct=totalShields/(maxShld||1);
       const shieldsR=Math.max(.1,sz*.95);
-      g.strokeStyle=isFed?`rgba(60,120,255,${shldPct*.4})`:`rgba(255,80,20,${shldPct*.4})`;
+      g.strokeStyle=isFed?`rgba(60,120,255,${shldPct*.4})`:isRom?`rgba(50,200,100,${shldPct*.4})`:`rgba(255,80,20,${shldPct*.4})`;
       g.lineWidth=1.5;g.beginPath();safeArc(g,sx,sy,shieldsR,0,Math.PI*2);g.stroke();
     }
-    g.save();g.translate(sx,sy);g.rotate(s.facing*Math.PI/3);
-    isFed?drawFedShip(g,sz,tacT,damaged):drawKliShip(g,sz,tacT,damaged);
+    g.save();g.translate(sx,sy);g.rotate(s.facing*Math.PI/3+Math.PI/2);
+    // Cloak visual — render at low opacity
+    if(s.cloaked) g.globalAlpha=0.25;
+    if(isFed) drawFedShip(g,sz,tacT,damaged);
+    else if(isRom) drawRomShip(g,sz,tacT,damaged);
+    else drawKliShip(g,sz,tacT,damaged);
+    g.globalAlpha=1.0;
     g.restore();
     // Selection ring
     if(s===GS.player){hpath(g,sx,sy,Math.max(.5,sz-1));g.strokeStyle='rgba(255,165,0,.7)';g.lineWidth=1.5;g.stroke();}
-    // Name
-    g.fillStyle=isFed?'#3366aa':'#884422';
+    // Name / cloak label
     g.font=`bold ${Math.max(8,sz*.22)}px Courier New`;g.textAlign='center';g.textBaseline='top';
-    g.fillText(s.name,sx,sy+sz*.9);
+    // Show CLOAKED label if cloaked
+    if(s.cloaked){
+      g.fillStyle='rgba(100,255,140,.6)';
+      g.fillText('[CLOAKED]',sx,sy+sz*.9);
+    } else {
+      g.fillStyle=isFed?'#3366aa':isRom?'#228844':'#884422';
+      g.fillText(s.name,sx,sy+sz*.9);
+    }
     // Heading indicator — bright arrowhead showing ship's forward direction
-    const arrowAng=s.facing*Math.PI/3-Math.PI/2;
+    const arrowAng=s.facing*Math.PI/3;
     const arrowTip=sz*1.05; // tip of arrow beyond hex edge
     const arrowBase=sz*.72;
     const tipX=sx+Math.cos(arrowAng)*arrowTip, tipY=sy+Math.sin(arrowAng)*arrowTip;
     const baseX=sx+Math.cos(arrowAng)*arrowBase, baseY=sy+Math.sin(arrowAng)*arrowBase;
     const perpAng=arrowAng+Math.PI/2;
     const wingW=sz*.12;
-    const col=isFed?'#4499ff':'#ff6633';
+    const arrowCol=isFed?'#4499ff':isRom?'#44cc77':'#ff6633';
     // Arrowhead fill
-    g.fillStyle=col;
+    g.fillStyle=arrowCol;
     g.globalAlpha=0.85;
     g.beginPath();
     g.moveTo(tipX,tipY);
@@ -2968,10 +3367,31 @@ function renderTac(){
     g.lineTo(baseX-Math.cos(perpAng)*wingW, baseY-Math.sin(perpAng)*wingW);
     g.closePath();g.fill();
     // Shaft
-    g.strokeStyle=col;g.lineWidth=1.5;g.globalAlpha=0.5;
+    g.strokeStyle=arrowCol;g.lineWidth=1.5;g.globalAlpha=0.5;
     g.beginPath();g.moveTo(sx,sy);g.lineTo(baseX,baseY);g.stroke();
     g.globalAlpha=1.0;
-  });
+
+    // F/P/S/A orientation labels at hex edges
+    const labelR=sz*1.22;
+    const labelFont=`bold ${Math.max(7,sz*.18)}px Courier New`;
+    g.font=labelFont;g.textAlign='center';g.textBaseline='middle';
+    const facingAng=s.facing*Math.PI/3; // 0=East, matches HEX_DIRS index 0
+    const labelDefs=[
+      {label:'F', offset:0},           // forward = facing direction
+      {label:'S', offset:Math.PI/3*1}, // starboard = +60°
+      {label:'P', offset:Math.PI/3*5}, // port = -60°
+      {label:'A', offset:Math.PI},     // aft = +180°
+    ];
+    const fCol=isFed?'rgba(80,140,255,.75)':isRom?'rgba(60,200,110,.75)':'rgba(255,120,50,.75)';
+    labelDefs.forEach(({label,offset})=>{
+      const ang=facingAng+offset;
+      const lx=sx+Math.cos(ang)*labelR;
+      const ly=sy+Math.sin(ang)*labelR;
+      // shadow
+      g.fillStyle='rgba(0,0,0,.7)';g.fillText(label,lx+1,ly+1);
+      g.fillStyle=fCol;g.fillText(label,lx,ly);
+    });
+  }); // end ships forEach
 
   // Combat effects
   tickFX();
@@ -2995,10 +3415,30 @@ function renderTac(){
   // Update range display
   document.getElementById('sb-range').textContent=`${range} hexes`;
   const mi=document.getElementById('sb-move-info');
-  if(mi&&MOVE_PHASES.includes(GS.phase)){
-    const idx=GS.subPhaseIdx;
-    const avail=GS.player.movePts[idx]-GS.player.movePtsUsed[idx];
-    mi.textContent=`Sub-phase ${idx+1}: ${avail} pts remaining\nTotal: ${GS.player.movePts.join('/')}`;
+  if(mi){
+    if(MOVE_PHASES.includes(GS.phase)){
+      const idx=GS.subPhaseIdx;
+      const s=GS.player;
+      const [p1,p2,p3]=s.movePts;
+      const used=s.movePtsUsed[idx];
+      const avail=s.movePts[idx]-used;
+      const phaseLabels=['Move 1','Move 2','Move 3'];
+      // Show all three phases, highlight current
+      const phaseInfo=[p1,p2,p3].map((pts,i)=>{
+        if(i<idx) return `Phase ${i+1}: done`;
+        if(i===idx) return `▶ Phase ${i+1}: ${avail}/${pts} pts left`;
+        return `Phase ${i+1}: ${pts} pts`;
+      }).join(' | ');
+      mi.innerHTML=`<b style="color:#ffaa33">${phaseLabels[idx]}</b> of 3<br>${phaseInfo}<br><span style="color:#445566">Each phase is independent — unused pts don't carry over</span>`;
+    } else if(FIRE_PHASES.includes(GS.phase)){
+      const idx=GS.subPhaseIdx;
+      const fireLabels=['Fire 1','Fire 2','Fire 3'];
+      const armed=GS.player.weapons.filter(w=>w.armed&&w.alive);
+      const fired=armed.filter(w=>w.fired);
+      mi.innerHTML=`<b style="color:#ff6644">${fireLabels[idx]}</b> of 3<br>${fired.length}/${armed.length} weapons fired this turn<br><span style="color:#445566">Each weapon fires once per turn max</span>`;
+    } else {
+      mi.innerHTML='—';
+    }
   }
 }
 
@@ -3008,30 +3448,64 @@ function initTac(){
   const cv=document.getElementById('tac-cv');
   function rsz(){cv.width=wrap.clientWidth;cv.height=wrap.clientHeight;renderTac();}
   rsz();window.addEventListener('resize',rsz);
+
+  function getHexAtEvent(e){
+    const ts=getTsc();const W=cv.width,H=cv.height;
+    const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
+    const ox=(W-mw)/2+tacPanX,oy=(H-mh)/2+tacPanY;
+    const rect=cv.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    return hexAt((cx-ox)/ts,(cy-oy)/ts);
+  }
+
   cv.addEventListener('click',e=>{
-    if(!GS||!MOVE_PHASES.includes(GS.phase))return;
-    const ts=getTsc();const W=cv.width,H=cv.height;
-    const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
-    const ox=(W-mw)/2,oy=(H-mh)/2;
-    const rect=cv.getBoundingClientRect();
-    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
-    const h=hexAt((cx-ox)/ts,(cy-oy)/ts);
-    if(h.col>=0&&h.col<COLS&&h.row>=0&&h.row<ROWS) playerMoveTo(h.col,h.row);
+    if(!GS) return;
+    const h=getHexAtEvent(e);
+    if(MOVE_PHASES.includes(GS.phase)){
+      if(h.col>=0&&h.col<COLS&&h.row>=0&&h.row<ROWS) playerMoveTo(h.col,h.row);
+    }
+    // Click own ship to focus/center view on it
+    if(GS.player&&h.col===GS.player.col&&h.row===GS.player.row){
+      zoomToShip(GS.player);
+    }
   });
+
   cv.addEventListener('mousemove',e=>{
-    const ts=getTsc();const W=cv.width,H=cv.height;
-    const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
-    const ox=(W-mw)/2,oy=(H-mh)/2;
-    const rect=cv.getBoundingClientRect();
-    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
-    const h=hexAt((cx-ox)/ts,(cy-oy)/ts);
+    const h=getHexAtEvent(e);
     if(h.col>=0&&h.col<COLS&&h.row>=0&&h.row<ROWS){
       document.getElementById('tac-hex').textContent=`HEX ${h.col},${h.row}`;
     }
   });
+
+  // Scroll wheel zoom — anchor to cursor position
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=cv.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    const W=cv.width, H=cv.height;
+    const oldZoom=userZoom;
+    const delta=e.deltaY<0?1.12:1/1.12;
+    userZoom=Math.max(0.5, Math.min(5.0, userZoom*delta));
+    // Adjust pan to keep cursor point fixed
+    const scale=userZoom/oldZoom;
+    tacPanX=(tacPanX-cx)*scale+cx;
+    tacPanY=(tacPanY-cy)*scale+cy;
+    // Update zoom label
+    const zl=document.getElementById('tac-zoom');
+    if(zl) zl.textContent=`ZOOM ${Math.round(userZoom*100)}%`;
+  },{passive:false});
+
+  // Double-click to reset zoom
+  cv.addEventListener('dblclick',e=>{
+    userZoom=1.0; tacPanX=0; tacPanY=0;
+    const zl=document.getElementById('tac-zoom');
+    if(zl) zl.textContent='TACTICAL VIEW';
+  });
+
   wrap.addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft'||e.key==='a'||e.key==='q') playerRotate(-1);
     else if(e.key==='ArrowRight'||e.key==='d'||e.key==='e') playerRotate(1);
+    else if(e.key==='f'||e.key==='F'){zoomToShip(GS&&GS.player);} // F to focus ship
     else return;
     e.preventDefault();
   });
@@ -3098,7 +3572,9 @@ function dmgDrawShip(g,W,H,dmgT,hullPct,dmgSystems){
   g.save();g.translate(cx,cy);
   // Draw the ship in FASA ink style
   const isFed=!GS||GS.player.faction==='fed';
+  const isRom=GS&&GS.player.faction==='rom';
   if(isFed) drawFedShip(g, U/0.028, dmgT, hullPct<0.7);
+  else if(isRom) drawRomShip(g, U/0.028, dmgT, hullPct<0.7);
   else       drawKliShip(g, U/0.028, dmgT, hullPct<0.7);
 
   // ── SHIELD FACE LABELS (FASA ship sheet style) ────────────────────
@@ -3368,23 +3844,21 @@ function getWeaponBlockReason(w){
   // Returns a short reason string if the weapon cannot fire right now, or null if fireable.
   if(!GS||!FIRE_PHASES.includes(GS.phase)) return null;
   if(!w.alive) return 'DESTROYED';
-  if(w.fired) return 'FIRED THIS PHASE';
-  if(!w.armed) return 'NOT ARMED';
+  if(w.fired) return 'FIRED THIS TURN';
+  if(!w.armed) return 'NOT ARMED — arm in Power tab';
+  if(GS.player.cloaked) return 'CLOAKED — disengage cloak to fire';
   const shooter=GS.player, target=GS.enemy;
-  // Range check first — most visible reason
+  // Power check for beams first — most actionable
+  if(w.type==='beam'&&(!w.poweredWith||w.poweredWith<=0)) return 'NO POWER — set power in Power tab before committing';
+  // Range check
   const range=hexDist(shooter.col,shooter.row,target.col,target.row);
   const maxR=w.maxRange||15;
-  if(range>maxR) return `OUT OF RANGE — ${range} hexes (max ${maxR})`;
-  // Power check for beams
-  if(w.type==='beam'&&(!w.poweredWith||w.poweredWith<=0)) return 'NO POWER ALLOCATED';
+  if(range>maxR) return `OUT OF RANGE — ${range} hexes (max ${maxR}) — close distance`;
   // Arc check
   if(!weaponArcCoversTarget(w,shooter,target)){
     const arcNames=['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
-    return `NOT IN ARC — rotate to: ${w.arcs.map(a=>arcNames[a]).join('/')}`;
+    return `NOT IN ARC — covers ${w.arcs.map(a=>arcNames[a]).join('/')} — rotate ship`;
   }
-  // Terrain info (doesn't block, just warns)
-  const sTerrain=terrain[`${shooter.col},${shooter.row}`]||'S';
-  if(sTerrain==='N') return 'NEBULA — SENSORS DEGRADED';
   return null; // clear to fire
 }
 
@@ -3393,11 +3867,22 @@ function updateWpnFireBtn(w,btn){
   if(!btn) return;
   const arcNames=['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
   const arcs=w.arcs.map(a=>arcNames[a]).join('/');
-  const dmgStr=w.type==='missile'?`DMG:${w.fixedDmg}`:`DMG:${w.poweredWith||0}`;
-  const pwrStr=w.type==='missile'?`ARM:${w.armCost||6}pwr`:`${w.poweredWith||0}pwr`;
+  const dmgStr=w.type==='missile'?`DMG:${w.fixedDmg}`:w.type==='plasma'?`DMG:rng-vary`:`DMG:${w.poweredWith||0}`;
+  const pwrStr=w.type==='missile'||w.type==='plasma'?`ARM:${w.armCost||6}pwr`:`${w.poweredWith||0}/${w.maxPower}pwr`;
   const inFirePhase=!!GS&&FIRE_PHASES.includes(GS.phase);
   const blockReason=inFirePhase?getWeaponBlockReason(w):null;
   const canFire=inFirePhase&&!blockReason&&w.alive&&w.armed&&!w.fired;
+  // Live range and arc status
+  let rangeStr='', arcStatus='';
+  if(inFirePhase&&GS){
+    const range=hexDist(GS.player.col,GS.player.row,GS.enemy.col,GS.enemy.row);
+    const inRng=range<=(w.maxRange||15);
+    rangeStr=`Range: ${range} hex${range!==1?'es':''}  (max ${w.maxRange||15}) ${inRng?'✓ IN RANGE':'✗ OUT OF RANGE'}`;
+    const inArc=weaponArcCoversTarget(w,GS.player,GS.enemy);
+    arcStatus=`Arc: ${arcs}  ${inArc?'✓ TARGET IN ARC':'✗ NOT IN ARC'}`;
+  } else {
+    arcStatus=`Arc: ${arcs}`;
+  }
   // Terrain context badges
   const sTerrain=GS?terrain[`${GS.player.col},${GS.player.row}`]||'S':'S';
   const tTerrain=GS?terrain[`${GS.enemy.col},${GS.enemy.row}`]||'S':'S';
@@ -3409,7 +3894,8 @@ function updateWpnFireBtn(w,btn){
   }</span>`:'';
   btn.innerHTML=`
     <div class="wfb-name">${w.alive?'':'[DEAD] '}${w.name}${terrainBadge}${tgtBadge}</div>
-    <div class="wfb-info">Arc:${arcs} · ${pwrStr} · ${dmgStr}</div>
+    <div class="wfb-info">${arcStatus}</div>
+    <div class="wfb-info">${inFirePhase?rangeStr:''} · ${pwrStr} · ${dmgStr}</div>
     ${blockReason&&!w.fired&&w.alive?`<div class="wfb-block">⊘ ${blockReason}</div>`:''}
   `;
   btn.disabled=!canFire;
@@ -3482,22 +3968,23 @@ function fireWeapon(wid){
     if(w.type==='beam'){
       dmg=w.poweredWith;
       if(w.dmgMod&&range<=w.dmgMod.maxRange) dmg+=w.dmgMod.bonus;
+    } else if(w.type==='plasma'){
+      // Plasma bolt: range-degrading damage from RL chart
+      const chart=ROM_PLASMA_DMG[w.plasmaDmgChart];
+      const clampedRange=Math.max(1,Math.min(range,w.maxRange||14));
+      dmg=chart?chart[clampedRange]||0:0;
+      log(`Plasma bolt range ${clampedRange}: <span class="chart">${w.plasmaDmgChart}</span> → <b>${dmg}</b> damage`,'info');
     } else { dmg=w.fixedDmg||20; }
     log(`Damage: <b>${dmg}</b> pts`,'dmg');
-    // Determine hit face
-    function toCube(col,row){const x=col-(row-(row&1))/2;const z=row;return{x,y:-x-z,z};}
-    const sc2=toCube(shooter.col,shooter.row),tc2=toCube(target.col,target.row);
-    const dx=tc2.x-sc2.x,dz=tc2.z-sc2.z;
-    const CUBE_DIRS=[[1,-1,0],[1,0,-1],[0,1,-1],[-1,1,0],[-1,0,1],[0,-1,1]];
-    let hitFaceAbs=0,bestDot=-99;
-    CUBE_DIRS.forEach(([ex,ey,ez],i)=>{const dot=(-dx)*ex+(-dz)*ez;if(dot>bestDot){bestDot=dot;hitFaceAbs=i;}});
-    const hitFace=((hitFaceAbs-target.facing)+6)%6;
+    // Determine hit face using pixel-angle approach
+    const hitFace=getHitFace(shooter,target);
     log(`Hits ${SHIELD_NAMES[hitFace]} shield (face ${hitFace})`,'info');
     // Shield absorption
+    let absorbedAmt2=0, genWasDead2=!target.shieldGenAlive[hitFace];
     if(target.shieldGenAlive[hitFace]&&target.shields[hitFace]>0){
-      const absorbed=Math.min(target.shields[hitFace],dmg);
-      target.shields[hitFace]-=absorbed;dmg-=absorbed;
-      log(`Shield absorbs ${absorbed} → ${dmg} penetrates`,'info');
+      absorbedAmt2=Math.min(target.shields[hitFace],dmg);
+      target.shields[hitFace]-=absorbedAmt2;dmg-=absorbedAmt2;
+      log(`Shield absorbs ${absorbedAmt2} → ${dmg} penetrates`,'info');
     } else if(!target.shieldGenAlive[hitFace]){
       log(`${SHIELD_NAMES[hitFace]} shield generator DEAD — full damage penetrates`,'warn');
     }
@@ -3506,6 +3993,15 @@ function fireWeapon(wid){
       const locRoll=d10();
       const loc=DMG_LOCATION[locRoll];
       log(`Location roll <span class="die">${locRoll}</span> → <b>${loc}</b>`,'roll');
+      if(loc==='superstructure'&&target.superstructure-dmg<=0){
+        GS.killBlow={
+          weaponName:w.name, weaponType:w.type, dmg, faceName:SHIELD_NAMES[hitFace],
+          shieldWasDown:genWasDead2,
+          shieldAbsorbedSome:absorbedAmt2>0,
+          targetName:target.name, targetCls:target.cls,
+          shooterName:shooter.name,
+        };
+      }
       applyDamage(target,dmg,loc,hitFace);
     } else { snd('shieldhit'); }
     checkVictory();
@@ -3542,7 +4038,7 @@ function initUI(){
   document.getElementById('pwr-total').textContent=s.totalPower;
   document.getElementById('shld-ratio-lbl').textContent=`Ratio ${s.shieldRatio===0.5?'1/2':s.shieldRatio}`;
   document.getElementById('shld-max-lbl').textContent=s.maxShieldPerFace;
-  document.getElementById('shld-center').textContent=s.reg;
+  document.getElementById('shld-center').textContent=`${s.reg} — AUTO distributes evenly`;
   document.getElementById('sb-id').textContent=`${s.name} · ${s.reg}`;
   document.getElementById('p-name').textContent=s.name;
   document.getElementById('p-class').textContent=`${s.cls} · ${s.reg}`;
@@ -3554,22 +4050,28 @@ function initUI(){
   // Slider max
   document.getElementById('sl-mv').max=s.totalPower;
   document.getElementById('sl-sh').max=s.totalPower;
+  buildShieldTicks(s.totalPower);
   // Weapon rows
   const wr=document.getElementById('wpn-rows');wr.innerHTML='';
   s.weapons.forEach(w=>{
     const row=document.createElement('div');row.className='wpn-row';
     const isMissile=w.type==='missile';
-    row.innerHTML=`<div class="wpn-arm" data-wid="${w.id}" onclick="togArm(this,'${w.id}')"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><input type="number" class="wpn-in" id="wi-${w.id}" value="0" min="0" max="${isMissile?w.armCost||6:w.maxPower}" ${isMissile?'disabled':''} oninput="clampWeaponInput('${w.id}');updPwr()"><div class="wpn-dmg">${isMissile?`DMG ${w.fixedDmg}`:`MAX ${w.maxPower}`}</div>`;
+    const isPlasma=w.type==='plasma';
+    const isArmedFixed=isMissile||isPlasma;
+    const dmgLabel=isPlasma?`ARM:${w.armCost} (rng-dmg)`:isMissile?`DMG ${w.fixedDmg}`:`MAX ${w.maxPower}`;
+    row.innerHTML=`<div class="wpn-arm" data-wid="${w.id}" onclick="togArm(this,'${w.id}')"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><input type="number" class="wpn-in" id="wi-${w.id}" value="0" min="0" max="${isArmedFixed?w.armCost||6:w.maxPower}" data-truemax="${isArmedFixed?w.armCost||6:w.maxPower}" ${isArmedFixed?'disabled':''} oninput="clampWeaponInput('${w.id}');updPwr()"><div class="wpn-dmg">${dmgLabel}</div>`;
     wr.appendChild(row);
   });
   // Build weapon fire buttons for the fire phase
   buildWpnFireBtns();
+  // Cloak UI (Romulan only)
+  initCloakUI();
   // Set slider defaults
   document.getElementById('sl-mv').value=0;
   document.getElementById('sl-sh').value=0;
   // Update faction header
   const pill=document.getElementById('hdr-faction');
-  if(pill) pill.textContent=s.faction==='fed'?'STARFLEET':'EMPIRE';
+  if(pill) pill.textContent=s.faction==='fed'?'STARFLEET':s.faction==='rom'?'STAR EMPIRE':'EMPIRE';
   // Reset shield mode to auto on new game
   shieldMode='auto';shieldManualPts=[0,0,0,0,0,0];
   const modeBtn=document.getElementById('shld-mode-btn');
@@ -3616,15 +4118,19 @@ function chooseFaction(f){
   playerFaction=f;
   document.getElementById('fb-fed').classList.toggle('active',f==='fed');
   document.getElementById('fb-kli').classList.toggle('active',f==='kli');
+  document.getElementById('fb-rom').classList.toggle('active',f==='rom');
   // Swap ship selectors to match faction
   const pSel=document.getElementById('player-ship');
   const eSel=document.getElementById('enemy-ship');
   if(f==='fed'){
     pSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option>';
-    eSel.innerHTML='<option value="D7">IKS Kronos — D-7 Class</option>';
-  } else {
+    eSel.innerHTML='<option value="D7">IKS Kronos — D-7 Class</option><option value="V8BirdOfPrey">RIS Talon — V-8 Bird of Prey</option>';
+  } else if(f==='kli'){
     pSel.innerHTML='<option value="D7">IKS Kronos — D-7 Class</option>';
-    eSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option>';
+    eSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option><option value="V8BirdOfPrey">RIS Talon — V-8 Bird of Prey</option>';
+  } else {
+    pSel.innerHTML='<option value="V8BirdOfPrey">RIS Talon — V-8 Bird of Prey</option>';
+    eSel.innerHTML='<option value="Constitution">USS Enterprise — Constitution Class</option><option value="D7">IKS Kronos — D-7 Class</option>';
   }
 }
 
