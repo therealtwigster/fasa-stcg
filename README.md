@@ -52,7 +52,11 @@ A bright arrowhead also points in the Forward direction, color-matched to your f
 | Double-click anywhere | Reset zoom to 100% and re-center |
 | Click a green hex (move phase) | Move your ship there |
 
-If text or hex details are hard to read at the default zoom, scroll in — the map redraws at any zoom level.
+### Adjusting the UI Scale
+
+The **− / +** buttons in the bottom-right corner of the status bar scale all interface text up or down, from 70% to 160% in 10% steps. The current percentage is shown between the two buttons.
+
+This is separate from the tactical map zoom — the UI scale affects the panels, labels, weapon buttons, combat log, power sliders, and victory screen text. The map canvas scales independently via the scroll wheel. If any text feels too small to read comfortably, increase the UI scale first, then zoom the map if needed.
 
 ---
 
@@ -180,6 +184,7 @@ Ships equipped with a cloaking device show an **⬡ ENGAGE CLOAK** button at the
 - While cloaked your ship renders at low visibility on the tactical map with a `[CLOAKED]` label in place of its name.
 - Click **⬡ DISENGAGE CLOAK** to drop the cloak and restore weapons access starting next turn.
 - The cloak toggle only works during the Power Allocation phase, before you commit.
+- **The cloak resets at the end of every turn.** If you want to stay cloaked into the next turn, you must re-engage it in the new turn's Power Allocation phase. This also means the power cost must be re-budgeted each turn — it doesn't automatically carry over.
 
 ---
 
@@ -224,12 +229,25 @@ The combat log is the left panel on the Tactical Map tab. It shows every dice ro
 
 ## Victory and Defeat
 
-When either ship's superstructure reaches zero, the battle ends immediately and a results screen appears with:
+There are two ways a battle can end.
 
-- **VICTORY** or **DEFEAT** in large text
-- A short narrative paragraph describing how the finishing blow landed — which weapon fired, where it struck, and whether the target's shields had already failed or simply weren't enough. This is generated from what actually happened in that exchange, not a generic message, so a torpedo kill reads differently from a disruptor kill or a plasma bolt kill.
-- Turn count and shot accuracy stats for both sides
-- A pulsing **"press any key to continue"** prompt — press any key, or click anywhere on the screen other than the New Mission button, to return to the start menu. There's a brief pause before this activates so a key still held down from the heat of combat doesn't skip past the result instantly.
+### Hull Destroyed
+When either ship's superstructure reaches zero, the battle ends immediately. The results screen shows **VICTORY** or **DEFEAT** with a short narrative paragraph describing the finishing blow — which weapon fired, where it struck, and whether the target's shields had already failed. This is generated from what actually happened, so a torpedo kill reads differently from a disruptor kill or a plasma bolt.
+
+### Total Power Failure
+When repeated engine hits drain a ship's available power to zero, that ship cannot move, cannot raise shields, and cannot fire. The battle ends with **VICTORY — SURRENDER** or **DEFEAT — ADRIFT**. The narrative in this case describes what happens to the surviving crew — and the outcome depends on *which faction won*.
+
+| Winner | Loser | Fate of the defeated crew |
+|--------|-------|--------------------------|
+| Federation | Any | Debriefing, medical treatment, eventual repatriation |
+| Klingon | Federation | Labor camps, no formal acknowledgement |
+| Klingon | Klingon | The useful are kept; the rest given an escape pod |
+| Klingon | Romulan | Taken to Klingon space; several do not survive the transit |
+| Romulan | Federation | Released with navigational memory wiped |
+| Romulan | Klingon | Never heard from again |
+| Romulan | Romulan | The ship and crew disappear into an unlisted facility |
+
+Both screens end with a pulsing **"press any key to continue"** prompt. Press any key, or click anywhere except the New Mission button, to return to the start menu. There is a brief pause before this activates so a key held down from the heat of combat doesn't skip past the result.
 
 ---
 
@@ -279,7 +297,8 @@ Orion and Gorn factions are data-complete and will become selectable in a future
 - **Nebulas are double-edged.** Moving into one hides you from precise sensor lock but also degrades your own weapons.
 - **The undo button is your friend.** You can take back moves within a sub-phase. Use it to explore positioning before committing.
 - **Manual shield allocation** lets you stack points forward when closing on an enemy, or rear-weight shields when breaking off. Switching back to AUTO resets all faces to even distribution.
-- **Cloaking is an all-or-nothing trade.** You can't fire while cloaked, so use it to reposition or break contact, not as a free defense while attacking.
+- **Cloaking is an all-or-nothing trade.** You can't fire while cloaked, and the cloak resets at the end of every turn — re-engage it in the next Power Allocation phase if you want to stay hidden. Use it to reposition or break contact, not as a free defense while attacking.
+- **Engine hits are a valid path to victory.** Sustained damage to an enemy's engines drains their available power. If it hits zero they lose the ability to move, shield, or fire — the battle ends as a capture rather than a kill. Watch the Warp Core bar in the status strip.
 - **Zoom in on tight engagements.** Scroll to zoom and click your own ship to center the view — useful once ships close to short range and the hex grid gets crowded.
 
 ---
