@@ -29,9 +29,14 @@ Open `StarTrek_TacticalCommand_GAME.html` in any modern desktop browser (Chrome,
 
 **3. Controls**
 - **Click a hex** to move there; **arrow keys / A-D / Q-E** rotate facing.
-- **Scroll** to zoom the tactical map; drag to pan.
+- **Scroll** to zoom the tactical map; **left-click-drag** to pan it around. The **⊕ Recenter** button (top-right of the map) reframes both ships; double-click resets the view.
+- Allocate weapon power with the **sliders** in the Power tab (selecting a beam auto-assigns 1 point; dragging to zero un-selects it). More power = a more intense blue beam, or more gold rapid-fire pulses.
+- In a firing phase, each weapon has its own **Fire** button (with an overt READY / power indicator), or use **⚡ Fire All Ready Weapons** to loose everything in one rolling volley.
 - Weapons fire within their **firing arcs** (six 60° arcs around the ship). Range affects hit chance and damage per the FASA firing charts.
 - Cloak-capable ships (Romulan Bird of Prey, late-mark Klingon D-7) can spend power to cloak.
+- A **pinned stats bar** at the top of the right panel keeps your hull, power, and all six shield facings in view while you scroll the weapon list — so you can watch damage land.
+
+**Weapon effects.** Federation beams render by era: older TOS-design phasers (FL-series and FH-6 or lower) fire a **solid blue beam** that brightens with allocated power; movie-era phasers (FH-7 and up, e.g. the Enterprise refit and Federation II dreadnought) fire **gold rapid-fire pulses** (more power = more pulses). Klingon and Romulan disruptors use procedural beams, and the Romulan **plasma torpedo** is a slow orange fireball that dims and cools as it travels — a visual echo of plasma's damage falloff with range.
 
 The game ends when a ship is destroyed, or when engine damage drops a ship's power to zero (triggering a capture/surrender outcome).
 
@@ -50,6 +55,8 @@ Every variant below is fully playable, with stats and weapons derived directly f
 | Enterprise (refit) Mk I | 60 | 4 | 0.25 | 16 | 26 |
 | Enterprise (refit) Mk II | 64 | 4 | 0.25 | 16 | 27 |
 | Enterprise (refit) Mk III | 68 | 4 | 0.25 | 16 | 28 |
+| Federation II Dreadnought Mk I | 82 | 6 | 0.25 | 15 | 62 |
+| Federation II Dreadnought Mk II | 86 | 6 | 0.25 | 20 | 62 |
 
 ### Klingon
 | Ship | Power | Move | Shield Ratio | Max Shield/Face | Superstructure | Cloak |
@@ -91,6 +98,12 @@ Selecting a playable ship and variant sets it as your ship and returns you to th
 | **Federation** | Constitution / Enterprise refit | Balanced cruisers, strong phasers and photon torpedoes |
 | **Klingon** | D-7 | Aggressive disruptor boats; late marks add cloaks |
 | **Romulan** | V-8 Bird of Prey | Cloak-and-strike with devastating plasma weapons |
+
+---
+
+## The battlefield
+
+Each game generates a fresh starfield with randomized terrain — clustered **asteroid fields** (rendered with miniaturized scanned-counter rock art, varied per hex), **nebula patches** (sensor-fouling), and isolated **gravity wells**. Terrain is capped so it never overwhelms the map (at most 50 affected hexes, sometimes none at all), and the ships' start zones are always left clear.
 
 ---
 
