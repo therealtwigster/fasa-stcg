@@ -27,22 +27,62 @@ Open `StarTrek_TacticalCommand_GAME.html` in any modern desktop browser (Chrome,
 3. **Movement / Firing** ×3 — three interleaved movement and firing sub-phases per turn.
 4. **Repower Shields** — end-of-turn shield regeneration.
 
-**3. Controls**
-- **Click a hex** to move there; **arrow keys / A-D / Q-E** rotate facing.
-- **Scroll** to zoom the tactical map; **left-click-drag** to pan it around. The **⊕ Recenter** button (top-right of the map) reframes both ships; double-click resets the view.
-- Allocate weapon power with the **sliders** in the Power tab (selecting a beam auto-assigns 1 point; dragging to zero un-selects it). More power = a more intense blue beam, or more gold rapid-fire pulses.
-- In a firing phase, each weapon has its own **Fire** button (with an overt READY / power indicator), or use **⚡ Fire All Ready Weapons** to loose everything in one rolling volley.
-- Weapons fire within their **firing arcs** (six 60° arcs around the ship). Range affects hit chance and damage per the FASA firing charts.
+**3. Play the battle**
+- Move, rotate, and fire through each phase. Full controls, display legends, and firing options are in the **Interface, controls & displays** section below.
+- Weapons fire within their **firing arcs** (six 60° arcs). Range affects hit chance and damage per the FASA firing charts.
 - Cloak-capable ships (Romulan Bird of Prey, late-mark Klingon D-7) can spend power to cloak.
-- A **pinned stats bar** at the top of the right panel keeps your hull, power, and all six shield facings in view while you scroll the weapon list — so you can watch damage land.
-
-**Weapon effects.** Federation beams render by era: older TOS-design phasers (FL-series and FH-6 or lower) fire a **solid blue beam** that brightens with allocated power; movie-era phasers (FH-7 and up, e.g. the Enterprise refit and Federation II dreadnought) fire **gold rapid-fire pulses** (more power = more pulses). Klingon and Romulan disruptors use procedural beams, and the Romulan **plasma torpedo** is a slow orange fireball that dims and cools as it travels — a visual echo of plasma's damage falloff with range.
 
 The game ends when a ship is destroyed, or when engine damage drops a ship's power to zero (triggering a capture/surrender outcome).
 
 ---
 
-## Playable ship roster
+## Interface, controls & displays
+
+The screen is divided into three areas: the **tactical map** (center), the **right sidebar** (your ship's status and weapon controls), and the **combat log** (bottom). Below is what each element shows and how to use it.
+
+### The tactical map
+
+The hex grid where the battle plays out. Your ship and the enemy are drawn as top-down silhouettes (real counter art where available, otherwise a faction-styled procedural hull).
+
+- **Heading arrow** — a bright arrowhead on each ship points in its current facing (forward).
+- **Hex-edge shields** — six colored segments trace the hex edges around each ship, one per shield facing. **Green** = charged and in good order (brighter/thicker = stronger); a **thin white line** = the generator works but that face is uncharged; **red with an ✕** = that shield generator is destroyed. The forward face always sits on the ship's heading side, so you can read at a glance which arcs are protected.
+- **Range rings** — during a firing phase, dashed blue rings radiate from your ship, one for each distinct weapon max-range, labeled in hexes. Use them to judge whether the enemy is inside a given weapon's reach before committing power.
+- **Terrain** — asteroid fields show miniaturized rock art (each hex varied); nebulae appear as dim purple hexes (they scatter sensors); gravity wells are faint green. Terrain is randomized every game.
+- **Firing-arc overlay** — when you have a weapon selected/armed, the target's arc is highlighted green (in-arc) or red (out-of-arc).
+
+**Map controls:**
+- **Left-click a hex** — move your ship there (during a movement phase).
+- **Left-click-drag** — pan the map around.
+- **Scroll wheel** — zoom in and out.
+- **⊕ Recenter button** (top-right of the map) — reframe both ships in view.
+- **Double-click** — reset the view.
+- **Arrow keys**, or **A/D**, or **Q/E** — rotate your ship's facing.
+
+### The right sidebar
+
+Tabs across the top switch between **◈ Power Allocation** and the weapon firing view.
+
+- **Pinned stats bar** — always visible at the top of the sidebar: **HULL** (superstructure current/max), **PWR** (power current/total), and six shield facings (F, FS, AS, A, AP, FP) color-coded by strength (✕ for a destroyed generator).
+- **Ship cards** — "Your Ship" and "Enemy Contact" panels show hull, shields, and power bars. **Hover any bar** for a styled tooltip with exact current/max values (superstructure boxes, total shields across active facings, reactor output), for both your ship and the enemy.
+- **Power Allocation tab** — divide your power pool between movement, shields (per face), and arming weapons. Each weapon has a **power slider** (green→amber→red track) with a live value/max readout. Selecting a beam auto-assigns 1 point; drag a beam to zero to un-select it. Systems that are **knocked out** (a destroyed weapon mount or shield generator) are flagged in red — "⊘ KNOCKED OUT" / "⊘ GENERATOR KNOCKED OUT" — so you know why you can't power them. Commit when ready.
+- **Weapon firing view** — each weapon is a compact row: a small **FIRE** button (color-coded — green when ready and in range, amber when blocked, faded once fired) with a status glyph and the weapon's name, and for beams a separate **⊕ PAIR** button. **Hover the FIRE button** for a tooltip with the full detail: status, in-range/out-of-range, firing arcs, damage, and power.
+
+### Firing weapons
+
+Three ways to fire:
+- **Single** — click a ready weapon's **FIRE** button to fire it on its own.
+- **Fire a pair** — click the **⊕ PAIR** button on two ready beam banks (each turns to **✓** and highlights), then **▶▶ FIRE SELECTED PAIR** at the top of the panel fires both together. Good for concentrating two phaser banks on one facing.
+- **Fire all** — **⚡ FIRE ALL READY WEAPONS** looses every ready weapon in a staggered rolling volley. Each weapon still rolls its own to-hit and damage.
+
+**Weapon effects by faction/era:** Federation TOS-design phasers (FL-series, FH-6 and below) fire a **solid blue beam** that brightens with the power you allocate; movie-era phasers (FH-7+, e.g. Enterprise refit, Federation II dreadnought) fire **gold rapid-fire pulses** (more power = more pulses). Each bank fires from its own point on the hull. Klingon/Romulan disruptors are procedural beams, and the Romulan **plasma torpedo** is a slow orange fireball that dims and cools as it crosses each hex — mirroring plasma's damage falloff with range. Projectiles resolve their hit exactly when they reach the target.
+
+**Sensor damage:** if your sensors are hit, the enemy contact on the map gets visual static and an uncertainty ring — degraded targeting resolution scales with the damage.
+
+### The combat log
+
+Runs along the bottom, **oldest at top, newest at the bottom**, and auto-scrolls so the latest result is always in view. It reports movement, to-hit rolls, damage by shield facing, critical hits, and kill narratives (Federation ships fire "phasers," Klingon/Romulan "disruptors").
+
+
 
 Every variant below is fully playable, with stats and weapons derived directly from the FASA ship-recognition manuals.
 
