@@ -88,7 +88,7 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .leg-swatch{width:16px;height:16px;border-radius:2px;flex-shrink:0;margin-top:1px;}
 .leg-text{font-size:8px;color:#556677;letter-spacing:.5px;line-height:1.6;}
 .leg-text b{color:#8899aa;letter-spacing:1px;font-size:8px;}
-#tac-sb{width:268px;background:#030810;border-left:2px solid #ff9900;display:flex;flex-direction:column;overflow-y:auto;}
+#tac-sb{width:320px;background:#030810;border-left:2px solid #ff9900;display:flex;flex-direction:column;overflow-y:auto;}
 
 /* ── COMBAT LOG ── */
 .log-main{flex:1;overflow-y:auto;padding:0;background:#020810;}
@@ -145,6 +145,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .wpn-row.locked{opacity:.5;pointer-events:none;}
 .wpn-arm{width:16px;height:16px;border-radius:50%;border:2px solid #2a0800;background:#090200;cursor:pointer;flex-shrink:0;transition:all .14s;}
 .wpn-arm.on{background:#aa1a00;border-color:#dd2200;box-shadow:0 0 6px rgba(180,30,0,.45);}
+.wpn-arm.ko{background:#1a0000;border-color:#661111;box-shadow:none;cursor:not-allowed;position:relative;}
+.wpn-row.ko-row{opacity:.72;}
+.ko-note{flex:1;font-size:9px;font-weight:bold;letter-spacing:1px;color:#ff5533;text-align:center;}
 .wpn-nm{flex:1;font-size:10px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;}
 .wpn-arc{font-size:9px;color:#283040;width:26px;text-align:center;letter-spacing:1px;}
 .wpn-in{width:40px;background:#030810;border:1px solid #141e2e;color:#cc2200;font-size:11px;text-align:center;font-family:'Courier New',monospace;padding:3px;border-radius:2px;}
@@ -188,6 +191,11 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 #pinned-stats .ps-sh{display:flex;flex-direction:column;align-items:center;background:#06101f;border:1px solid #14283e;border-radius:2px;padding:2px 0;}
 #pinned-stats .ps-sh span{font-size:7px;letter-spacing:.5px;color:#4a6a8a;}
 #pinned-stats .ps-sh b{font-size:11px;font-family:'Courier New',monospace;color:#3a7aff;line-height:1.1;}
+#pinned-stats .ps-item,#pinned-stats .ps-sh{cursor:help;}
+#ship-tooltip{position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(6,14,26,.98);border:1px solid #ff9a3c;border-radius:7px;padding:7px 11px;font-size:11px;letter-spacing:.5px;color:#cfe0ff;box-shadow:0 4px 16px rgba(0,0,0,.7);min-width:150px;font-family:'Courier New',monospace;}
+#ship-tooltip h5{margin:0 0 4px;color:#ffcf6b;font-size:10px;letter-spacing:1.5px;}
+#ship-tooltip .big{font-size:15px;color:#fff;}
+#ship-tooltip .sub{color:#5f7799;font-size:9px;margin-top:3px;}
 .s-sec{border-bottom:1px solid #0c1420;padding:12px 13px;}
 .s-lbl{font-size:9px;letter-spacing:3px;color:#ff9900;text-transform:uppercase;margin-bottom:9px;}
 .ship-card{background:#050c18;border:1px solid #141e2e;border-radius:3px;padding:9px 10px;margin-bottom:7px;}
@@ -220,6 +228,24 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 .wpn-fire-btn.fired{opacity:.35;cursor:not-allowed;border-color:#331100;color:#553322;}
 .wpn-fire-btn.blocked{border-color:#664400;color:#775500;cursor:not-allowed;background:#0a0500;}
 .fire-all-btn{display:block;width:100%;padding:9px 8px;margin-bottom:8px;background:#1a0a00;border:1px solid #883300;color:#ffaa44;font-family:'Courier New',monospace;font-size:11px;font-weight:bold;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-align:center;transition:all .15s;}
+.fire-pair-btn{display:block;width:100%;padding:8px;margin-bottom:6px;background:#0a1424;border:1px solid #2a4a7a;color:#8fbfff;font-family:'Courier New',monospace;font-size:11px;font-weight:bold;letter-spacing:1.5px;cursor:pointer;border-radius:3px;text-align:center;transition:all .15s;}
+.fire-pair-btn.armed{border-color:#5aa0ff;color:#cfe4ff;background:#12233c;box-shadow:0 0 9px rgba(90,160,255,.4);}
+.fire-pair-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.pair-chip{float:right;font-family:'Courier New',monospace;font-size:8px;letter-spacing:.5px;padding:2px 7px;border:1px solid #2a4a7a;border-radius:8px;color:#8fbfff;background:#0a1424;cursor:pointer;}
+.wfb-compact{display:flex;align-items:stretch;gap:5px;}
+.wfb-pair{flex:0 0 30px;font-family:'Courier New',monospace;font-size:13px;font-weight:bold;border:1px solid #2a4a7a;border-radius:5px;background:#0a1424;color:#8fbfff;cursor:pointer;transition:all .12s;}
+.wfb-pair:hover{background:#12233c;border-color:#5aa0ff;}
+.wfb-pair.on{background:#5aa0ff;color:#04070d;border-color:#5aa0ff;}
+.wfb-fire{flex:1;display:flex;align-items:center;gap:6px;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.5px;padding:6px 9px;border:1px solid #333;border-radius:5px;background:#0a0f18;color:#889;cursor:pointer;text-align:left;transition:all .12s;}
+.wfb-fire .wfb-mini{font-size:12px;flex:0 0 auto;}
+.wfb-fire .wfb-fname{flex:1;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wfb-fire.ready{border-color:#2bd94f;color:#bfffce;background:#08160c;box-shadow:0 0 7px rgba(43,217,79,.35);}
+.wfb-fire.ready:hover{background:#0d2413;}
+.wfb-fire.blocked{border-color:#664400;color:#997722;background:#0a0500;}
+.wfb-fire.fired{opacity:.5;}
+.wfb-fire:disabled{cursor:not-allowed;}
+.pair-chip:hover{background:#12233c;border-color:#5aa0ff;}
+.pair-chip.on{background:#5aa0ff;color:#04070d;border-color:#5aa0ff;font-weight:bold;}
 .fire-all-btn.armed{border-color:#ff6600;color:#ffcc66;background:#2a1000;box-shadow:0 0 10px rgba(255,100,0,.35);}
 .fire-all-btn.armed:hover{background:#3a1800;color:#ffe0a0;}
 .fire-all-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
@@ -391,6 +417,7 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 </style>
 </head>
 <body>
+<div id="ship-tooltip"></div>
 
 <!-- SCENARIO SCREEN -->
 <div id="scenario-screen">
@@ -503,16 +530,16 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
   <div id="tac-sb" class="sidebar">
     <div id="pinned-stats">
       <div class="ps-top">
-        <span class="ps-item"><span class="ps-lbl">HULL</span><b id="ps-hull">—</b></span>
-        <span class="ps-item"><span class="ps-lbl">PWR</span><b id="ps-pwr">—</b></span>
+        <span class="ps-item" data-tip="hull" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span class="ps-lbl">HULL</span><b id="ps-hull">—</b></span>
+        <span class="ps-item" data-tip="power" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span class="ps-lbl">PWR</span><b id="ps-pwr">—</b></span>
       </div>
       <div class="ps-shields">
-        <div class="ps-sh"><span>F</span><b id="ps-sh0">0</b></div>
-        <div class="ps-sh"><span>FS</span><b id="ps-sh1">0</b></div>
-        <div class="ps-sh"><span>AS</span><b id="ps-sh2">0</b></div>
-        <div class="ps-sh"><span>A</span><b id="ps-sh3">0</b></div>
-        <div class="ps-sh"><span>AP</span><b id="ps-sh4">0</b></div>
-        <div class="ps-sh"><span>FP</span><b id="ps-sh5">0</b></div>
+        <div class="ps-sh" data-tip="sh0" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>F</span><b id="ps-sh0">0</b></div>
+        <div class="ps-sh" data-tip="sh1" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>FS</span><b id="ps-sh1">0</b></div>
+        <div class="ps-sh" data-tip="sh2" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>AS</span><b id="ps-sh2">0</b></div>
+        <div class="ps-sh" data-tip="sh3" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>A</span><b id="ps-sh3">0</b></div>
+        <div class="ps-sh" data-tip="sh4" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>AP</span><b id="ps-sh4">0</b></div>
+        <div class="ps-sh" data-tip="sh5" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><span>FP</span><b id="ps-sh5">0</b></div>
       </div>
     </div>
     <div class="s-sec">
@@ -521,9 +548,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
         <div class="sc-nm" id="p-name">USS Enterprise</div>
         <div class="sc-cl" id="p-class">Constitution Class · NCC-1701</div>
         <div class="sc-bars">
-          <div class="sc-br"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="pb-hull" style="background:#336633"></div></div><span class="sc-bv" id="pv-hull" style="font-size:9px;margin-left:4px;color:#448844">100%</span></div>
-          <div class="sc-br"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="pb-shld" style="background:#1a44aa"></div></div><span class="sc-bv" id="pv-shld" style="font-size:9px;margin-left:4px;color:#2255aa">—</span></div>
-          <div class="sc-br"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="pb-pwr" style="background:#aa6600"></div></div><span class="sc-bv" id="pv-pwr" style="font-size:9px;margin-left:4px;color:#cc7700">38</span></div>
+          <div class="sc-br" data-ship="p" data-tip="hull" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="pb-hull" style="background:#336633"></div></div><span class="sc-bv" id="pv-hull" style="font-size:9px;margin-left:4px;color:#448844">100%</span></div>
+          <div class="sc-br" data-ship="p" data-tip="shld" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="pb-shld" style="background:#1a44aa"></div></div><span class="sc-bv" id="pv-shld" style="font-size:9px;margin-left:4px;color:#2255aa">—</span></div>
+          <div class="sc-br" data-ship="p" data-tip="pwr" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="pb-pwr" style="background:#aa6600"></div></div><span class="sc-bv" id="pv-pwr" style="font-size:9px;margin-left:4px;color:#cc7700">38</span></div>
         </div>
       </div>
     </div>
@@ -533,9 +560,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
         <div class="sc-nm" id="e-name" style="color:#cc6644">IKS Kronos</div>
         <div class="sc-cl" id="e-class">D-7 Class</div>
         <div class="sc-bars">
-          <div class="sc-br"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="eb-hull" style="background:#884422"></div></div><span class="sc-bv" id="ev-hull" style="font-size:9px;margin-left:4px;color:#aa5533">100%</span></div>
-          <div class="sc-br"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="eb-shld" style="background:#884422"></div></div><span class="sc-bv" id="ev-shld" style="font-size:9px;margin-left:4px;color:#aa5533">—</span></div>
-          <div class="sc-br"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="eb-pwr" style="background:#553300"></div></div><span class="sc-bv" id="ev-pwr" style="font-size:9px;margin-left:4px;color:#774400">34</span></div>
+          <div class="sc-br" data-ship="e" data-tip="hull" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Hull</div><div class="sc-bt"><div class="sc-bf" id="eb-hull" style="background:#884422"></div></div><span class="sc-bv" id="ev-hull" style="font-size:9px;margin-left:4px;color:#aa5533">100%</span></div>
+          <div class="sc-br" data-ship="e" data-tip="shld" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Shields</div><div class="sc-bt"><div class="sc-bf" id="eb-shld" style="background:#884422"></div></div><span class="sc-bv" id="ev-shld" style="font-size:9px;margin-left:4px;color:#aa5533">—</span></div>
+          <div class="sc-br" data-ship="e" data-tip="pwr" onmousemove="showShipTip(event)" onmouseleave="hideShipTip()"><div class="sc-bl">Power</div><div class="sc-bt"><div class="sc-bf" id="eb-pwr" style="background:#553300"></div></div><span class="sc-bv" id="ev-pwr" style="font-size:9px;margin-left:4px;color:#774400">34</span></div>
         </div>
       </div>
     </div>
@@ -1956,7 +1983,7 @@ function buildShieldFaceSliders(){
         min="0" max="${max}" value="${shieldManualPts[i]}"
         ${alive?'':'disabled'}
         oninput="updShieldFace(${i})">
-      ${alive?'':'<div style=\"font-size:7px;color:#441100;letter-spacing:1px;margin-top:2px\">GEN OFFLINE</div>'}
+      ${alive?'':'<div style=\"font-size:8px;font-weight:bold;color:#ff5533;letter-spacing:1px;margin-top:2px\">⊘ GENERATOR KNOCKED OUT</div>'}
     `;
     container.appendChild(row);
   });
@@ -2287,17 +2314,17 @@ function addBeamFX(scHex,tcHex,col){
   FX.push({type:'beam',life:1.0,dec:.035,sc:scHex,tc:tcHex,col});
 }
 // Blue solid beam — intensity, thickness and glow all scale with power/maxPower.
-function addBlueBeamFX(scHex,tcHex,power,maxPower){
+function addBlueBeamFX(scHex,tcHex,power,maxPower,emitOff){
   const frac=Math.max(0.1,Math.min(1,power/Math.max(1,maxPower)));
-  FX.push({type:'bluebeam',life:1.0,dec:.032,sc:scHex,tc:tcHex,frac});
+  FX.push({type:'bluebeam',life:1.0,dec:.032,sc:scHex,tc:tcHex,frac,emitOff:emitOff||{dx:0,dy:0}});
 }
 // Gold rapid-fire — N bolts (N=round(power/2)) spaced ~130ms apart, glow scales with power.
-function addGoldBeamFX(scHex,tcHex,power,maxPower){
+function addGoldBeamFX(scHex,tcHex,power,maxPower,emitOff){
   const n=Math.max(1,Math.round(power/2));
   const gfrac=Math.max(0.1,Math.min(1,power/Math.max(1,maxPower)));
   const gap=8;   // ~130ms at 60fps between bolts
   for(let k=0;k<n;k++){
-    FX.push({type:'goldpulse',life:1.0,dec:.09,sc:scHex,tc:tcHex,prog:0,delay:k*gap,gfrac,started:false});
+    FX.push({type:'goldpulse',life:1.0,dec:.09,sc:scHex,tc:tcHex,prog:0,delay:k*gap,gfrac,started:false,emitOff:emitOff||{dx:0,dy:0}});
   }
 }
 function addTorpFX(scHex,tcHex,onArrive){
@@ -2364,7 +2391,8 @@ function drawFX(g,ts,ox,oy){
 
     } else if(f.type==='bluebeam'){
       const sp=hexCen(f.sc.col,f.sc.row), tp=hexCen(f.tc.col,f.tc.row);
-      const sx=sp.x*ts+ox, sy=sp.y*ts+oy, tx=tp.x*ts+ox, ty=tp.y*ts+oy;
+      const eo=f.emitOff||{dx:0,dy:0};
+      const sx=(sp.x+eo.dx)*ts+ox, sy=(sp.y+eo.dy)*ts+oy, tx=tp.x*ts+ox, ty=tp.y*ts+oy;
       if(Math.hypot(sx-tx,sy-ty)<1){g.restore();return;}
       const e=1-f.life;                                   // 0..1 over life
       const env = e<0.15 ? e/0.15 : e<0.6 ? 1 : Math.max(0,1-(e-0.6)/0.4);  // rise/hold/fade
@@ -2381,7 +2409,8 @@ function drawFX(g,ts,ox,oy){
     } else if(f.type==='goldpulse'){
       if(!f.started){ g.restore(); return; }
       const sp=hexCen(f.sc.col,f.sc.row), tp=hexCen(f.tc.col,f.tc.row);
-      const sx=sp.x*ts+ox, sy=sp.y*ts+oy, tx=tp.x*ts+ox, ty=tp.y*ts+oy;
+      const eo=f.emitOff||{dx:0,dy:0};
+      const sx=(sp.x+eo.dx)*ts+ox, sy=(sp.y+eo.dy)*ts+oy, tx=tp.x*ts+ox, ty=tp.y*ts+oy;
       const prog=f.prog, x=sx+(tx-sx)*prog, y=sy+(ty-sy)*prog;
       const tail=Math.max(0,prog-.22), trx=sx+(tx-sx)*tail, tr_y=sy+(ty-sy)*tail;
       const gl=16*f.gfrac;                                // glow scales with power
@@ -2401,7 +2430,7 @@ function drawFX(g,ts,ox,oy){
       const tx=tp.x*ts+ox, ty=tp.y*ts+oy;
       const px=sx+(tx-sx)*f.prog;
       const py=sy+(ty-sy)*f.prog;
-      const trailProg=Math.max(0,f.prog-.28);
+      const trailProg=Math.max(0,f.prog-.028);   // tail shrunk 90% (was .28)
       const trx=sx+(tx-sx)*trailProg, tr_y=sy+(ty-sy)*trailProg;
       g.globalAlpha=al;
       g.shadowColor=f.col;g.shadowBlur=12;
@@ -2413,7 +2442,7 @@ function drawFX(g,ts,ox,oy){
         g.beginPath();g.moveTo(trx,tr_y);g.lineTo(px,py);g.stroke();
       }
       // Head glow
-      const hR=Math.max(4,HR*ts*.12);
+      const hR=Math.max(4.4,HR*ts*.132);   // photon head +10% (was .12)
       const hg=g.createRadialGradient(px,py,0,px,py,hR);
       hg.addColorStop(0,'#ffffff');hg.addColorStop(.35,f.col);hg.addColorStop(1,'transparent');
       g.fillStyle=hg;g.beginPath();safeArc(g,px,py,hR,0,Math.PI*2);g.fill();
@@ -2524,10 +2553,20 @@ function triggerWeaponFX(shooter,target,weapon,hit){
   if(weapon.type==='beam'){
     const style=beamStyleFor(weapon);
     const power=weapon.poweredWith||0, maxP=weapon.maxPower||10;
+    // Emitter source: mount direction = centroid of the weapon's firing arcs (ship-local),
+    // rotated by ship facing, plus a small per-weapon perpendicular spread so banks sharing a
+    // mount don't perfectly overlap. This makes each bank fire from its own point on the hull.
+    let vx=0,vy=0; (weapon.arcs||[0]).forEach(a=>{const ang=a*Math.PI/3; vx+=Math.cos(ang); vy+=Math.sin(ang);});
+    const ml=Math.hypot(vx,vy)||1; vx/=ml; vy/=ml;
+    const fa=(shooter.facing||0)*Math.PI/3, C=Math.cos(fa), Sn=Math.sin(fa);
+    const mx=vx*C - vy*Sn, my=vx*Sn + vy*C;              // world-space mount direction
+    const idx=Math.max(0,(shooter.weapons||[]).indexOf(weapon));
+    const spr=(((idx%3)-1))*0.20;                        // -0.20, 0, +0.20 perpendicular
+    const emitOff={dx:(mx*0.62 - my*spr)*HR, dy:(my*0.62 + mx*spr)*HR};
     if(style==='blue'){
-      addBlueBeamFX(scHex,tcHex,power,maxP);
+      addBlueBeamFX(scHex,tcHex,power,maxP,emitOff);
     } else if(style==='gold'){
-      addGoldBeamFX(scHex,tcHex,power,maxP);
+      addGoldBeamFX(scHex,tcHex,power,maxP,emitOff);
     } else {
       const col=shooter.faction==='fed'?'#66bbff':shooter.faction==='rom'?'#44ff88':'#ffaa22';
       addBeamFX(scHex,tcHex,col);
@@ -4101,6 +4140,19 @@ function renderTac(){
     }
   }
 
+  // Weapon range rings around the player ship (one per distinct max range of a ready/armed weapon)
+  if(GS.player&&FIRE_PHASES.includes(GS.phase)&&!GS.player.cloaked){
+    const pc=hexCen(GS.player.col,GS.player.row); const pcx=pc.x*ts+ox, pcy=pc.y*ts+oy;
+    const ranges=[...new Set(GS.player.weapons.filter(w=>w.alive&&w.armed).map(w=>w.maxRange||15))].sort((a,b)=>a-b);
+    ranges.forEach(rg=>{
+      const rad=rg*(HR*Math.sqrt(3))*ts;   // hex distance → pixels (center-to-center)
+      g.strokeStyle='rgba(90,160,255,.22)'; g.setLineDash([3,6]); g.lineWidth=1;
+      g.beginPath(); safeArc(g,pcx,pcy,rad,0,Math.PI*2); g.stroke(); g.setLineDash([]);
+      g.fillStyle='rgba(90,160,255,.55)'; g.font=`${Math.max(8,ts*3)}px Courier New`; g.textAlign='left';
+      g.fillText(rg+' hex', pcx+rad-2, pcy-3);
+    });
+  }
+
   // Ships
   [GS.player,GS.enemy].forEach(s=>{
     const{x,y}=hexCen(s.col,s.row);const sx=x*ts+ox,sy=y*ts+oy;const sz=HR*ts;
@@ -4120,14 +4172,39 @@ function renderTac(){
     // Shield bubble — drawn ON TOP of hull so it is never buried by sprite pixels.
     // Alpha has a floor (0.35) so any raised shield is clearly visible; strength
     // still modulates brightness. Line width scales with zoom.
-    const totalShields=s.shields.reduce((a,b)=>a+b,0);
-    if(totalShields>0&&!s.cloaked){
-      const maxShld=s.shieldGenAlive.filter(x=>x).length*s.maxShieldPerFace;
-      const shldPct=totalShields/(maxShld||1);
-      const shieldsR=Math.max(.1,sz*.95);
-      const shldA=.35+shldPct*.45;
-      g.strokeStyle=isFed?`rgba(90,150,255,${shldA})`:isRom?`rgba(70,220,120,${shldA})`:`rgba(255,150,60,${shldA})`;
-      g.lineWidth=Math.max(1.5,sz*.08);g.beginPath();safeArc(g,sx,sy,shieldsR,0,Math.PI*2);g.stroke();
+    // Per-facing HEX-EDGE shields (matches the hex grid): green=charged (brightness/width ∝ strength),
+    // thin white=functional but uncharged, red+✕=destroyed generator. Forward facing = heading direction.
+    if(!s.cloaked){
+      const R=Math.max(2,sz*0.98);
+      for(let i=0;i<6;i++){
+        const nrm=(s.facing+i)*Math.PI/3;             // outward normal of facing i
+        const a0=nrm-Math.PI/6, a1=nrm+Math.PI/6;     // the hex edge spans normal ±30°
+        const x0=sx+Math.cos(a0)*R, y0=sy+Math.sin(a0)*R;
+        const x1=sx+Math.cos(a1)*R, y1=sy+Math.sin(a1)*R;
+        const dead=!s.shieldGenAlive[i], charged=s.shields[i]>0;
+        if(dead){ g.strokeStyle='rgba(255,69,54,.95)'; g.lineWidth=Math.max(2,sz*.10); }
+        else if(charged){ const p=Math.min(1,s.shields[i]/(s.maxShieldPerFace||1)); g.strokeStyle=`rgba(57,230,122,${.5+.5*p})`; g.lineWidth=Math.max(2,sz*.07*(0.6+0.9*p)); }
+        else { g.strokeStyle='rgba(232,240,255,.82)'; g.lineWidth=Math.max(1,sz*.022); }
+        g.lineCap='round'; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke();
+        if(dead){ const mx=(x0+x1)/2,my=(y0+y1)/2,d=Math.max(2,sz*.12); g.lineWidth=Math.max(1,sz*.03);
+          g.beginPath(); g.moveTo(mx-d,my-d);g.lineTo(mx+d,my+d);g.moveTo(mx+d,my-d);g.lineTo(mx-d,my+d); g.stroke(); }
+      }
+    }
+    // Sensor static: when the PLAYER's sensors are degraded, the ENEMY contact gets noise/scatter
+    // (targeting resolution drops). Driven by real sensor damage (ship.sensors 0-100).
+    if(s===GS.enemy && GS.player && GS.player.sensors<100 && !s.cloaked){
+      const noise=Math.min(1,(100-GS.player.sensors)/100);
+      const R=sz*1.4;
+      g.save();
+      g.globalAlpha=Math.min(.7,noise*0.85);
+      for(let n=0;n<noise*90;n++){
+        g.fillStyle=Math.random()<.5?'#8fbfff':'#ffffff';
+        g.fillRect(sx-R+Math.random()*R*2, sy-R+Math.random()*R*2, Math.max(1,sz*.05), Math.max(1,sz*.05));
+      }
+      g.restore();
+      // uncertainty ring around the contact
+      g.strokeStyle=`rgba(255,194,58,${0.12+noise*0.4})`; g.setLineDash([4,4]); g.lineWidth=1;
+      g.beginPath(); safeArc(g,sx,sy,R*0.7,0,Math.PI*2); g.stroke(); g.setLineDash([]);
     }
     // Selection ring
     if(s===GS.player){hpath(g,sx,sy,Math.max(.5,sz-1));g.strokeStyle='rgba(255,165,0,.7)';g.lineWidth=1.5;g.stroke();}
@@ -4600,6 +4677,40 @@ function updatePhaseUI(){
   });
 }
 
+// Custom styled hover tooltip for the ship cards + pinned stats bar (live, damage-adjusted values)
+function showShipTip(ev){
+  if(!GS) return;
+  const el=ev.currentTarget, kind=el.dataset.tip, whose=el.dataset.ship||'p';
+  const P=whose==='e'?GS.enemy:GS.player; if(!P) return;
+  const who=whose==='e'?'CONTACT ':'';
+  const tip=document.getElementById('ship-tooltip');
+  const FN=['Forward','Fwd-Starboard','Aft-Starboard','Aft','Aft-Port','Fwd-Port'];
+  let html='';
+  if(kind==='hull'){
+    const pct=Math.round(P.superstructure/P.superstructureMax*100);
+    html=`<h5>${who}SUPERSTRUCTURE</h5><span class="big">${P.superstructure} / ${P.superstructureMax}</span><div class="sub">${pct}% structural integrity</div>`;
+  } else if(kind==='power'||kind==='pwr'){
+    const pct=Math.round(P.currentPower/(P.totalPower||1)*100);
+    html=`<h5>${who}POWER</h5><span class="big">${P.currentPower} / ${P.totalPower}</span><div class="sub">${pct}% of reactor output available</div>`;
+  } else if(kind==='shld'){
+    const tot=P.shields.reduce((a,b)=>a+b,0);
+    const aliveGens=P.shieldGenAlive.filter(x=>x).length;
+    const mx=aliveGens*(P.maxShieldPerFace||0);
+    const dead=6-aliveGens;
+    html=`<h5>${who}SHIELDS</h5><span class="big">${tot} / ${mx}</span><div class="sub">total across ${aliveGens} active facing${aliveGens!==1?'s':''}${dead?` · ${dead} generator${dead!==1?'s':''} knocked out`:''}</div>`;
+  } else if(kind&&kind.startsWith('sh')){
+    const i=+kind.slice(2), alive=P.shieldGenAlive?P.shieldGenAlive[i]:true;
+    const v=P.shields[i]||0, mx=P.maxShieldPerFace||1;
+    html=alive
+      ? `<h5>${FN[i]} SHIELD</h5><span class="big">${v} / ${mx}</span><div class="sub">${v<=0?'functional but uncharged':'charged'}</div>`
+      : `<h5>${FN[i]} SHIELD</h5><span class="big" style="color:#ff5533">✕ DESTROYED</span><div class="sub">generator knocked out — no protection this facing</div>`;
+  }
+  tip.innerHTML=html; tip.style.display='block';
+  tip.style.left=Math.min(ev.clientX+14, innerWidth-tip.offsetWidth-8)+'px';
+  tip.style.top=Math.min(ev.clientY+14, innerHeight-tip.offsetHeight-8)+'px';
+}
+function hideShipTip(){ const t=document.getElementById('ship-tooltip'); if(t) t.style.display='none'; }
+
 function updateSidebar(){
   if(!GS) return;
   const upd=(pfx,s)=>{
@@ -4617,9 +4728,9 @@ function updateSidebar(){
     const pv=document.getElementById(pfx+'v-pwr');if(pv)pv.textContent=s.currentPower;
     // Status bar (player only)
     if(pfx==='p'){
-      // Pinned compact stats bar (always visible above the scrolling weapon list)
+      // Pinned compact stats bar (always visible; updates as damage is taken)
       const ph=document.getElementById('ps-hull'); if(ph){ph.textContent=s.superstructure+'/'+s.superstructureMax;ph.style.color=hcol;}
-      const pw=document.getElementById('ps-pwr'); if(pw)pw.textContent=s.currentPower+'/'+s.totalPower;
+      const pw=document.getElementById('ps-pwr'); if(pw){pw.textContent=s.currentPower+'/'+s.totalPower;}
       for(let i=0;i<6;i++){
         const el=document.getElementById('ps-sh'+i); if(!el) continue;
         const alive=s.shieldGenAlive?s.shieldGenAlive[i]:true;
@@ -4650,6 +4761,13 @@ function buildWpnFireBtns(){
   const panel=document.getElementById('wpn-fire-panel');
   if(!panel||!GS) return;
   panel.innerHTML='';
+  GS.selectedBeams=GS.selectedBeams||[];
+  // Fire Selected Pair — pick two ready beam banks, fire them together
+  const firePair=document.createElement('button');
+  firePair.className='fire-pair-btn'; firePair.id='fire-pair-btn';
+  firePair.textContent='▶▶ FIRE SELECTED PAIR';
+  firePair.onclick=fireSelectedPair;
+  panel.appendChild(firePair);
   // Fire All Weapons — fires every READY weapon, staggered for a rolling volley
   const fireAll=document.createElement('button');
   fireAll.className='fire-all-btn';
@@ -4658,14 +4776,36 @@ function buildWpnFireBtns(){
   fireAll.onclick=fireAllWeapons;
   panel.appendChild(fireAll);
   GS.player.weapons.forEach(w=>{
-    const btn=document.createElement('button');
+    const btn=document.createElement('div');
     btn.className='wpn-fire-btn';
     btn.id='wfb-'+w.id;
-    btn.onclick=()=>fireWeapon(w.id);
     updateWpnFireBtn(w,btn);
     panel.appendChild(btn);
   });
-  updateFireAllBtn();
+  updateFireAllBtn(); updateFirePairBtn();
+}
+// Beam pairing: keep at most two selected ready beams
+function togglePair(wid){
+  const w=GS.player.weapons.find(x=>x.id===wid);
+  if(!w||w.type!=='beam'||getWeaponBlockReason(w)) return;
+  GS.selectedBeams=GS.selectedBeams||[];
+  const i=GS.selectedBeams.indexOf(wid);
+  if(i>=0) GS.selectedBeams.splice(i,1);
+  else { GS.selectedBeams.push(wid); if(GS.selectedBeams.length>2) GS.selectedBeams.shift(); }
+  refreshWpnFireBtns();
+}
+function updateFirePairBtn(){
+  const b=document.getElementById('fire-pair-btn'); if(!b||!GS) return;
+  GS.selectedBeams=(GS.selectedBeams||[]).filter(id=>{ const w=GS.player.weapons.find(x=>x.id===id); return w&&!getWeaponBlockReason(w); });
+  const n=GS.selectedBeams.length;
+  b.disabled=n!==2;
+  b.textContent=n===0?'▶▶ FIRE PAIR (pick 2 beams)':n===1?'▶▶ FIRE PAIR (pick 1 more)':'▶▶ FIRE SELECTED PAIR';
+  b.classList.toggle('armed',n===2);
+}
+function fireSelectedPair(){
+  if(!GS||(GS.selectedBeams||[]).length!==2) return;
+  const ids=GS.selectedBeams.slice(); GS.selectedBeams=[];
+  ids.forEach((id,k)=>setTimeout(()=>{ const w=GS.player.weapons.find(x=>x.id===id); if(w&&!w.fired&&!getWeaponBlockReason(w)) fireWeapon(id); }, k*90));
 }
 // Enable Fire-All only when at least one weapon is ready; show the ready count.
 function updateFireAllBtn(){
@@ -4750,26 +4890,44 @@ function updateWpnFireBtn(w,btn){
   else if(!inFirePhase)  statusBadge=`<span class="wfb-status idle">— not fire phase —</span>`;
   else if(canFire)       statusBadge=`<span class="wfb-status ready">● READY TO FIRE</span>`;
   else                   statusBadge=`<span class="wfb-status blocked">⊘ CANNOT FIRE</span>`;
+  // Stash the full detail on the element for the hover tooltip (status/range/arc/damage/power).
+  const paired=(GS.selectedBeams||[]).includes(w.id);
+  btn._tip={ name:w.name, alive:w.alive, fired:w.fired, canFire, inFirePhase,
+             statusBadge, powerBadge, arcStatus, rangeStr, dmgStr, blockReason, terrainBadge, tgtBadge };
+  // Compact row: [PAIR] [shrunk FIRE button]. Details live in the hover tooltip.
+  const mini = !w.alive ? '✕' : w.fired ? '✓' : !inFirePhase ? '·' : canFire ? '●' : '⊘';
   btn.innerHTML=`
-    <div class="wfb-name">${w.alive?'':'[DEAD] '}${w.name}${terrainBadge}${tgtBadge}</div>
-    <div class="wfb-statusrow">${statusBadge} ${powerBadge}</div>
-    <div class="wfb-info">${arcStatus}</div>
-    <div class="wfb-info">${inFirePhase?rangeStr:''} · ${dmgStr}</div>
-    ${blockReason&&!w.fired&&w.alive?`<div class="wfb-block">⊘ ${blockReason}</div>`:''}
+    <div class="wfb-compact">
+      ${w.type==='beam'&&canFire?`<button class="wfb-pair ${paired?'on':''}" title="Pair for combined fire" onclick="togglePair('${w.id}')">${paired?'✓':'⊕'}</button>`:''}
+      <button class="wfb-fire ${canFire?'ready':''} ${w.fired?'fired':''} ${(!canFire&&w.alive&&w.armed&&!w.fired&&inFirePhase)?'blocked':''}"
+        ${canFire?'':'disabled'} onclick="fireWeapon('${w.id}')"
+        onmousemove="showWpnTip(event,'${w.id}')" onmouseleave="hideShipTip()">
+        <span class="wfb-mini">${mini}</span><span class="wfb-fname">${w.alive?'':'[DEAD] '}${w.name}</span>
+      </button>
+    </div>
   `;
-  btn.disabled=!canFire;
-  btn.classList.toggle('charged', canFire);
-  btn.classList.toggle('ready', canFire);
-  btn.classList.toggle('fired', !!w.fired);
-  btn.classList.toggle('blocked', !canFire&&w.alive&&w.armed&&!w.fired&&inFirePhase);
-  if(!w.alive) btn.style.opacity='.3';
-  else btn.style.opacity='';
+  btn.style.opacity = w.alive?'':'.4';
+}
+// Hover tooltip for a weapon: status, in-range, arc, damage, power (moved out of the button face).
+function showWpnTip(ev,wid){
+  const btn=document.getElementById('wfb-'+wid); if(!btn||!btn._tip) return;
+  const d=btn._tip, tip=document.getElementById('ship-tooltip');
+  tip.innerHTML=`<h5>${d.alive?'':'[DESTROYED] '}${d.name}</h5>
+    <div class="sub" style="margin:0 0 4px">${d.statusBadge} &nbsp; ${d.powerBadge}</div>
+    <div class="sub">${d.arcStatus}</div>
+    ${d.inFirePhase&&d.rangeStr?`<div class="sub">${d.rangeStr}</div>`:''}
+    <div class="sub">${d.dmgStr}</div>
+    ${d.terrainBadge||d.tgtBadge?`<div class="sub">${d.terrainBadge} ${d.tgtBadge}</div>`:''}
+    ${d.blockReason&&!d.fired&&d.alive?`<div class="sub" style="color:#ffb03a">⊘ ${d.blockReason}</div>`:''}`;
+  tip.style.display='block';
+  tip.style.left=Math.min(ev.clientX+14, innerWidth-tip.offsetWidth-8)+'px';
+  tip.style.top=Math.min(ev.clientY+14, innerHeight-tip.offsetHeight-8)+'px';
 }
 
 function refreshWpnFireBtns(){
   if(!GS) return;
   GS.player.weapons.forEach(w=>updateWpnFireBtn(w));
-  updateFireAllBtn();
+  updateFireAllBtn(); updateFirePairBtn();
   // If all armed weapons fired, auto-advance hint
   const armed=GS.player.weapons.filter(w=>w.armed&&w.alive);
   const allFired=armed.length>0&&armed.every(w=>w.fired);
@@ -4920,7 +5078,13 @@ function initUI(){
     const isPlasma=w.type==='plasma';
     const isArmedFixed=isMissile||isPlasma;
     const dmgLabel=isPlasma?`ARM:${w.armCost} (rng-dmg)`:isMissile?`DMG ${w.fixedDmg}`:`MAX ${w.maxPower}`;
-    row.innerHTML=`<div class="wpn-arm" data-wid="${w.id}" onclick="togArm(this,'${w.id}')"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><input type="range" class="wpn-in wpn-slider" id="wi-${w.id}" value="0" min="0" max="${isArmedFixed?w.armCost||6:w.maxPower}" data-truemax="${isArmedFixed?w.armCost||6:w.maxPower}" ${isArmedFixed?'disabled':''} oninput="clampWeaponInput('${w.id}');updPwr()"><span class="wpn-val" id="wv-${w.id}">0</span><div class="wpn-dmg">${dmgLabel}</div>`;
+    if(!w.alive){
+      // Weapon mount destroyed — show why power can't be allocated
+      row.classList.add('ko-row');
+      row.innerHTML=`<div class="wpn-arm ko"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><div class="ko-note">⊘ KNOCKED OUT — cannot power</div><div class="wpn-dmg">—</div>`;
+    } else {
+      row.innerHTML=`<div class="wpn-arm" data-wid="${w.id}" onclick="togArm(this,'${w.id}')"></div><div class="wpn-nm">${w.name}</div><div class="wpn-arc">${w.arcs.map(a=>ARC_NAMES[a]).join('/')}</div><input type="range" class="wpn-in wpn-slider" id="wi-${w.id}" value="0" min="0" max="${isArmedFixed?w.armCost||6:w.maxPower}" data-truemax="${isArmedFixed?w.armCost||6:w.maxPower}" ${isArmedFixed?'disabled':''} oninput="clampWeaponInput('${w.id}');updPwr()"><span class="wpn-val" id="wv-${w.id}">0</span><div class="wpn-dmg">${dmgLabel}</div>`;
+    }
     wr.appendChild(row);
   });
   // Build weapon fire buttons for the fire phase
