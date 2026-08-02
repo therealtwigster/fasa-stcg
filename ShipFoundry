@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprite Foundry — Starship Counter Drydock</title>
+<style>
+  :root{
+    --void:#04070d; --panel:#0a1018; --panel2:#0c1524; --line:#152238;
+    --amber:#ff9900; --amber-dim:#8a5a12; --cyan:#4fd0e0; --green:#2bd94f;
+    --red:#ff5533; --tx:#c9d6e5; --mut:#5f7188; --mut2:#3a4a60;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--void);color:var(--tx);
+    font-family:'Courier New',ui-monospace,monospace;font-size:13px;line-height:1.5;}
+  body{background-image:radial-gradient(circle at 82% -8%,#0a1830 0,transparent 55%),
+    radial-gradient(circle at 5% 110%,#120a04 0,transparent 45%);min-height:100vh;}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 18px 60px;}
+  header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:12px;}
+  h1{font-size:16px;letter-spacing:5px;color:var(--amber);text-transform:uppercase;margin:0;font-weight:bold;}
+  .sub{font-size:9px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;}
+  .stamp{margin-left:auto;font-size:9px;letter-spacing:2px;color:var(--mut2);}
+  .stamp b{color:var(--amber-dim);}
+
+  .step-hd{display:flex;align-items:center;gap:10px;margin:22px 0 10px;}
+  .step-no{width:22px;height:22px;flex:0 0 22px;border:1px solid var(--amber);color:var(--amber);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;}
+  .step-hd h2{font-size:11px;letter-spacing:3px;color:var(--tx);text-transform:uppercase;margin:0;font-weight:bold;}
+  .step-hd .hint{font-size:10px;color:var(--mut);letter-spacing:1px;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;}
+  .grid{display:grid;gap:16px;}
+  .g2{grid-template-columns:1fr 1fr;}
+  @media(max-width:840px){.g2{grid-template-columns:1fr;}}
+
+  /* drop zone */
+  #drop{border:1.5px dashed var(--amber-dim);border-radius:6px;padding:26px;text-align:center;
+    color:var(--mut);cursor:pointer;transition:all .15s;background:#070d16;}
+  #drop.hot{border-color:var(--amber);color:var(--amber);background:#0d1626;}
+  #drop b{color:var(--amber);letter-spacing:2px;}
+  #drop small{display:block;margin-top:6px;font-size:10px;color:var(--mut2);}
+  #thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .thumb{width:78px;height:78px;border:1px solid var(--line);border-radius:3px;object-fit:cover;
+    cursor:pointer;background:#060b13;transition:all .12s;}
+  .thumb:hover{border-color:var(--cyan);}
+  .thumb.on{border-color:var(--amber);box-shadow:0 0 8px rgba(255,153,0,.35);}
+
+  canvas{display:block;background:
+    linear-gradient(45deg,#0a0f18 25%,transparent 25%),linear-gradient(-45deg,#0a0f18 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#0a0f18 75%),linear-gradient(-45deg,transparent 75%,#0a0f18 75%);
+    background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;border:1px solid var(--line);border-radius:3px;}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .stage .cap{font-size:9px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;}
+
+  label.ctl{display:block;margin:12px 0 4px;font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;}
+  label.ctl .val{color:var(--cyan);float:right;}
+  input[type=range]{width:100%;accent-color:var(--amber);}
+  input[type=text]{width:100%;background:#060b13;border:1px solid var(--line);color:var(--tx);
+    font-family:inherit;font-size:13px;padding:7px 9px;border-radius:3px;letter-spacing:1px;}
+  input[type=text]:focus{outline:none;border-color:var(--amber);}
+
+  .btn{font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;
+    padding:9px 14px;border-radius:3px;cursor:pointer;transition:all .12s;border:1px solid;}
+  .btn.primary{background:#1a0f00;border-color:var(--amber);color:var(--amber);}
+  .btn.primary:hover{background:#2a1a00;box-shadow:0 0 10px rgba(255,153,0,.3);}
+  .btn.ghost{background:#0a1424;border-color:var(--line);color:var(--cyan);}
+  .btn.ghost:hover{border-color:var(--cyan);}
+  .btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .nudge{width:38px;padding:7px 0;text-align:center;}
+
+  .toggle{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:11px;color:var(--tx);cursor:pointer;}
+  .toggle input{accent-color:var(--amber);width:15px;height:15px;}
+
+  /* segmented polarity toggle */
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;}
+  .seg button{font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+    padding:6px 12px;border:0;border-right:1px solid var(--line);background:#0a1424;color:var(--mut);
+    cursor:pointer;transition:all .12s;}
+  .seg button:last-child{border-right:0;}
+  .seg button:hover{color:var(--cyan);}
+  .seg button.on{background:#1a0f00;color:var(--amber);box-shadow:inset 0 0 8px rgba(255,153,0,.25);}
+  .res{font-size:9px;letter-spacing:2px;color:var(--mut2);margin-left:8px;text-transform:uppercase;}
+  .res b{color:var(--cyan);}
+  .swatch{width:22px;height:22px;border:1px solid var(--line);border-radius:3px;flex:0 0 22px;
+    background:repeating-conic-gradient(#0a0f18 0 25%,transparent 0 50%) 0/12px 12px;}
+  .swatch i{display:block;width:100%;height:100%;border-radius:2px;}
+  input[type=text].dis,input[type=range]:disabled{opacity:.35;}
+  .crosshair{cursor:crosshair!important;}
+
+  pre{background:#060b13;border:1px solid var(--line);border-radius:3px;padding:12px;
+    font-size:11px;color:var(--green);overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all;margin:0;}
+  .out-note{font-size:10px;color:var(--mut);letter-spacing:1px;margin:8px 0 4px;}
+  .dim{color:var(--mut2);}
+  .warn{color:var(--red);font-size:11px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Sprite Foundry</h1>
+    <span class="sub">Starship Counter Drydock</span>
+    <span class="stamp">for <b>Star Trek: Tactical Command</b> · extract · orient · bake · <b>v0.3 raw+light-bg</b></span>
+  </header>
+
+  <!-- STEP 1 — LOAD -->
+  <div class="step-hd"><div class="step-no">1</div><h2>Load counter scans</h2>
+    <span class="hint">drop one file or a full sheet — all local, nothing is uploaded</span></div>
+  <div class="panel">
+    <div id="drop">Drop scanned counter image(s) here — or <b>click to browse</b>
+      <small>PNG / JPG · a single counter or a multi-counter sheet</small></div>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+    <div id="err" class="warn" style="display:none;margin-top:10px"></div>
+    <div id="thumbs"></div>
+  </div>
+
+  <!-- STEP 2 — CROP + EXTRACT -->
+  <div class="step-hd"><div class="step-no">2</div><h2>Crop &amp; extract the ship</h2>
+    <span class="hint">drag a box around the counter, then tune the cleanup</span></div>
+  <div class="grid g2">
+    <div class="panel stage">
+      <span class="cap">Source — drag to select the counter</span>
+      <canvas id="src" width="480" height="360"></canvas>
+      <div class="row">
+        <button class="btn ghost" id="autoCrop">Auto-detect hex</button>
+        <button class="btn ghost" id="wholeCrop">Use whole image</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="stage"><span class="cap">Extracted ship (background removed)</span>
+        <canvas id="iso" width="300" height="300"></canvas></div>
+      <label class="ctl">Processing</label>
+      <div class="row">
+        <div class="seg" id="procmode">
+          <button data-p="raw" class="on">Raw (untouched)</button>
+          <button data-p="full">Full pipeline</button>
+        </div>
+      </div>
+      <div class="dim" style="font-size:10px;letter-spacing:1px;margin-top:4px">Raw = flood the background away from the border and keep every ship pixel exactly as scanned; one clean resize happens only at bake. Full = the older gate-based cleanup (dark counter sheets).</div>
+      <label class="toggle" id="stripRow"><input type="checkbox" id="stripNum"> Strip white counter number</label>
+
+      <label class="ctl">Background polarity</label>
+      <div class="row">
+        <div class="seg" id="bgmode">
+          <button data-m="auto" class="on">Auto</button>
+          <button data-m="dark">Dark bg</button>
+          <button data-m="light">Light bg</button>
+        </div>
+        <span class="res" id="bgres"></span>
+      </div>
+      <div class="dim" style="font-size:10px;letter-spacing:1px;margin-top:4px">Dark = black counter sheets (Romulan). Light = pale/grey concrete tokens (Klingon Bird-of-Prey). Auto reads the crop border.</div>
+
+      <label class="ctl">Sample background colour <span class="dim">(for mottled concrete)</span></label>
+      <div class="row">
+        <button class="btn ghost" id="pick">🎯 Eyedropper</button>
+        <span class="swatch"><i id="sw" style="background:transparent"></i></span>
+        <button class="btn ghost" id="pickClr" disabled>Clear</button>
+        <span class="dim" id="pickHint" style="font-size:10px">click a background spot on the source</span>
+      </div>
+      <label class="ctl" id="lblTol">Background match tolerance <span class="val" id="vTol">70</span></label>
+      <input type="range" id="tol" min="0" max="180" value="70">
+
+      <label class="ctl" id="lblBg">Background darkness cutoff <span class="val" id="vBg">42</span></label>
+      <input type="range" id="bg" min="0" max="255" value="42">
+      <label class="ctl">Kill bright scan debris — brightness <span class="val" id="vDl">150</span></label>
+      <input type="range" id="dl" min="80" max="255" value="150">
+      <label class="ctl">Kill bright scan debris — max color <span class="val" id="vDs">45</span></label>
+      <input type="range" id="ds" min="0" max="120" value="45">
+      <label class="ctl">Saturation boost <span class="dim">(pale token art)</span> <span class="val" id="vSat">1.0×</span></label>
+      <input type="range" id="sat" min="100" max="260" value="100">
+      <label class="ctl">Contrast boost <span class="val" id="vCon">1.0×</span></label>
+      <input type="range" id="con" min="100" max="200" value="100">
+      <label class="ctl">Smoothing — dissolves halftone grain <span class="val" id="vDn">1</span></label>
+      <input type="range" id="dn" min="0" max="3" value="1">
+      <label class="toggle"><input type="checkbox" id="erode" checked> Erode stray speckles</label>
+    </div>
+  </div>
+
+  <!-- STEP 3 — ORIENT -->
+  <div class="step-hd"><div class="step-no">3</div><h2>Orient the bow to the F arc</h2>
+    <span class="hint">spin until the nose points at the F (forward) arrow</span></div>
+  <div class="grid g2">
+    <div class="panel stage">
+      <span class="cap">Orientation hex — bow should point at ▲ F</span>
+      <canvas id="hex" width="340" height="340"></canvas>
+    </div>
+    <div class="panel">
+      <label class="ctl">Rotation (counter-clockwise) <span class="val" id="vRot">0°</span></label>
+      <input type="range" id="rot" min="0" max="359" value="0">
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost nudge" data-n="-15">−15</button>
+        <button class="btn ghost nudge" data-n="-5">−5</button>
+        <button class="btn ghost nudge" data-n="-1">−1</button>
+        <button class="btn ghost nudge" data-n="1">+1</button>
+        <button class="btn ghost nudge" data-n="5">+5</button>
+        <button class="btn ghost nudge" data-n="15">+15</button>
+      </div>
+      <label class="toggle" style="margin-top:16px"><input type="checkbox" id="anchorOn"> Show name-plate anchor <span class="dim">(future-proofing — where a name/registry gets painted later)</span></label>
+      <div class="dim" id="anchorHint" style="display:none;font-size:10px;letter-spacing:1px">Drag the ◇ marker on the hex to set where the construction facility will later paint the ship's name. You don't need a name now — this just reserves the spot.</div>
+      <label class="ctl" style="margin-top:16px">Sprite size in hex <span class="val" id="vFill">100%</span></label>
+      <input type="range" id="fill" min="70" max="130" value="100">
+      <div class="dim" style="font-size:10px;letter-spacing:1px">Push higher to fill the hex fully (close the gap); lower to sit smaller inside it.</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 — BAKE -->
+  <div class="step-hd"><div class="step-no">4</div><h2>Bake</h2>
+    <span class="hint">produces a drop-in sprite entry + a PNG</span></div>
+  <div class="panel">
+    <div class="row">
+      <div style="flex:1;min-width:220px">
+        <label class="ctl">Sprite key <span class="dim">(class placeholder — e.g. V30WingedDefender)</span></label>
+        <input type="text" id="key" placeholder="ShipClassKey" spellcheck="false">
+      </div>
+      <button class="btn primary" id="bake" style="align-self:flex-end">⚙ Bake sprite</button>
+    </div>
+    <div id="bakeOut" style="display:none;margin-top:16px">
+      <div class="stage" style="align-items:flex-start">
+        <span class="cap">Baked 256×256 sprite</span>
+        <canvas id="final" width="256" height="256"></canvas>
+      </div>
+      <div class="out-note">Paste this into the game (drop the sprite entry beside the others in <span class="dim">SHIP_SPRITES</span>; the META line reserves the name-plate spot):</div>
+      <pre id="code"></pre>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" id="copy">Copy code</button>
+        <a class="btn ghost" id="dl2" download="sprite.png">Download PNG</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let srcImg=null, srcCanvas=$('src'), sctx=srcCanvas.getContext('2d');
+let srcScale=1, srcDrawW=0, srcDrawH=0;                 // display fit
+let crop=null;                                          // {x,y,w,h} in source px
+let isoCanvas=$('iso'), ictx=isoCanvas.getContext('2d');
+let isoBits=null, isoW=0, isoH=0;                        // trimmed extracted ship (ImageData + dims)
+let hexCanvas=$('hex'), hctx=hexCanvas.getContext('2d');
+let angle=0;                                             // CCW degrees
+let anchor={x:0.5,y:0.80}, draggingAnchor=false;
+let fillPct=100;                                         // sprite size in hex (%)
+let bgSel='auto';                                        // 'auto' | 'dark' | 'light' (segmented choice)
+let procMode='raw';                                      // 'raw' (flood, pixels untouched) | 'full' (legacy pipeline)
+let sampledBg=null;                                      // {r,g,b} from the eyedropper, or null
+let pickMode=false;                                      // eyedropper armed
+let srcFull=null;                                        // cached full-res source canvas (for sampling)
+
+/* ---------- STEP 1: file load ---------- */
+const drop=$('drop');
+drop.onclick=()=>$('file').click();
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot');}));
+drop.addEventListener('drop',ev=>addFiles(ev.dataTransfer.files));
+$('file').addEventListener('change',e=>addFiles(e.target.files));
+
+function showErr(msg){ const e=$('err'); if(e){ e.textContent='⚠ '+msg; e.style.display='block'; } }
+function clearErr(){ const e=$('err'); if(e) e.style.display='none'; }
+
+function addFiles(files){
+  clearErr();
+  const list=[...files].filter(f=>f.type.startsWith('image/'));
+  if(!list.length){ showErr('No image files found — drop a PNG or JPG.'); return; }
+  list.forEach(f=>{
+    const rd=new FileReader();
+    rd.onerror=()=>showErr('Could not read "'+f.name+'".');
+    rd.onload=()=>{
+      const im=new Image();
+      im.onerror=()=>showErr('Could not decode "'+f.name+'" — try a PNG or JPG.');
+      im.onload=()=>{
+        if(!im.naturalWidth||!im.naturalHeight){ showErr('"'+f.name+'" has no image data.'); return; }
+        const t=document.createElement('img');
+        t.src=im.src; t.className='thumb'; t.title=f.name;
+        t.addEventListener('click',()=>{ document.querySelectorAll('.thumb').forEach(x=>x.classList.remove('on'));
+          t.classList.add('on'); loadSource(im); });
+        $('thumbs').appendChild(t);
+        if(!srcImg){ t.classList.add('on'); loadSource(im); }
+      };
+      im.src=rd.result;                 // data URL — sandbox-safe, no cross-origin taint
+    };
+    rd.readAsDataURL(f);
+  });
+}
+
+function loadSource(im){
+  try{
+    if(!im||!im.naturalWidth){ showErr('Image not ready yet — try again.'); return; }
+    clearErr();
+    srcImg=im;
+    const maxW=480, maxH=360;
+    srcScale=Math.min(maxW/im.naturalWidth, maxH/im.naturalHeight, 1);
+    srcDrawW=Math.max(1,Math.round(im.naturalWidth*srcScale));
+    srcDrawH=Math.max(1,Math.round(im.naturalHeight*srcScale));
+    srcCanvas.width=srcDrawW; srcCanvas.height=srcDrawH;
+    srcFull=document.createElement('canvas'); srcFull.width=im.naturalWidth; srcFull.height=im.naturalHeight;
+    srcFull.getContext('2d').drawImage(im,0,0);           // full-res copy for the eyedropper
+    crop=null;
+    drawSource();                  // show the scan IMMEDIATELY — never crop blind
+    autoDetectHex();               // sensible default crop (redraws + extracts)
+    drawSource();                  // final draw, in case auto-detect bailed out early
+  }catch(e){ showErr('Load failed: '+e.message); try{drawSource();}catch(_){} }
+}
+
+/* ---------- STEP 2: crop interaction ---------- */
+let dragStart=null;
+srcCanvas.addEventListener('mousedown',e=>{
+  if(pickMode){ samplePixel(e); return; }               // eyedropper: sample, don't start a crop
+  const r=srcCanvas.getBoundingClientRect();
+  dragStart={x:e.clientX-r.left,y:e.clientY-r.top};});
+srcCanvas.addEventListener('mousemove',e=>{
+  if(!dragStart)return; const r=srcCanvas.getBoundingClientRect();
+  const x=e.clientX-r.left,y=e.clientY-r.top;
+  const dx=Math.min(dragStart.x,x),dy=Math.min(dragStart.y,y),dw=Math.abs(x-dragStart.x),dh=Math.abs(y-dragStart.y);
+  crop={x:dx/srcScale,y:dy/srcScale,w:dw/srcScale,h:dh/srcScale};
+  drawSource();
+});
+window.addEventListener('mouseup',()=>{ if(dragStart&&crop&&crop.w>8&&crop.h>8) extract(); dragStart=null; });
+
+$('autoCrop').onclick=autoDetectHex;
+$('wholeCrop').onclick=()=>{ if(!srcImg)return; crop={x:0,y:0,w:srcImg.naturalWidth,h:srcImg.naturalHeight}; drawSource(); extract(); };
+
+function drawSource(){
+  if(!srcImg)return;
+  sctx.clearRect(0,0,srcCanvas.width,srcCanvas.height);
+  sctx.drawImage(srcImg,0,0,srcDrawW,srcDrawH);
+  if(crop){
+    sctx.strokeStyle='#ff9900'; sctx.lineWidth=1.5; sctx.setLineDash([5,3]);
+    sctx.strokeRect(crop.x*srcScale,crop.y*srcScale,crop.w*srcScale,crop.h*srcScale);
+    sctx.setLineDash([]);
+  }
+}
+
+function autoDetectHex(){
+  if(!srcImg||!srcImg.naturalWidth){ return; }
+  try{
+    const IW=srcImg.naturalWidth, IH=srcImg.naturalHeight;
+    // Analyse a DOWNSCALED copy — a full-res 8000px-wide scan can exceed canvas limits and throw.
+    const cap=1400, asc=Math.min(cap/IW, cap/IH, 1);
+    const aw=Math.max(1,Math.round(IW*asc)), ah=Math.max(1,Math.round(IH*asc));
+    const tmp=document.createElement('canvas'); tmp.width=aw; tmp.height=ah;
+    const tx=tmp.getContext('2d'); tx.drawImage(srcImg,0,0,aw,ah);
+    const d=tx.getImageData(0,0,aw,ah).data;
+    let minX=aw,minY=ah,maxX=0,maxY=0,found=false;
+    const step=Math.max(1,Math.floor(aw/400));
+    for(let y=0;y<ah;y+=step)for(let x=0;x<aw;x+=step){
+      const i=(y*aw+x)*4, lum=(d[i]+d[i+1]+d[i+2])/3;
+      if(lum<70){ if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y; found=true; }
+    }
+    if(found){ const pad=6;   // convert the detected box from downscaled space back to full-res pixels
+      crop={x:Math.max(0,(minX-pad)/asc),y:Math.max(0,(minY-pad)/asc),
+        w:Math.min(IW,(maxX-minX+2*pad)/asc),h:Math.min(IH,(maxY-minY+2*pad)/asc)};
+    } else crop={x:0,y:0,w:IW,h:IH};
+    drawSource(); extract();
+  }catch(e){ showErr('Auto-detect failed (crop the ship manually): '+e.message); drawSource(); }
+}
+
+/* ---------- STEP 2: extraction pipeline (mirrors the settled recipe) ---------- */
+function extract(){
+  if(!crop||!srcImg)return;
+  try{
+  const clip=v=>v<0?0:v>255?255:v;
+  const bgCut=+$('bg').value, dLum=+$('dl').value, dSat=+$('ds').value, tol=+$('tol').value;
+  const faintLum=90, faintSat=22, doErode=$('erode').checked;
+  const cw=Math.round(crop.w), ch=Math.round(crop.h);
+  const tmp=document.createElement('canvas'); tmp.width=cw; tmp.height=ch;
+  const tx=tmp.getContext('2d');
+  tx.drawImage(srcImg,crop.x,crop.y,cw,ch,0,0,cw,ch);
+  const dn=+$('dn').value;                 // smoothing strength → final downscale target
+  const img=tx.getImageData(0,0,cw,ch), d=img.data, N=cw*ch;
+  if(procMode==='raw'){ rawExtract(d,cw,ch); return; }   // minimal path — flood only, pixels untouched
+  // --- resolve background polarity + key colour from the crop border ---
+  const border=borderStats(d,cw,ch);
+  const mode = bgSel==='auto' ? (border.lum>140?'light':'dark') : bgSel;
+  // key colour: eyedropper sample wins; else in light mode use the measured border colour
+  const keyCol = sampledBg ? sampledBg : (mode==='light' ? {r:border.r,g:border.g,b:border.b} : null);
+  const bgLum  = sampledBg ? (sampledBg.r+sampledBg.g+sampledBg.b)/3 : border.lum;
+  const alpha=new Float32Array(N);
+  for(let p=0;p<N;p++){
+    const r=d[p*4],g=d[p*4+1],b=d[p*4+2];
+    const lum=(r+g+b)/3, sat=Math.max(r,g,b)-Math.min(r,g,b);
+    let a;
+    if(mode==='dark'){
+      a=clip((lum-bgCut)*4);                         // dark → transparent, bright → keep
+    }else{
+      a=clip((bgLum-12-lum)*4);                      // light bg: brighter-than-bg → transparent
+      if(sat>55) a=Math.max(a,clip((sat-55)*8));     // rescue vivid hull colour even if bright
+    }
+    if(keyCol){                                       // colour-key: remove pixels near the background colour
+      const dr=r-keyCol.r,dg=g-keyCol.g,db=b-keyCol.b, cd=Math.sqrt(dr*dr+dg*dg+db*db);
+      if(cd<tol) a=0;
+      else if(cd<tol+40) a=Math.min(a,(cd-tol)/40*255); // soft feather at the tolerance edge
+    }
+    if(lum>dLum&&sat<dSat) a=0;                        // kill bright low-colour debris (numbers/page)
+    if(lum>faintLum&&sat<faintSat) a=0;
+    alpha[p]=a;
+  }
+  updateBgUI(mode);
+  if(doErode){
+    const m=new Uint8Array(N); for(let p=0;p<N;p++)m[p]=alpha[p]>40?1:0;
+    const er=morph(m,cw,ch,Math.min), di=morph(er,cw,ch,Math.max);
+    for(let p=0;p<N;p++) if(!di[p]) alpha[p]=0;
+  }
+  // bbox trim
+  let minX=cw,minY=ch,maxX=0,maxY=0,any=false;
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){ if(alpha[y*cw+x]>18){
+    if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;any=true;} }
+  if(!any){ isoBits=null; ictx.clearRect(0,0,300,300); return; }
+  const bw=maxX-minX+1, bh=maxY-minY+1;
+  const satB=+$('sat').value/100, conB=+$('con').value/100;   // 1.0 = identity (dark-bg path unchanged)
+  const out=ictx.createImageData(bw,bh);
+  for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){
+    const sp=((y+minY)*cw+(x+minX)), dp=(y*bw+x)*4;
+    let r=d[sp*4],g=d[sp*4+1],b=d[sp*4+2];
+    if(conB!==1){ r=(r-128)*conB+128; g=(g-128)*conB+128; b=(b-128)*conB+128; }
+    if(satB!==1){ const L=0.299*r+0.587*g+0.114*b; r=L+(r-L)*satB; g=L+(g-L)*satB; b=L+(b-L)*satB; }
+    out.data[dp]=clip(r); out.data[dp+1]=clip(g); out.data[dp+2]=clip(b); out.data[dp+3]=alpha[sp];
+  }
+  isoBits=out;
+  // full-res isolated ship
+  const full=document.createElement('canvas'); full.width=bw; full.height=bh;
+  full.getContext('2d').putImageData(out,0,0);
+  // ONE Lanczos downscale — dissolves halftone grain AND keeps definition/colour (like the Python pipeline).
+  // Keep resolution high so detail survives; higher smoothing setting averages a bit more.
+  const targetDim=[300,272,240,208][dn]||272;
+  const sm=lanczosResize(full, targetDim);
+  isoBits._canvas=sm; isoW=sm.width; isoH=sm.height;
+  // preview the smoothed result
+  ictx.clearRect(0,0,300,300);
+  const s=Math.min(280/isoW,280/isoH), dw=isoW*s, dh=isoH*s;
+  ictx.imageSmoothingEnabled=true; ictx.imageSmoothingQuality='high';
+  ictx.drawImage(sm,(300-dw)/2,(300-dh)/2,dw,dh);
+  drawHex();
+  }catch(e){ showErr('Extraction failed: '+e.message); }
+}
+// Proper Lanczos-3 resample with PREMULTIPLIED alpha (prevents transparent-pixel colour bleed that
+// muddies edges). Separable (horizontal then vertical) for speed. Matches the Python/PIL quality.
+function lanczosResize(src, maxDim){
+  const sw=src.width, sh=src.height;
+  const scale=Math.min(maxDim/sw, maxDim/sh);
+  const dw=Math.max(1,Math.round(sw*scale)), dh=Math.max(1,Math.round(sh*scale));
+  const s=src.getContext('2d').getImageData(0,0,sw,sh).data;
+  const pm=new Float32Array(sw*sh*4);          // premultiplied source
+  for(let i=0;i<sw*sh;i++){ const al=s[i*4+3]/255;
+    pm[i*4]=s[i*4]*al; pm[i*4+1]=s[i*4+1]*al; pm[i*4+2]=s[i*4+2]*al; pm[i*4+3]=s[i*4+3]; }
+  const A=3;
+  const L=x=>{ x=Math.abs(x); if(x>=A)return 0; if(x<1e-6)return 1;
+    const px=Math.PI*x; return A*Math.sin(px)*Math.sin(px/A)/(px*px); };
+  // horizontal sw->dw
+  const tmp=new Float32Array(dw*sh*4), rx=sw/dw, supX=Math.max(1,rx)*A;
+  for(let dx=0;dx<dw;dx++){
+    const c=(dx+0.5)*rx-0.5, lo=Math.max(0,Math.ceil(c-supX)), hi=Math.min(sw-1,Math.floor(c+supX));
+    const ws=[]; let wsum=0;
+    for(let x=lo;x<=hi;x++){ const w=L((x-c)/Math.max(1,rx)); ws.push(w); wsum+=w; }
+    for(let y=0;y<sh;y++){ let r=0,g=0,b=0,a=0;
+      for(let x=lo,k=0;x<=hi;x++,k++){ const w=ws[k]/wsum, si=(y*sw+x)*4;
+        r+=pm[si]*w; g+=pm[si+1]*w; b+=pm[si+2]*w; a+=pm[si+3]*w; }
+      const ti=(y*dw+dx)*4; tmp[ti]=r;tmp[ti+1]=g;tmp[ti+2]=b;tmp[ti+3]=a; }
+  }
+  // vertical sh->dh
+  const out=new Uint8ClampedArray(dw*dh*4), ry=sh/dh, supY=Math.max(1,ry)*A;
+  for(let dy=0;dy<dh;dy++){
+    const c=(dy+0.5)*ry-0.5, lo=Math.max(0,Math.ceil(c-supY)), hi=Math.min(sh-1,Math.floor(c+supY));
+    const ws=[]; let wsum=0;
+    for(let y=lo;y<=hi;y++){ const w=L((y-c)/Math.max(1,ry)); ws.push(w); wsum+=w; }
+    for(let dx=0;dx<dw;dx++){ let r=0,g=0,b=0,a=0;
+      for(let y=lo,k=0;y<=hi;y++,k++){ const w=ws[k]/wsum, ti=(y*dw+dx)*4;
+        r+=tmp[ti]*w; g+=tmp[ti+1]*w; b+=tmp[ti+2]*w; a+=tmp[ti+3]*w; }
+      const oi=(dy*dw+dx)*4;
+      if(a>0.5){ const inv=255/a; out[oi]=r*inv; out[oi+1]=g*inv; out[oi+2]=b*inv; out[oi+3]=a; }
+    }
+  }
+  const oc=document.createElement('canvas'); oc.width=dw; oc.height=dh;
+  oc.getContext('2d').putImageData(new ImageData(out,dw,dh),0,0);
+  return oc;
+}
+function morph(mask,w,h,fn){
+  const out=new Uint8Array(w*h);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    let v=fn===Math.min?1:0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      const nx=x+dx,ny=y+dy; let m=(nx<0||ny<0||nx>=w||ny>=h)?0:mask[ny*w+nx];
+      v=fn(v,m);
+    }
+    out[y*w+x]=v;
+  }
+  return out;
+}
+// 3x3 median on RGB — smooths halftone dots / scan grain while keeping edges
+function medianRGB(d,w,h){
+  const src=d.slice(); const nb=new Array(9);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    for(let c=0;c<3;c++){
+      let k=0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+        const nx=Math.max(0,Math.min(w-1,x+dx)), ny=Math.max(0,Math.min(h-1,y+dy));
+        nb[k++]=src[(ny*w+nx)*4+c];
+      }
+      nb.sort((a,b)=>a-b);
+      d[(y*w+x)*4+c]=nb[4];
+    }
+  }
+}
+['bg','dl','ds','dn','tol'].forEach(id=>$(id).addEventListener('input',()=>{
+  $('v'+{bg:'Bg',dl:'Dl',ds:'Ds',dn:'Dn',tol:'Tol'}[id]).textContent=$(id).value; extract();
+}));
+['sat','con'].forEach(id=>$(id).addEventListener('input',()=>{
+  $('v'+{sat:'Sat',con:'Con'}[id]).textContent=($(id).value/100).toFixed(1)+'×'; extract();
+}));
+$('erode').addEventListener('change',extract);
+
+// --- processing mode (segmented) ---
+document.querySelectorAll('#procmode button').forEach(b=>b.onclick=()=>{
+  procMode=b.dataset.p;
+  document.querySelectorAll('#procmode button').forEach(x=>x.classList.toggle('on',x===b));
+  updateProcUI(); extract();
+});
+
+// --- background polarity (segmented) ---
+document.querySelectorAll('#bgmode button').forEach(b=>b.onclick=()=>{
+  bgSel=b.dataset.m;
+  document.querySelectorAll('#bgmode button').forEach(x=>x.classList.toggle('on',x===b));
+  extract();
+});
+
+// --- eyedropper ---
+$('pick').onclick=()=>{ pickMode=!pickMode; updatePickUI(); };
+$('pickClr').onclick=()=>{ sampledBg=null; pickMode=false; updatePickUI(); extract(); };
+function updatePickUI(){
+  $('pick').classList.toggle('primary',pickMode);
+  $('pick').classList.toggle('ghost',!pickMode);
+  srcCanvas.classList.toggle('crosshair',pickMode);
+  $('pickHint').textContent = pickMode ? 'click a background spot on the source ↙'
+    : (sampledBg ? 'sampled — tune tolerance below' : 'click a background spot on the source');
+  $('sw').style.background = sampledBg ? `rgb(${sampledBg.r},${sampledBg.g},${sampledBg.b})` : 'transparent';
+  $('pickClr').disabled = !sampledBg;
+}
+function samplePixel(e){
+  if(!srcFull){ return; }
+  const r=srcCanvas.getBoundingClientRect();
+  const px=Math.round((e.clientX-r.left)/srcScale), py=Math.round((e.clientY-r.top)/srcScale);
+  const cx=Math.max(0,Math.min(srcFull.width-1,px)), cy=Math.max(0,Math.min(srcFull.height-1,py));
+  const s=srcFull.getContext('2d').getImageData(cx,cy,1,1).data;
+  sampledBg={r:s[0],g:s[1],b:s[2]};
+  pickMode=false; updatePickUI(); extract();
+}
+
+// median colour + luminance of the crop-border ring (robust polarity + key-colour detection)
+function borderStats(d,w,h){
+  const R=Math.max(1,Math.round(Math.min(w,h)*0.03));
+  const rs=[],gs=[],bs=[],ls=[];
+  const push=(x,y)=>{const i=(y*w+x)*4; rs.push(d[i]);gs.push(d[i+1]);bs.push(d[i+2]);ls.push((d[i]+d[i+1]+d[i+2])/3);};
+  for(let x=0;x<w;x++)for(let t=0;t<R;t++){ push(x,t); push(x,h-1-t); }
+  for(let y=0;y<h;y++)for(let t=0;t<R;t++){ push(t,y); push(w-1-t,y); }
+  const med=a=>{ a.sort((p,q)=>p-q); return a.length?a[a.length>>1]:0; };
+  return {r:med(rs),g:med(gs),b:med(bs),lum:med(ls)};
+}
+
+// reflect the resolved polarity in the UI (relabel + grey the inactive knob)
+function updateBgUI(mode){
+  $('bgres').innerHTML = bgSel==='auto' ? 'resolved &rarr; <b>'+mode+'</b>' : '';
+  const light = mode==='light';
+  $('lblBg').firstChild.textContent = light ? 'Background darkness cutoff (auto in light) ' : 'Background darkness cutoff ';
+  $('bg').disabled = light;
+  const tolActive = light || !!sampledBg;   // tolerance only bites in light mode or once a colour is sampled
+  $('tol').disabled = !tolActive;
+  $('lblTol').style.opacity = tolActive?1:.4;
+}
+
+// RAW extraction: flood the background inward from the border, keep every ship pixel EXACTLY as scanned.
+// No brightness gates, no debris/erode passes, no colour shifting, no premultiplied resize. One clean
+// resize happens later at bake. This is the "take the raw file as it is" path.
+function rawExtract(d,cw,ch){
+  const tol=+$('tol').value, t2=tol*tol;
+  const stripNum=$('stripNum').checked;
+  const border=borderStats(d,cw,ch);
+  const bgc=sampledBg||{r:border.r,g:border.g,b:border.b};   // eyedropper overrides the border sample
+  const near=i=>{const dr=d[i*4]-bgc.r,dg=d[i*4+1]-bgc.g,db=d[i*4+2]-bgc.b; return dr*dr+dg*dg+db*db<t2;};
+  const bg=new Uint8Array(cw*ch), st=[];
+  const seed=i=>{ if(near(i)&&!bg[i]){bg[i]=1;st.push(i);} };
+  for(let x=0;x<cw;x++){ seed(x); seed((ch-1)*cw+x); }       // top + bottom edges
+  for(let y=0;y<ch;y++){ seed(y*cw); seed(y*cw+cw-1); }      // left + right edges
+  while(st.length){ const i=st.pop(), x=i%cw, y=(i/cw)|0;    // 4-connected flood through bg-coloured pixels
+    if(x>0){const j=i-1; if(!bg[j]&&near(j)){bg[j]=1;st.push(j);}}
+    if(x<cw-1){const j=i+1; if(!bg[j]&&near(j)){bg[j]=1;st.push(j);}}
+    if(y>0){const j=i-cw; if(!bg[j]&&near(j)){bg[j]=1;st.push(j);}}
+    if(y<ch-1){const j=i+cw; if(!bg[j]&&near(j)){bg[j]=1;st.push(j);}}
+  }
+  const alpha=new Uint8ClampedArray(cw*ch);
+  for(let i=0;i<cw*ch;i++){
+    let a=bg[i]?0:255;
+    if(a&&stripNum){ const r=d[i*4],g=d[i*4+1],b=d[i*4+2],lum=(r+g+b)/3,sat=Math.max(r,g,b)-Math.min(r,g,b);
+      if(lum>175&&sat<38) a=0; }                             // optional white-number knockout
+    alpha[i]=a;
+  }
+  // bbox trim
+  let minX=cw,minY=ch,maxX=0,maxY=0,any=false;
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++) if(alpha[y*cw+x]){
+    if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;any=true; }
+  updateProcUI();
+  if(!any){ isoBits=null; ictx.clearRect(0,0,300,300); drawHex(); return; }
+  const bw=maxX-minX+1, bh=maxY-minY+1;
+  const out=ictx.createImageData(bw,bh);
+  for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){
+    const sp=((y+minY)*cw+(x+minX)), dp=(y*bw+x)*4;
+    out.data[dp]=d[sp*4]; out.data[dp+1]=d[sp*4+1]; out.data[dp+2]=d[sp*4+2]; out.data[dp+3]=alpha[sp]; // untouched RGB
+  }
+  isoBits=out;
+  const full=document.createElement('canvas'); full.width=bw; full.height=bh;
+  full.getContext('2d').putImageData(out,0,0);
+  isoBits._canvas=full; isoW=bw; isoH=bh;                    // native resolution; bake does the single resize
+  ictx.clearRect(0,0,300,300);
+  const s=Math.min(280/isoW,280/isoH), dw=isoW*s, dh=isoH*s;
+  ictx.imageSmoothingEnabled=true; ictx.imageSmoothingQuality='high';
+  ictx.drawImage(full,(300-dw)/2,(300-dh)/2,dw,dh);
+  drawHex();
+}
+
+// reflect processing mode: grey the full-pipeline-only controls when in raw mode
+function updateProcUI(){
+  const raw=procMode==='raw';
+  ['bg','dl','ds','dn','sat','con'].forEach(id=>$(id).disabled=raw);
+  $('erode').disabled=raw;
+  document.querySelectorAll('#bgmode button').forEach(b=>b.disabled=raw);
+  $('lblTol').firstChild.textContent = raw ? 'Background removal tolerance ' : 'Background match tolerance ';
+  $('lblTol').style.opacity=1; $('tol').disabled=false;
+  $('bgres').innerHTML = raw ? 'mode <b>raw</b> — flood-fill, pixels untouched' : '';
+  $('stripRow').style.display = raw ? 'flex' : 'none';
+}
+
+/* ---------- STEP 3: orientation hex ---------- */
+const ARC=['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'];
+function drawHex(){
+  const W=340,C=W/2,R=150; hctx.clearRect(0,0,W,W);
+  const ER=R*Math.cos(Math.PI/6);           // distance from center to a flat-edge midpoint
+  hctx.save(); hctx.translate(C,C);
+  // flat-top hexagon: vertices at 60*i-60  → flat edges at top & bottom (arcs sit on edges)
+  hctx.strokeStyle='#1b2c44'; hctx.lineWidth=1.5; hctx.beginPath();
+  for(let i=0;i<6;i++){ const a=(Math.PI/180)*(60*i-60); const x=R*Math.cos(a),y=R*Math.sin(a);
+    i?hctx.lineTo(x,y):hctx.moveTo(x,y);} hctx.closePath(); hctx.stroke();
+  // highlight the forward (F) flat edge at top
+  const va=(Math.PI/180)*(-120), vb=(Math.PI/180)*(-60);
+  hctx.strokeStyle='#ff9900'; hctx.lineWidth=3; hctx.beginPath();
+  hctx.moveTo(R*Math.cos(va),R*Math.sin(va)); hctx.lineTo(R*Math.cos(vb),R*Math.sin(vb)); hctx.stroke();
+  // arc labels centered on each flat edge (F on the top edge)
+  hctx.font='10px Courier New'; hctx.textAlign='center';
+  for(let i=0;i<6;i++){ const a=(Math.PI/180)*(60*i-90); const x=(ER+16)*Math.cos(a),y=(ER+16)*Math.sin(a)+3;
+    hctx.fillStyle=i===0?'#ff9900':'#5f7188'; hctx.fillText(ARC[i],x,y); }
+  // F arrow — points up to the top flat edge
+  hctx.strokeStyle='#ff9900'; hctx.fillStyle='#ff9900'; hctx.lineWidth=2;
+  hctx.beginPath(); hctx.moveTo(0,-ER+58); hctx.lineTo(0,-ER+26); hctx.stroke();
+  hctx.beginPath(); hctx.moveTo(0,-ER+18); hctx.lineTo(-6,-ER+30); hctx.lineTo(6,-ER+30); hctx.closePath(); hctx.fill();
+  hctx.restore();
+  // ship, rotated CCW by angle
+  if(isoBits&&isoBits._canvas){
+    const base=252*fillPct/100, target=base/256*300;         // match baked fill as fraction of hex circle
+    const s=Math.min(target/isoW,target/isoH), dw=isoW*s, dh=isoH*s;
+    hctx.save(); hctx.translate(C,C); hctx.rotate(-angle*Math.PI/180); // canvas Y-down: negative = CCW
+    hctx.imageSmoothingEnabled=true; hctx.imageSmoothingQuality='high';
+    hctx.drawImage(isoBits._canvas,-dw/2,-dh/2,dw,dh); hctx.restore();
+  }
+  // name anchor marker
+  if($('anchorOn').checked){
+    const ax=anchor.x*W, ay=anchor.y*W;
+    hctx.strokeStyle='#4fd0e0'; hctx.fillStyle='rgba(79,208,224,.15)'; hctx.lineWidth=1.5;
+    hctx.beginPath(); hctx.moveTo(ax,ay-8); hctx.lineTo(ax+8,ay); hctx.lineTo(ax,ay+8); hctx.lineTo(ax-8,ay); hctx.closePath();
+    hctx.fill(); hctx.stroke();
+    hctx.fillStyle='#4fd0e0'; hctx.font='9px Courier New'; hctx.textAlign='center'; hctx.fillText('NAME',ax,ay+20);
+  }
+}
+$('rot').addEventListener('input',()=>{ angle=+$('rot').value; $('vRot').textContent=angle+'°'; drawHex(); });
+$('fill').addEventListener('input',()=>{ fillPct=+$('fill').value; $('vFill').textContent=fillPct+'%'; drawHex(); });
+document.querySelectorAll('.nudge').forEach(b=>b.onclick=()=>{
+  angle=(angle+ +b.dataset.n+360)%360; $('rot').value=angle; $('vRot').textContent=angle+'°'; drawHex(); });
+$('anchorOn').addEventListener('change',()=>{ $('anchorHint').style.display=$('anchorOn').checked?'block':'none'; drawHex(); });
+hexCanvas.addEventListener('mousedown',e=>{ if(!$('anchorOn').checked)return;
+  const r=hexCanvas.getBoundingClientRect(); const ax=anchor.x*340,ay=anchor.y*340;
+  if(Math.hypot(e.clientX-r.left-ax,e.clientY-r.top-ay)<16) draggingAnchor=true; });
+hexCanvas.addEventListener('mousemove',e=>{ if(!draggingAnchor)return;
+  const r=hexCanvas.getBoundingClientRect();
+  anchor.x=Math.max(0,Math.min(1,(e.clientX-r.left)/340));
+  anchor.y=Math.max(0,Math.min(1,(e.clientY-r.top)/340)); drawHex(); });
+window.addEventListener('mouseup',()=>draggingAnchor=false);
+
+/* ---------- STEP 4: bake ---------- */
+$('bake').onclick=()=>{
+  if(!isoBits){ alert('Extract a ship first (step 2).'); return; }
+  const key=($('key').value.trim()||'ShipClassKey').replace(/[^A-Za-z0-9_]/g,'');
+  const fc=$('final'), fx=fc.getContext('2d'); fx.clearRect(0,0,256,256);
+  fx.imageSmoothingEnabled=true; fx.imageSmoothingQuality='high';
+  // Rotate the smoothed ship into its own bounding box, THEN scale to fill the sprite canvas.
+  // This makes the ship fill the hex consistently at any orientation (matches how the game
+  // maps the whole 256px sprite onto the hex circle).
+  const rad=-angle*Math.PI/180, ca=Math.abs(Math.cos(rad)), sa=Math.abs(Math.sin(rad));
+  const rw=Math.max(1,Math.round(isoW*ca+isoH*sa)), rh=Math.max(1,Math.round(isoW*sa+isoH*ca));
+  const rt=document.createElement('canvas'); rt.width=rw; rt.height=rh;
+  const rc=rt.getContext('2d'); rc.imageSmoothingEnabled=true; rc.imageSmoothingQuality='high';
+  rc.translate(rw/2,rh/2); rc.rotate(rad); rc.drawImage(isoBits._canvas,-isoW/2,-isoH/2,isoW,isoH);
+  const FILL=Math.min(256, 252*fillPct/100), s=Math.min(FILL/rw, FILL/rh), dw=rw*s, dh=rh*s;
+  fx.drawImage(rt,(256-dw)/2,(256-dh)/2,dw,dh);
+  const uri=fc.toDataURL('image/png');
+  const na=$('anchorOn').checked?{x:+anchor.x.toFixed(3),y:+anchor.y.toFixed(3)}:{x:0.5,y:0.80};
+  const stamp=new Date().toISOString().slice(0,16).replace('T',' ')+' UTC';
+  const code=
+`// ${key} — baked ${stamp}, rotation ${angle}° CCW
+SHIP_SPRITES.${key} = '${uri}';
+// Reserved for the construction facility to paint the display name/registry later:
+SHIP_SPRITE_META.${key} = { rotation: ${angle}, nameAnchor: { x: ${na.x}, y: ${na.y} } };`;
+  $('code').textContent=code;
+  $('dl2').href=uri; $('dl2').download=key+'.png';
+  $('bakeOut').style.display='block';
+  $('bakeOut').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+$('copy').onclick=()=>{ navigator.clipboard.writeText($('code').textContent).then(()=>{
+  $('copy').textContent='Copied ✓'; setTimeout(()=>$('copy').textContent='Copy code',1400); }); };
+
+updatePickUI();
+updateProcUI();
+drawHex();
+</script>
+</body>
+</html>
