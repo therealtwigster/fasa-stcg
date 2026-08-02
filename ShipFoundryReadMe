@@ -1,0 +1,91 @@
+# Sprite Foundry — Starship Counter Drydock
+
+> Companion tool for **Star Trek: Tactical Command** · single-file, offline · pipeline: **extract → orient → bake**
+
+The Sprite Foundry turns a **scanned ship counter** (the printed hex token — ship art on a tile, usually with a white ID number) into a clean, transparent, correctly-oriented **256×256 PNG sprite** ready to drop into the game. It also emits the small code entry you paste into the game's sprite table.
+
+Everything runs in the browser from one HTML file — no install, no server, no internet. Just open `sprite_foundry.html`.
+
+> **Why it matters going forward:** this is the front end for adding new ships, and it's the natural basis for the planned **custom ship construction** feature — players will use this same extract-orient-bake flow to bring their own hulls into the game.
+
+---
+
+## Before you scan (this is the whole ballgame)
+
+The extractor's hardest problem is that **the darkest hull tones and a near-black counter tile can be the same color** — so a careless scan makes any "remove the background" step eat real hull. Capture well and the rest is easy:
+
+- **Scan at high resolution** (~1200 DPI is what the reference set used) with **blacks not crushed** — let the darkest hull sit a bit above pure black so it separates from the tile.
+- Keep the **white paper margins** around each counter — the tool uses that light border as a segmentation cue.
+- **Don't** put black paper behind the tiles; it removes the white cue and doesn't help.
+- Multiple ships in one scan is fine — you crop them one at a time.
+
+See `FOUNDRY_HANDOVER.md` for the measured details behind this.
+
+---
+
+## File formats & limits
+
+| | |
+|---|---|
+| **Accepted input** | Any image the browser can decode — **PNG or JPG** recommended (the file picker uses `image/*`). Drag-and-drop or click to load; **multiple files** at once are fine. |
+| **Loaded as** | Data URLs (sandbox-safe, no cross-origin issues) — so it works fully offline. |
+| **Max scan size** | Very large scans work (the reference sheet is **8000×1550**). The auto-detect analyzes a downscaled copy so big scans don't hit canvas limits. Note: extremely wide scans display in the source view as a **short strip** — croppable, just small. |
+| **Source view** | Fit to ~480×360, aspect preserved. |
+| **Output** | Fixed **256×256 transparent PNG**, plus a code snippet for the game. |
+
+---
+
+## The workflow
+
+### Step 1 — Load counter scans
+Drop your scan(s) onto the loader or click to browse. Each becomes a thumbnail; the first one loads into the source view automatically. Click any thumbnail to switch to it.
+
+### Step 2 — Crop & extract the ship
+**Drag a box** around a single counter in the Source view. The extracted ship appears live in the right-hand preview. Two helpers: **Auto-detect hex** (guesses a crop from the dark art) and **Use whole image**.
+
+Then tune the cleanup:
+
+- **Processing** — **Raw (untouched)** *[default]* floods the background away from the crop border and keeps every ship pixel exactly as scanned (one clean resize happens only at bake). **Full pipeline** is the older gate-based cleanup for dark counter sheets. *Start with Raw.*
+- **Strip white counter number** — removes the printed ID digit from the tile.
+- **Background polarity** — **Auto** / **Dark bg** / **Light bg**. Auto reads the crop border; override if it guesses wrong.
+- **Sample background colour (Eyedropper 🎯)** — for mottled/concrete tiles, click a background spot on the source to key off that exact colour. **Clear** to remove the sample.
+- **Background match tolerance** (0–180, default 70) — how close a pixel must be to the keyed background to be removed. Higher = removes more.
+- **Background darkness cutoff** (0–255, default 42) — pixels darker than this read as background (dark-tile mode). Raise carefully — too high eats dark hull.
+- **Kill bright scan debris — brightness** (80–255, default 150) and **— max colour** (0–120, default 45) — together strip bright, near-grey scanner speckle without touching saturated ship art.
+- **Saturation boost** (1.0×–2.6×) / **Contrast boost** (1.0×–2.0×) — lift pale token art.
+- **Smoothing** (0–3, default 1) — dissolves halftone print grain; also sets the pre-bake downscale target.
+- **Erode stray speckles** *(on by default)* — removes lone leftover pixels.
+
+Goal: the ship's real silhouette, nothing else — no tile leak, no eaten hull, no confetti.
+
+### Step 3 — Orient the bow to the **F** arc
+The game draws every ship **nose-up** and rotates it by facing, so the sprite's **bow must point at ▲ F (forward/up)**. Use the **Rotation** slider (0–359°, counter-clockwise) and the **−15 / −5 / −1 / +1 / +5 / +15** nudge buttons to line the bow up with the F marker on the orientation hex.
+
+### Step 4 — Bake
+Enter a **Sprite key** (the class placeholder, e.g. `V30WingedDefender`) and click **⚙ Bake sprite**. You get:
+
+- The final **256×256 sprite** preview.
+- A **drop-in code entry** — paste it beside the others in the game's sprite table (`SHIP_SPRITES`); the accompanying META line reserves the name-plate spot.
+- **Copy code** and **Download PNG** buttons.
+
+---
+
+## Getting it into the game
+
+1. **Copy code** from the bake step and paste the sprite entry into the game file's `SHIP_SPRITES` block (next to the existing entries).
+2. Reference the new `spriteKey` from a ship's registry entry so a hull uses it.
+3. (Sprites are embedded as base64 data URIs — no external files, keeping the game a single self-contained HTML.)
+
+---
+
+## Tips & known limitations
+
+- **Trust your eyes over the preview metrics.** A pixel-recall number can look great while the silhouette is quietly eaten at the dark edges — judge by the actual extracted image.
+- **Dark hull on a near-black tile is the failure mode.** If edges vanish, *lower* the darkness cutoff and lean on the eyedropper / tolerance instead of brute brightness thresholds. A better scan (uncrushed blacks) beats any slider.
+- **Two reference ships still fight the extractor** (per the handover: a battlecruiser and one D-32 bird) — heavy tile-leak from hull/tile colour overlap. If you hit that, it's the known-hard case, not you.
+- **Raw mode first.** It preserves ship pixels exactly; only reach for Full pipeline on stubborn dark sheets.
+
+---
+
+## Version
+Foundry **v0.3** (raw + light-bg pipeline). Deep extraction internals, the settled recipe, and the dead-ends not worth re-running are documented in `FOUNDRY_HANDOVER.md`.
