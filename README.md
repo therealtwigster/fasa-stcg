@@ -1,113 +1,163 @@
 # Star Trek: Tactical Command Simulator
 
-> **Build v1.33-S44** · single-file, no dependencies
+> **Build v1.15-S26** · 2026-08-11 11:27 UTC
 
-A browser-based tactical starship combat game built on the **FASA Star Trek: Starship Tactical Combat Simulator** rules. Command a capital ship on a hex grid, divide power between engines, shields, and weapons across a multi-phase turn, and fight a difficulty-scaled AI to destruction or a power-out surrender.
 
-Everything — code, art, ship data, and the fleet database — lives in **one HTML file** with no external assets, server, or internet connection. Just open it in a browser.
+A single-file, browser-based tactical starship combat game built on the **FASA Star Trek: Starship Tactical Combat Simulator** rules. Command a capital ship on a hex grid, manage power between engines, shields, and weapons across a multi-phase turn, and fight an AI opponent to destruction or surrender.
+
+Everything — code, art, ship data, and the fleet database — lives in one HTML file with no external dependencies. Just open it in a browser.
 
 ---
 
 ## Running the game
 
-Open `StarTrek_TacticalCommand_GAME.html` in any modern desktop browser (Chrome, Firefox, Edge, Safari). No install, build step, or network needed. To confirm your version, check the build stamp in the header (**v1.33-S44**) or the top line of any exported combat log.
+Open `StarTrek_TacticalCommand_GAME.html` in any modern desktop browser (Chrome, Firefox, Edge, Safari). No server, build step, or internet connection is required.
 
 ---
 
 ## How to play
 
-### 1. Set up the battle
-- **Play As** — Federation, Klingon, or Romulan (sets your faction theme and sides).
-- **Your Ship / Enemy Ship** — pick any playable variant from the roster below.
-- **AI Difficulty** — Cadet → Ensign → Lt. Cmdr → Captain → Admiral. These are genuinely different AI behaviors, not just stat tweaks (see **Difficulty** below).
-- **◈ Ship Recognition Database** — browse the full fleet visually and pick your hull.
-- **⬡ Engage** — start.
+**1. Set up the battle (scenario screen)**
+- **Play As** — choose Federation, Klingon, or Romulan.
+- **Your Ship / Enemy Ship** — pick from every playable variant (see roster below).
+- **AI Difficulty** — Cadet through Admiral (5 levels).
+- **◈ Ship Recognition Database** — opens the full fleet database to browse hulls and pick your ship visually (see below).
+- **⬡ Engage** — start the battle.
 
-### 2. Each turn follows FASA's phase sequence
-1. **Power Allocation** — split your reactor output between movement, shields (per facing), and arming weapons. Commit when ready.
-2. **Tactical Advantage** — a contested roll; the loser must move first each sub-phase (exposing their position before the winner commits).
-3. **Movement / Firing ×3** — three interleaved movement and firing sub-phases.
-4. **Repower Shields** — shields recharge, and the next turn begins.
+**2. Each turn runs through FASA's phase sequence**
+1. **Power Allocation** — divide your ship's power pool between movement, shields (per face), and arming weapons. Commit when ready.
+2. **Tactical Advantage** — a contested roll; the loser must move first each sub-phase.
+3. **Movement / Firing** ×3 — three interleaved movement and firing sub-phases per turn.
+4. **Repower Shields** — end-of-turn shield regeneration.
 
-### 3. Winning
-Destroy the enemy's superstructure, or knock out its power entirely (a **power-out**, which triggers a boarding/capture narrative). The end screen gives a written after-action account and full shot statistics.
+**3. Play the battle**
+- Move, rotate, and fire through each phase. Full controls, display legends, and firing options are in the **Interface, controls & displays** section below.
+- Weapons fire within their **firing arcs** (six 60° arcs). Range affects hit chance and damage per the FASA firing charts.
+- Cloak-capable ships (Romulan Bird of Prey, late-mark Klingon D-7) can spend power to cloak.
 
----
-
-## Controls
-
-**Movement (during a movement phase)**
-- **↑ / W** — advance one hex forward · **↓ / S** — reverse
-- **← / A** — rotate to port · **→ / D** — rotate to starboard
-- **Click a highlighted green hex** — move there directly
-- **Hold / Undo** buttons — burn a move point in place, or take back a move
-
-**View**
-- **Left-drag** — pan · **Scroll** — zoom to cursor · **Double-click** — reset view · **F** — focus/center on your ship
-
-**Firing (during a firing phase)**
-- Click individual weapon buttons, or **Fire All**. Each shot rolls to-hit against the FASA firing chart for that weapon at the current range.
-
-**End screen**
-- **⬇ Download Combat Log** — save the full battle log as a text file
-- **Space** — start a new mission (mouse clicks won't restart, so you can freely copy the log/narrative)
+The game ends when a ship is destroyed, or when engine damage drops a ship's power to zero (triggering a capture/surrender outcome).
 
 ---
 
-## The cloak system (fog of war)
+## Interface, controls & displays
 
-Cloak-capable ships (Klingon Birds of Prey, Romulan warbirds, some D-7 variants) can cloak during power allocation. Cloaking costs power and takes weapons offline for the turn — but it makes the ship **genuinely hidden**, not just dimmed:
+The screen is divided into three areas: the **tactical map** (center), the **right sidebar** (your ship's status and weapon controls), and the **combat log** (bottom). Below is what each element shows and how to use it.
 
-- **A cloaked enemy vanishes from the map.** In its place, a pulsing **◇ LAST KNOWN** marker sits at the last hex you actually saw it. It freezes there while the ship moves unseen — hover it for a readout of when contact was lost.
-- **Firing at a cloak is a guess.** Your to-hit is slashed (you'll see *"firing solution reduced to a guess"* and mostly miss), and your shots trace toward the last-known position, not the real one.
-- **The enemy readout obfuscates.** By default the Enemy Contact panel shows **◇ SENSOR CONTACT LOST** while the target is cloaked. A toggle in the panel header switches it to **Last Known** — frozen, greyed-out stats stamped with the turn you last saw them.
-- **Difficulty gates your intel.** At lower difficulty you get sensor hints (a shimmer over the ship's true hex, an impact flash when a blind shot lands). At **Admiral you get nothing** — total fog.
-- **The AI plays by the same rules.** Cloak *your* ship and the AI loses your position too, navigating and shooting at where it last saw you. No cheating.
+### The tactical map
 
-The counter-play: a cloaked ship can't fire. Watch for it to **decloak and strike**, and punish the moment it reappears.
+The hex grid where the battle plays out. Your ship and the enemy are drawn as top-down silhouettes (real counter art where available, otherwise a faction-styled procedural hull).
 
----
+- **Heading arrow** — a bright arrowhead on each ship points in its current facing (forward).
+- **Hex-edge shields** — six colored segments trace the hex edges around each ship, one per shield facing. **Green** = charged and in good order (brighter/thicker = stronger); a **thin white line** = the generator works but that face is uncharged; **red with an ✕** = that shield generator is destroyed. The forward face always sits on the ship's heading side, so you can read at a glance which arcs are protected.
+- **Range rings** — during a firing phase, dashed blue rings radiate from your ship, one for each distinct weapon max-range, labeled in hexes. Use them to judge whether the enemy is inside a given weapon's reach before committing power.
+- **Terrain** — asteroid fields show miniaturized rock art (each hex varied); nebulae appear as dim purple hexes (they scatter sensors); gravity wells are faint green. Terrain is randomized every game.
+- **Firing-arc overlay** — when you have a weapon selected/armed, the target's arc is highlighted green (in-arc) or red (out-of-arc).
 
-## Difficulty tiers
+**Map controls:**
+- **Left-click a hex** — move your ship there (during a movement phase).
+- **Left-click-drag** — pan the map around.
+- **Scroll wheel** — zoom in and out.
+- **⊕ Recenter button** (top-right of the map) — reframe both ships in view.
+- **Double-click** — reset the view.
+- **Arrow keys**, or **A/D**, or **Q/E** — rotate your ship's facing.
 
-The five levels are distinct AI code paths. Higher tiers unlock more of the AI's behavior — if you only play Ensign, you're seeing a fraction of what the opponent can do.
+### The right sidebar
 
-| Tier | Behavior |
-|------|----------|
-| **Cadet** | Random power, fires ~60% of the time regardless, no cloak, wanders. A practice dummy. |
-| **Ensign** | Fixed power split, fires when a weapon bears, cloaks only to survive when hurt, closes then holds. |
-| **Lt. Cmdr** | Range-aware power, disciplined fire, uses cloak to disengage and to approach hidden. |
-| **Captain** | Optimized power scaled to range, concentrates shields toward you, jinks to spoil your aim. |
-| **Admiral** | Full optimization — commits to cloaked approaches, turns aggressive when you're weak, decloaks and strikes at point-blank, and gives you zero sensor hints. |
+Tabs across the top switch between **◈ Power Allocation** and the weapon firing view.
 
----
+- **Pinned stats bar** — always visible at the top of the sidebar: **HULL** (superstructure current/max), **PWR** (power current/total), and six shield facings (F, FS, AS, A, AP, FP) color-coded by strength (✕ for a destroyed generator).
+- **Ship cards** — "Your Ship" and "Enemy Contact" panels show hull, shields, and power bars. **Hover any bar** for a styled tooltip with exact current/max values (superstructure boxes, total shields across active facings, reactor output), for both your ship and the enemy.
+- **Power Allocation tab** — divide your power pool between movement, shields (per face), and arming weapons. Each weapon has a **power slider** (green→amber→red track) with a live value/max readout. Selecting a beam auto-assigns 1 point; drag a beam to zero to un-select it. Systems that are **knocked out** (a destroyed weapon mount or shield generator) are flagged in red — "⊘ KNOCKED OUT" / "⊘ GENERATOR KNOCKED OUT" — so you know why you can't power them. Commit when ready.
+- **Weapon firing view** — each weapon is a compact row: a small **FIRE** button (color-coded — green when ready and in range, amber when blocked, faded once fired) with a status glyph and the weapon's name, and for beams a separate **⊕ PAIR** button. **Hover the FIRE button** for a tooltip with the full detail: status, in-range/out-of-range, firing arcs, damage, and power.
 
-## Combat log
+### Firing weapons
 
-Every battle records a full turn-by-turn log — power splits, tactical-advantage rolls, every shot's chart/range/roll/result, damage and system hits, and cloak state. At the end screen, **Download Combat Log** saves it as a text file (stamped with the build number). It's great for reviewing a fight, sharing a war story, or reporting a bug.
+Three ways to fire:
+- **Single** — click a ready weapon's **FIRE** button to fire it on its own.
+- **Fire a pair** — click the **⊕ PAIR** button on two ready beam banks (each turns to **✓** and highlights), then **▶▶ FIRE SELECTED PAIR** at the top of the panel fires both together. Good for concentrating two phaser banks on one facing.
+- **Fire all** — **⚡ FIRE ALL READY WEAPONS** looses every ready weapon in a staggered rolling volley. Each weapon still rolls its own to-hit and damage.
 
----
+**Weapon effects by faction/era:** Federation TOS-design phasers (FL-series, FH-6 and below) fire a **solid blue beam** that brightens with the power you allocate; movie-era phasers (FH-7+, e.g. Enterprise refit, Federation II dreadnought) fire **gold rapid-fire pulses** (more power = more pulses). Each bank fires from its own point on the hull. Klingon/Romulan disruptors are procedural beams, and the Romulan **plasma torpedo** is a slow orange fireball that dims and cools as it crosses each hex — mirroring plasma's damage falloff with range. Projectiles resolve their hit exactly when they reach the target.
 
-## Ship roster
+**Sensor damage:** if your sensors are hit, the enemy contact on the map gets visual static and an uncertainty ring — degraded targeting resolution scales with the damage.
 
-All stats and weapon arcs are transcribed from the FASA ship recognition manuals. Weapon firing arcs follow the manual's forward/aft-quarter notation (a "forward-port" weapon fires forward **and** to port).
+### The combat log
 
-**Federation** — Constitution (base) and Constitution Mk I/II/III; Enterprise Mk I/II/III; Federation-class Mk I/II.
+Runs along the bottom, **oldest at top, newest at the bottom**, and auto-scrolls so the latest result is always in view. It reports movement, to-hit rolls, damage by shield facing, critical hits, and kill narratives (Federation ships fire "phasers," Klingon/Romulan "disruptors").
 
-**Klingon** — D-7 (base) and D-7 A/C/G/M/R/S variants; D-4 Predator; D-2 Sting Tongue; D-18 Gull; L-9 Saber; T-5 Throne Seeker; L-24 Ever Victorious; **K-22 Bird of Prey** (cloak scout); D-32 Stronger Bird (cloak); L-42 Great Bird (cloak).
 
-**Romulan** — V-8 Bird of Prey (base) and Type 1/Type 4; V-30 Winged Defender Type 1/Type 2. (Romulan cloaking hulls.)
 
-> **A note on Birds of Prey:** the light cloak scouts (K-22, V-8) are deliberately fragile and short-ranged. One-on-one against a cruiser they should lose — in the source material they hunt in **groups**. Fleet combat (multiple ships per side) is a planned feature that will let them fight the way they're meant to.
+Every variant below is fully playable, with stats and weapons derived directly from the FASA ship-recognition manuals.
+
+### Federation
+| Ship | Power | Move | Shield Ratio | Max Shield/Face | Superstructure |
+|------|-------|------|--------------|-----------------|----------------|
+| Constitution Mk I | 36 | 4 | 1.0 | 9 | 20 |
+| Constitution Mk II | 44 | 4 | 0.5 | 16 | 20 |
+| Constitution Mk III | 48 | 4 | 0.33 | 16 | 22 |
+| Enterprise (refit) Mk I | 60 | 4 | 0.25 | 16 | 26 |
+| Enterprise (refit) Mk II | 64 | 4 | 0.25 | 16 | 27 |
+| Enterprise (refit) Mk III | 68 | 4 | 0.25 | 16 | 28 |
+| Federation II Dreadnought Mk I | 82 | 6 | 0.25 | 15 | 62 |
+| Federation II Dreadnought Mk II | 86 | 6 | 0.25 | 20 | 62 |
+| Chandley Mk I (XI) | 48 | 3 | 0.33 | 16 | 22 |
+| Chandley Mk II (XI) | 52 | 3 | 0.33 | 16 | 22 |
+| Chandley Mk III (XI) | 56 | 3 | 0.25 | 16 | 22 |
+
+### Klingon
+| Ship | Power | Move | Shield Ratio | Max Shield/Face | Superstructure | Cloak |
+|------|-------|------|--------------|-----------------|----------------|-------|
+| D-7 A (VIII) | 40 | 4 | 1.0 | 8 | 20 | — |
+| D-7 C (VII) | 32 | 4 | 1.0 | 9 | 18 | — |
+| D-7 G (VIII) | 40 | 4 | 1.0 | 8 | 20 | — |
+| D-7 M (IX) | 44 | 3 | 0.5 | 12 | 20 | — |
+| D-7 R (IX) | 44 | 3 | 0.5 | 12 | 20 | Yes |
+| D-7 S (IX) | 44 | 3 | 0.5 | 12 | 22 | Yes |
+| K-22 Bird of Prey (V Scout) | 25 | 2 | 1.0 | 10 | 9 | Yes |
+| D-32 Stronger Bird (VII Cruiser) | 46 | 4 | 0.5 | 10 | 15 | Yes |
+| L-42 Great Bird (IX–X Frigate) | 55 | 3 | 0.33 | 15 | 18 | Yes |
+
+### Romulan
+| Ship | Power | Move | Shield Ratio | Max Shield/Face | Superstructure | Cloak |
+|------|-------|------|--------------|-----------------|----------------|-------|
+| V-8 Bird of Prey Type 1 | 26 | 3 | 0.5 | 8 | 15 | Yes |
+| V-8 Bird of Prey Type 4 | 28 | 3 | 0.5 | 11 | 15 | Yes |
+| V-30 Winged Defender Type 1 (XII) | 68 | 4 | 0.33 | 13 | 30 | Yes |
+| V-30 Winged Defender Type 2 (XII) | 68 | 4 | 0.33 | 13 | 31 | Yes |
+
+The **Constitution** and the movie-era **Enterprise refit** are treated as distinct FASA hulls (both Class XI cruisers), each with its own sprite.
 
 ---
 
 ## Ship Recognition Database
 
-The **◈ Ship Recognition Database** on the scenario screen is a browsable fleet reference — hull art, class silhouettes, and stat blocks for the ships in the game. Use it to pick your ship visually or just to browse the fleets.
+Click **◈ Ship Recognition Database** on the scenario screen to open an in-game fleet reference, styled as a starfleet intel file:
+
+- **Left roster** — filter by faction, search by name, grouped by faction and role.
+- **Right dossier** — targeting-reticle silhouette, FASA reliability-grade stamp, variant selector, full stat grid, weapons table with a six-segment firing-arc indicator, and combat-efficiency bars.
+- **Live sprites** for hulls that have scanned counter art (Constitution, Enterprise refit, D-7, Romulan V-8 Bird of Prey, V-30 Winged Defender, Chandley); procedural silhouettes for the rest.
+- The canonical reference mark for each ship is marked with a glowing gold ★.
+
+Selecting a playable ship and variant sets it as your ship and returns you to the scenario screen, ready to Engage. The database also catalogs dozens of non-playable reference hulls from the Federation, Klingon, and Romulan manuals for browsing.
+
+---
+
+## Factions
+
+| Faction | Signature ship | Style |
+|---------|----------------|-------|
+| **Federation** | Constitution / Enterprise refit | Balanced cruisers, strong phasers and photon torpedoes |
+| **Klingon** | D-7 | Aggressive disruptor boats; late marks add cloaks |
+| **Romulan** | V-8 Bird of Prey | Cloak-and-strike with devastating plasma weapons |
+
+---
+
+## The battlefield
+
+Each game generates a fresh starfield with randomized terrain — clustered **asteroid fields** (rendered with miniaturized scanned-counter rock art, varied per hex), **nebula patches** (sensor-fouling), and isolated **gravity wells**. Terrain is capped so it never overwhelms the map (at most 50 affected hexes, sometimes none at all), and the ships' start zones are always left clear.
 
 ---
 
 ## Credits & intellectual property
 
-This is a personal, non-commercial fan project built on the tabletop rules of the FASA *Star Trek: Starship Tactical Combat Simulator*. *Star Trek* and all related marks are the property of their respective rights holders. All in-game audio is original synthesis; no copyrighted sound recordings are included.
+This is a fan-made tactical simulator built on the tabletop rules and ship data from FASA's *Star Trek: Starship Tactical Combat Simulator* and its ship-recognition manuals. Star Trek and all related marks are the property of their respective rights holders. This project is non-commercial and intended for personal, educational use.
