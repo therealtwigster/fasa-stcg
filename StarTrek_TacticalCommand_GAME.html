@@ -489,7 +489,7 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.15-S26</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.19-S30</div>
 </div>
 
 <!-- TABS -->
@@ -521,9 +521,9 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     <div id="tac-hint">POWER ALLOCATION PHASE — Go to ◈ Power Allocation tab</div>
     <div id="tac-legend">
       <div class="leg-title">TERRAIN</div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#160828;border:1px solid #5a20a0"></div><div class="leg-text"><b>NEBULA</b><br>Sensors −30%<br>No sensor lock</div></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#181008;border:1px solid #7a5010"></div><div class="leg-text"><b>ASTEROID</b><br>+1 cover vs beams<br>Move costs +1</div></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#081408;border:1px solid #206020"></div><div class="leg-text"><b>GRAVITY WELL</b><br>Move costs +1 to leave<br>Torpedoes arc</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:radial-gradient(circle at 45% 40%,rgba(170,70,210,.95),rgba(80,28,120,.55) 55%,rgba(20,8,40,.9));border:1px solid #5a20a0"></div><div class="leg-text"><b>NEBULA</b> <span style="color:#ff9900;font-size:7px;border:1px solid #ff9900;border-radius:2px;padding:0 2px;letter-spacing:.5px">HOUSE RULE</span><br>Sensors −30%<br>No sensor lock</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:radial-gradient(circle,#cfe3ff,#12203a 60%,#000);border:1px solid #2a6a9a"></div><div class="leg-text"><b>GRAVITY WELL</b> <span style="color:#ff9900;font-size:7px;border:1px solid #ff9900;border-radius:2px;padding:0 2px;letter-spacing:.5px">HOUSE RULE</span><br>Move cost +1<br>Warps nearby movement</div></div>
+      <div class="leg-item"><div class="leg-swatch" style="background:radial-gradient(circle at 38% 32%,#9a7a52,#5a4530 55%,#241a10);border:1px solid #7a5010"></div><div class="leg-text"><b>ASTEROID</b><br>+1 cover vs beams<br>Move costs +1</div></div>
       <div class="leg-item"><div class="leg-swatch" style="background:#010a18;border:1px solid #224466"></div><div class="leg-text"><b>OPEN SPACE</b><br>No modifiers</div></div>
     </div>
   </div>
@@ -1648,7 +1648,7 @@ function launchGame() {
   if(zl) zl.textContent='TACTICAL VIEW';
 
   // Place ships: left side faces right (facing 1=E), right side faces left (facing 4=W)
-  log('BUILD v1.15-S26 — embedded sprites, live-at-commit shields','info');
+  log('BUILD v1.19-S30 — embedded sprites, live-at-commit shields','info');
   const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -3620,27 +3620,51 @@ function snd(type){
 // ═══════════════════════════════════════════════════════════════════════════
 let tacT=0,tacLT=0,tacRunning=false;
 let terrain={};
+let terrainStyle={};   // per-hex look: nebula {hue,density≤2}, grav well {hue,spin≤1}
 // Randomized terrain, re-rolled each game. At most 50 affected hexes (as few as 0).
 // Asteroid fields and nebulae cluster (random-walk) so they read as fields, not confetti.
 function generateTerrain(){
-  terrain={};
+  terrain={}; terrainStyle={};
+  const NEB_HUES=[150,352,205,278,38], GRAV_HUES=[210,285,34];
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) terrain[`${c},${r}`]='S';
-  const cap=Math.floor(Math.random()*51);            // 0..50 affected hexes
+  const cap=22+Math.floor(Math.random()*29);         // 22..50 affected hexes (floor raised for reliable variety)
   let placed=0;
   const inb=(c,r)=>c>=0&&c<COLS&&r>=0&&r<ROWS;
-  const setT=(c,r,t)=>{ const k=`${c},${r}`; if(inb(c,r)&&terrain[k]==='S'){ terrain[k]=t; placed++; return true; } return false; };
-  const grow=(t,size)=>{ // random-walk cluster
+  const setT=(c,r,t,style)=>{ const k=`${c},${r}`; if(inb(c,r)&&terrain[k]==='S'){ terrain[k]=t; if(style)terrainStyle[k]=style; placed++; return true; } return false; };
+  const grow=(t,size,style)=>{ // random-walk cluster (shares one style across the patch)
     let cc=1+Math.floor(Math.random()*(COLS-2)), cr=1+Math.floor(Math.random()*(ROWS-2));
-    for(let s=0;s<size&&placed<cap;s++){ setT(cc,cr,t); cc+=Math.floor(Math.random()*3)-1; cr+=Math.floor(Math.random()*3)-1; cc=Math.max(0,Math.min(COLS-1,cc)); cr=Math.max(0,Math.min(ROWS-1,cr)); }
+    for(let s=0;s<size&&placed<cap;s++){ setT(cc,cr,t,style); cc+=Math.floor(Math.random()*3)-1; cr+=Math.floor(Math.random()*3)-1; cc=Math.max(0,Math.min(COLS-1,cc)); cr=Math.max(0,Math.min(ROWS-1,cr)); }
   };
-  const astFields=Math.floor(Math.random()*3);       // 0-2 asteroid fields
+  // Place gravity wells + nebulae FIRST so asteroid fields can't consume the whole budget.
+  const gravs=Math.floor(Math.random()*3);           // 0-2 isolated grav wells (random hue + spin, capped 1.0)
+  for(let gi=0;gi<gravs&&placed<cap;gi++){
+    const st={hue:GRAV_HUES[Math.floor(Math.random()*GRAV_HUES.length)], spin:Math.min(1.0, 0.35+Math.random()*0.65)};
+    setT(1+Math.floor(Math.random()*(COLS-2)),1+Math.floor(Math.random()*(ROWS-2)),'G',st);
+  }
+  const nebPatches=Math.floor(Math.random()*3);      // 0-2 nebula patches (placed, then coloured by blob below)
+  for(let f=0;f<nebPatches&&placed<cap;f++){
+    grow('N',3+Math.floor(Math.random()*6));
+  }
+  const astFields=Math.floor(Math.random()*3);       // 0-2 asteroid fields (placed last)
   for(let f=0;f<astFields&&placed<cap;f++) grow('A',4+Math.floor(Math.random()*10));
-  const nebPatches=Math.floor(Math.random()*3);      // 0-2 nebula patches
-  for(let f=0;f<nebPatches&&placed<cap;f++) grow('N',3+Math.floor(Math.random()*6));
-  const gravs=Math.floor(Math.random()*3);           // 0-2 isolated grav wells
-  for(let g=0;g<gravs&&placed<cap;g++){ setT(1+Math.floor(Math.random()*(COLS-2)),1+Math.floor(Math.random()*(ROWS-2)),'G'); }
   // Always clear the ship start zones
-  ['4,9','5,9','19,9','18,9','3,9','20,9'].forEach(k=>terrain[k]='S');
+  ['4,9','5,9','19,9','18,9','3,9','20,9'].forEach(k=>{terrain[k]='S';delete terrainStyle[k];});
+  // Colour nebulae by CONNECTED BLOB: every contiguous nebula shares one hue+density (continuity);
+  // separate (non-adjacent) blobs get an independent style — a different "material" per nebula.
+  const seen={};
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const k=`${c},${r}`;
+    if(terrain[k]==='N' && !seen[k]){
+      const st={hue:NEB_HUES[Math.floor(Math.random()*NEB_HUES.length)], density:Math.min(2.0, 0.9+Math.random()*1.1)};
+      const stack=[[c,r]]; seen[k]=1;
+      while(stack.length){
+        const [cc,cr]=stack.pop(); terrainStyle[`${cc},${cr}`]=st;
+        const dirs=(cr%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD);
+        for(const [dc,dr] of dirs){ const nc=cc+dc,nr=cr+dr,nk=`${nc},${nr}`;
+          if(nc>=0&&nc<COLS&&nr>=0&&nr<ROWS && terrain[nk]==='N' && !seen[nk]){ seen[nk]=1; stack.push([nc,nr]); } }
+      }
+    }
+  }
 }
 generateTerrain();
 
@@ -4096,6 +4120,81 @@ const ASTEROID_SPRITES=['data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAC
 const asteroidImgs=ASTEROID_SPRITES.map(u=>{const im=new Image();im.src=u;return im;});
 const TC={S:'#010a18',N:'#160828',A:'#181008',G:'#081408'};
 
+// ── Animated terrain helpers (nebula churning noise + gravity-well swirl) ──
+let _lastView={ts:1,ox:0,oy:0};
+const TERRAIN_TIP={
+  N:{name:'Nebula',eff:'Sensors −30% · no sensor lock for ships inside. Also degrades sensors & weapon lock fired THROUGH this hex.',hr:true},
+  G:{name:'Gravity Well',eff:'Move cost +1 within · engine power bleeds off near the core.',hr:true},
+  A:{name:'Asteroid Field',eff:'+1 cover vs beam fire · move cost +1.',hr:false}
+};
+function showTerrainTip(ev){
+  const cv=document.getElementById('tac-cv'); if(!cv||!GS) { hideShipTip(); return; }
+  const rect=cv.getBoundingClientRect();
+  const {ts,ox,oy}=_lastView;
+  const wx=(ev.clientX-rect.left-ox)/ts, wy=(ev.clientY-rect.top-oy)/ts;
+  const {col,row}=hexAt(wx,wy);
+  const t=terrain[`${col},${row}`];
+  const info=TERRAIN_TIP[t];
+  const tip=document.getElementById('ship-tooltip');
+  if(!info||!tip){ if(tip)tip.style.display='none'; return; }
+  const st=terrainStyle[`${col},${row}`];
+  tip.innerHTML=`<h5>${info.name}${info.hr?' <span style="color:#ff9900;font-size:8px;border:1px solid #ff9900;border-radius:2px;padding:0 3px;letter-spacing:1px">HOUSE RULE</span>':''}</h5>`+
+    `<div class="sub">${info.eff}</div>`+
+    `<div class="sub" style="color:#8fbfff;margin-top:4px">Affects only a ship occupying this hex — adjacent ships are unaffected.</div>`;
+  tip.style.display='block';
+  tip.style.left=Math.min(ev.clientX+14, innerWidth-tip.offsetWidth-8)+'px';
+  tip.style.top=Math.min(ev.clientY+14, innerHeight-tip.offsetHeight-8)+'px';
+}
+function terHSL(h,s,l){ h/=360; const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h*12)%12; return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))));};
+  return [f(0),f(8),f(4)]; }
+const _nebTexCache={};
+function nebTex(hue){
+  if(_nebTexCache[hue]) return _nebTexCache[hue];
+  const size=64, P=8;
+  const rnd=(x,y)=>{x=((x%P)+P)%P;y=((y%P)+P)%P;const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
+  const sm=t=>t*t*(3-2*t);
+  const vn=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;const a=rnd(xi,yi),b=rnd(xi+1,yi),c=rnd(xi,yi+1),d=rnd(xi+1,yi+1),u=sm(xf),v=sm(yf);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;};
+  const fbm=(x,y)=>{let s=0,amp=.5,f=1;for(let o=0;o<4;o++){s+=amp*vn(x*f,y*f);f*=2;amp*=.5;}return s;};
+  const cv=document.createElement('canvas');cv.width=cv.height=size;const cx=cv.getContext('2d'),img=cx.createImageData(size,size);
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    let n=fbm(x/size*P,y/size*P);n=Math.max(0,Math.min(1,(n-.42)*1.8));
+    const i=(y*size+x)*4;const col=terHSL(hue,.6,.28+.42*n);
+    img.data[i]=col[0];img.data[i+1]=col[1];img.data[i+2]=col[2];img.data[i+3]=Math.pow(n,1.3)*255;
+  }
+  cx.putImageData(img,0,0);return _nebTexCache[hue]=cv;
+}
+function drawNebulaHex(g,sx,sy,hr,st,time){
+  const tex=nebTex(st.hue), sz=tex.width, dens=Math.min(2.0,st.density||1.3);
+  const off=(time*7)%sz;
+  g.save(); hpath(g,sx,sy,hr); g.clip();
+  g.filter=`contrast(${0.55+dens*0.85}) brightness(${0.6+dens*0.5})`;
+  for(let gx=sx-hr-off; gx<sx+hr; gx+=sz) for(let gy=sy-hr-off; gy<sy+hr; gy+=sz) g.drawImage(tex,gx,gy);
+  g.filter='none';
+  const p=0.30+0.20*(0.5+0.5*Math.sin(time*1.1)), col=terHSL(st.hue,.6,.6);
+  const gr=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,hr));
+  gr.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},${p})`); gr.addColorStop(1,'transparent');
+  g.fillStyle=gr; g.fillRect(sx-hr,sy-hr,hr*2,hr*2);
+  g.restore();
+}
+function drawGravHex(g,sx,sy,hr,st,time){
+  const col=terHSL(st.hue,.85,.7), TAU=Math.PI*2, spin=time*1.1*Math.min(1.0,st.spin||0.6);
+  g.save(); hpath(g,sx,sy,hr); g.clip();
+  g.fillStyle='rgba(4,6,12,.65)'; g.fillRect(sx-hr,sy-hr,hr*2,hr*2);
+  g.globalCompositeOperation='lighter';
+  g.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},.5)`; g.lineWidth=Math.max(.6,hr*.06);
+  for(let arm=0;arm<3;arm++){ g.beginPath();
+    for(let k=0;k<=18;k++){ const rad=hr*(0.12+0.8*k/18), ang=spin+arm*TAU/3+k*0.5, px=sx+Math.cos(ang)*rad, py=sy+Math.sin(ang)*rad; k?g.lineTo(px,py):g.moveTo(px,py); }
+    g.stroke(); }
+  const ringP=0.6+0.4*(0.5+0.5*Math.sin(time*2.2));
+  const ring=g.createRadialGradient(sx,sy,hr*.10,sx,sy,hr*.34);
+  ring.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},0)`); ring.addColorStop(.6,`rgba(${col[0]},${col[1]},${col[2]},${.5*ringP})`); ring.addColorStop(1,'transparent');
+  g.fillStyle=ring; g.beginPath(); safeArc(g,sx,sy,hr*.34,0,TAU); g.fill();
+  g.globalCompositeOperation='source-over';
+  g.fillStyle='#000'; g.beginPath(); safeArc(g,sx,sy,Math.max(.4,hr*.16),0,TAU); g.fill();
+  g.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},${.7*ringP})`; g.lineWidth=Math.max(.5,hr*.04); g.beginPath(); safeArc(g,sx,sy,Math.max(.4,hr*.16),0,TAU); g.stroke();
+  g.restore();
+}
 function renderTac(){
   const cv=document.getElementById('tac-cv');if(!cv)return;
   const wrap=document.getElementById('tac-wrap');
@@ -4108,14 +4207,15 @@ function renderTac(){
   const ts=getTsc();
   const mw=HR*Math.sqrt(3)*(COLS+.5)*ts,mh=HR*1.5*(ROWS+.333)*ts;
   const ox=(W-mw)/2+tacPanX,oy=(H-mh)/2+tacPanY;
+  _lastView={ts,ox,oy};
   // Draw hexes
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const{x,y}=hexCen(c,r);const sx=x*ts+ox,sy=y*ts+oy;
     const t=terrain[`${c},${r}`]||'S';const hr=Math.max(.5,HR*ts-1);
     hpath(g,sx,sy,hr);g.fillStyle=TC[t];g.fill();
     g.strokeStyle='rgba(38,98,158,.35)';g.lineWidth=.8;g.stroke();
-    if(t==='N'){const ng=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,hr));ng.addColorStop(0,'rgba(110,28,190,.2)');ng.addColorStop(1,'transparent');g.fillStyle=ng;hpath(g,sx,sy,hr);g.fill();}
-    if(t==='G'){const gg=g.createRadialGradient(sx,sy,0,sx,sy,Math.max(.1,hr));gg.addColorStop(0,'rgba(18,72,18,.18)');gg.addColorStop(1,'transparent');g.fillStyle=gg;hpath(g,sx,sy,hr);g.fill();}
+    if(t==='N'){const st=terrainStyle[`${c},${r}`]||{hue:278,density:1.3};drawNebulaHex(g,sx,sy,hr,st,tacT);}
+    if(t==='G'){const st=terrainStyle[`${c},${r}`]||{hue:210,spin:0.6};drawGravHex(g,sx,sy,hr,st,tacT);}
     if(t==='A'){
       // miniaturized scanned asteroid, per-hex variation (which rock + rotation), seeded so it's stable
       const img=asteroidImgs[Math.abs(c*7+r*13)%asteroidImgs.length];
@@ -4392,6 +4492,8 @@ function initTac(){
   const cv=document.getElementById('tac-cv');
   function rsz(){cv.width=wrap.clientWidth;cv.height=wrap.clientHeight;renderTac();}
   rsz();window.addEventListener('resize',rsz);
+  cv.addEventListener('mousemove',showTerrainTip);
+  cv.addEventListener('mouseleave',hideShipTip);
 
   function getHexAtEvent(e){
     const ts=getTsc();const W=cv.width,H=cv.height;
