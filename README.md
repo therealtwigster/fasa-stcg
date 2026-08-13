@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command Simulator
 
-> **Build v1.15-S26** · 2026-08-11 11:27 UTC
+> **Build v1.19-S30** · 2026-08-13 16:07 UTC
 
 
 A single-file, browser-based tactical starship combat game built on the **FASA Star Trek: Starship Tactical Combat Simulator** rules. Command a capital ship on a hex grid, manage power between engines, shields, and weapons across a multi-phase turn, and fight an AI opponent to destruction or surrender.
