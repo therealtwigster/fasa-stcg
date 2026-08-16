@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command Simulator
 
-> **Build v1.19-S30** · 2026-08-13 16:07 UTC
+> **Build v1.23-S34** · 2026-08-15 18:08 UTC
 
 
 A single-file, browser-based tactical starship combat game built on the **FASA Star Trek: Starship Tactical Combat Simulator** rules. Command a capital ship on a hex grid, manage power between engines, shields, and weapons across a multi-phase turn, and fight an AI opponent to destruction or surrender.
@@ -149,6 +149,27 @@ Selecting a playable ship and variant sets it as your ship and returns you to th
 | **Federation** | Constitution / Enterprise refit | Balanced cruisers, strong phasers and photon torpedoes |
 | **Klingon** | D-7 | Aggressive disruptor boats; late marks add cloaks |
 | **Romulan** | V-8 Bird of Prey | Cloak-and-strike with devastating plasma weapons |
+
+---
+
+## Rulesets & Customization
+
+At the scenario screen, a **Customization** panel lets you choose how faithful the simulation runs. It's driven by a house-rules registry, so options can grow over time.
+
+**Ruleset — Basic Course vs. Intermediate:**
+
+- **Basic Course** (default) is fast play. Both ships are in permanent sensor contact — you know each other's position, heading and speed, and you fire freely. Cloak uses a simplified homebrew model (a cloaked ship simply can't be fired on).
+- **Intermediate** adds the full FASA sensor layer. Each turn now runs a **Sensors Phase before each of the three movement cycles** (`Power → Tac Adv → Scan 1 → Move 1 → Fire 1 → Scan 2 → …`).
+
+**In the Sensors Phase (Intermediate):**
+
+- **Sensor lock** — against a visible enemy, click **Attempt Sensor Lock** (60% base; roll 6 or less on a d10). A lock isn't required to fire — it's intelligence. Once locked, you may ask **one of nine questions** per phase about the target: its available power, how it has prioritized power, shield status by facing, which weapons are armed and with how much power, damage taken, crew status (only if the facing shield is down), and transporter activity. The answers are read from the enemy's real state.
+- **Cloak detection** — if the enemy cloaks, its counter vanishes from the map (you'll see only a faint *"contact lost"* ghost at its last-seen hex, and its contact card reads `???`). To fire on it you must first **detect** it: pick one of your **shield arcs** and **Scan**. Detection reads the ion trail, so it's rolled against the **Cloak Detection Table** (range × whether the target moved), is impossible beyond **30 hexes**, and is *harder against a stationary ship* than a moving one. Holding a lock grants **+3** to next phase's detection roll; a hit on you breaks your lock.
+- **Firing on a detected cloaked ship** carries a to-hit penalty: **+3** if it was moving, **+5** if it was stationary. The penalty is shown on the weapon's fire tooltip.
+
+The AI plays by the same rules: it rolls its own locks, and against a *cloaked player* it must run detection scans — you'll see its scan sweep arc on the map (green if it found you, cyan if it missed). Its scan **skill scales with difficulty** (Cadet rarely picks the right arc; Admiral almost always does) rather than simply seeing through the cloak.
+
+**Terrain house rules** — **Nebulae** and **Gravity Wells** are each individually toggleable (they're flagged as house rules, since neither is in the FASA core rules) and apply under either ruleset. Asteroid fields and open space are always available.
 
 ---
 
