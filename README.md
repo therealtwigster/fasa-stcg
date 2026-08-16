@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command Simulator
 
-> **Build v1.23-S34** · 2026-08-15 18:08 UTC
+> **Build v1.29-S40** · 2026-08-16 22:05 UTC
 
 
 A single-file, browser-based tactical starship combat game built on the **FASA Star Trek: Starship Tactical Combat Simulator** rules. Command a capital ship on a hex grid, manage power between engines, shields, and weapons across a multi-phase turn, and fight an AI opponent to destruction or surrender.
@@ -59,14 +59,16 @@ The hex grid where the battle plays out. Your ship and the enemy are drawn as to
 - **Scroll wheel** — zoom in and out.
 - **⊕ Recenter button** (top-right of the map) — reframe both ships in view.
 - **Double-click** — reset the view.
-- **Arrow keys**, or **A/D**, or **Q/E** — rotate your ship's facing.
+- **↑ / W** — move forward one hex (in your current facing); **↓ / S** — reverse one hex astern (facing unchanged). Each costs one move point.
+- **← / →**, or **A/D**, or **Q/E** — rotate your ship's facing.
+- **Click a highlighted hex** — move there directly. The green reachable set now includes forward, both diagonals, and the hex directly astern (reverse).
 
 ### The right sidebar
 
 Tabs across the top switch between **◈ Power Allocation** and the weapon firing view.
 
 - **Pinned stats bar** — always visible at the top of the sidebar: **HULL** (superstructure current/max), **PWR** (power current/total), and six shield facings (F, FS, AS, A, AP, FP) color-coded by strength (✕ for a destroyed generator).
-- **Ship cards** — "Your Ship" and "Enemy Contact" panels show hull, shields, and power bars. **Hover any bar** for a styled tooltip with exact current/max values (superstructure boxes, total shields across active facings, reactor output), for both your ship and the enemy.
+- **Ship cards** — "Your Ship" and "Enemy Contact" panels show hull, shields, and power bars. **Hover any bar** for a styled tooltip with exact current/max values (superstructure boxes, total shields across active facings, reactor output). In **Basic** these read live for both ships. In **Intermediate** the enemy card is masked to an *unidentified contact* — its identity, hull, shields, and power are hidden until you hold a **sensor lock** (see below); its position, heading, and speed remain visible on the map at all times, per the FASA rules.
 - **Power Allocation tab** — divide your power pool between movement, shields (per face), and arming weapons. Each weapon has a **power slider** (green→amber→red track) with a live value/max readout. Selecting a beam auto-assigns 1 point; drag a beam to zero to un-select it. Systems that are **knocked out** (a destroyed weapon mount or shield generator) are flagged in red — "⊘ KNOCKED OUT" / "⊘ GENERATOR KNOCKED OUT" — so you know why you can't power them. Commit when ready.
 - **Weapon firing view** — each weapon is a compact row: a small **FIRE** button (color-coded — green when ready and in range, amber when blocked, faded once fired) with a status glyph and the weapon's name, and for beams a separate **⊕ PAIR** button. **Hover the FIRE button** for a tooltip with the full detail: status, in-range/out-of-range, firing arcs, damage, and power.
 
@@ -163,7 +165,8 @@ At the scenario screen, a **Customization** panel lets you choose how faithful t
 
 **In the Sensors Phase (Intermediate):**
 
-- **Sensor lock** — against a visible enemy, click **Attempt Sensor Lock** (60% base; roll 6 or less on a d10). A lock isn't required to fire — it's intelligence. Once locked, you may ask **one of nine questions** per phase about the target: its available power, how it has prioritized power, shield status by facing, which weapons are armed and with how much power, damage taken, crew status (only if the facing shield is down), and transporter activity. The answers are read from the enemy's real state.
+- **Sensor lock** — against a visible enemy, click **Attempt Sensor Lock** (60% base; roll 6 or less on a d10). Per the rules you get **one lock roll per Sensors Phase** — a failure locks the button until the next Sensors Phase, so with three Sensors Phases you have up to three tries across a turn. The cloak-detection scan is likewise **one roll per phase**. Each scan throws a faction-colored **radar sweep** from the scanning ship — Federation light blue, Klingon crimson red, Romulan mint green — so you can see who's pinging whom. A lock isn't required to fire — it's intelligence. Once locked, you may ask **one of nine questions** per phase about the target: its available power, how it has prioritized power, shield status by facing, which weapons are armed and with how much power, damage taken, crew status (only if the facing shield is down), and transporter activity. The answers are read from the enemy's real state.
+- **What a lock unlocks (Intermediate):** without a lock the enemy is a bare sensor contact — the map shows its counter, heading arrow, and F/P/S/A facing, but the contact card, hover tooltips, on-map name, and per-facing shield edges all read *NO LOCK / UNIDENTIFIED CONTACT*. The moment you obtain a lock, identity is revealed and the live enemy card, tooltips, and shield-facing readouts light up as a real sensor track; the nine questions then dig deeper (power-allocation order, per-weapon arming, exact per-face points, crew, transporters). A lock breaks if the enemy cloaks or lands a hit on you, so the display can go dark mid-fight — exactly as the rules intend.
 - **Cloak detection** — if the enemy cloaks, its counter vanishes from the map (you'll see only a faint *"contact lost"* ghost at its last-seen hex, and its contact card reads `???`). To fire on it you must first **detect** it: pick one of your **shield arcs** and **Scan**. Detection reads the ion trail, so it's rolled against the **Cloak Detection Table** (range × whether the target moved), is impossible beyond **30 hexes**, and is *harder against a stationary ship* than a moving one. Holding a lock grants **+3** to next phase's detection roll; a hit on you breaks your lock.
 - **Firing on a detected cloaked ship** carries a to-hit penalty: **+3** if it was moving, **+5** if it was stationary. The penalty is shown on the weapon's fire tooltip.
 
@@ -182,3 +185,18 @@ Each game generates a fresh starfield with randomized terrain — clustered **as
 ## Credits & intellectual property
 
 This is a fan-made tactical simulator built on the tabletop rules and ship data from FASA's *Star Trek: Starship Tactical Combat Simulator* and its ship-recognition manuals. Star Trek and all related marks are the property of their respective rights holders. This project is non-commercial and intended for personal, educational use.
+
+
+## Planets & Moons (optional · FASA §13)
+
+Enable **Planets & Moons** in the scenario **Customization** panel (off by default) to seed maps
+with sub-light celestial bodies drawn from a 96-variant library (2 planets + 2 moons, each in 6
+colours × 4 rotations, generated at runtime from the real scanned counters).
+
+They play by the book:
+- **Block movement** — a planet fills 7 hexes, a moon 1; no ship may enter or pass through.
+- **Block line-of-sight** — you cannot fire *through* a body.
+- **Cast a mutual sensor shadow** — a target behind a body can't be locked, scanned, or read on the
+  contact card, and it's mutual. Slip behind a moon to break an enemy's lock or deny a firing solution.
+
+Hover any body on the tactical map for a tooltip explaining its effect.
