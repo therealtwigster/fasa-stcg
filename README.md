@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command
 
-**Build v1.47-S58**
+**Build v1.49-S60**
 
 A hex-grid starship combat simulator built on the FASA *Star Trek: Starship Tactical Combat
 Simulator* (2nd Edition, 1983) rules — the tabletop game, not a re-skin of a video game. Fly a
@@ -17,6 +17,7 @@ Open `StarTrek_TacticalCommand_GAME.html` in any modern browser (Chrome, Firefox
 desktop or mobile). There's nothing to install and nothing to configure to get started.
 
 1. **Pick your side** — Federation, Klingon, Romulan, Gorn, or Orion — and a ship from that faction's roster.
+   Both your ship and the enemy's show a live artwork preview as you browse the dropdown.
 2. **Pick a difficulty** — six tiers, Cadet through Legend (see below).
 3. **Power Allocation Phase** — split your ship's total power across Movement, Shields, and
    Weapons (and Cloak, if your ship has one). This is the strategic heart of the game: overcommit
@@ -26,6 +27,10 @@ desktop or mobile). There's nothing to install and nothing to configure to get s
 5. **Three Sensors → Movement → Firing sub-phases per turn** — maneuver into arc, try to lock
    sensors on the enemy (or scan for a cloaked one), and fire when you've got a shot.
 6. **Repeat until one side's superstructure hits zero**, or you disengage.
+
+The combat log panel on the left can be resized by dragging the handle on its right edge, and its
+text size is controlled separately by the "UI Scale" control in the status bar (70%-160%) — the
+two work together if the default is too cramped to read comfortably.
 
 Combat logs can be exported from the victory/defeat screen — useful for reviewing a fight, or (see
 below) for teaching the AI.
@@ -94,6 +99,15 @@ instance), it's noted honestly in `HANDOVER.md` rather than presented as more ve
 A handful of fields (mostly `moveRatio`) were left blank in the sourcebook for the Gorn and Orion
 ships specifically — those are reasoned estimates, flagged as such in `HANDOVER.md`, not sourced
 numbers.
+
+## Ship Recognition Database
+
+A browsable in-game reference of every ship documented in the source material — not just the ones
+you can fly. Filter by faction, search by name, and hover any entry for a quick preview with
+artwork and stats before clicking through to the full dossier. Ships that are fully built and
+playable show their real in-game art; ships that are documented in the sourcebooks but not yet
+built into the game show a generic silhouette instead, so you can always tell the difference at a
+glance.
 
 ## AI difficulty
 
