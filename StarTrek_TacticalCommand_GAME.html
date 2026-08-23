@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v1.48-S59</title>
+<title>Star Trek: Tactical Command — v1.50-S61</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -43,6 +43,9 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#
 .sc-sub{font-size:11px;letter-spacing:4px;color:#445566;text-transform:uppercase;}
 .sc-panel{background:#030810;border:1px solid #ff9900;border-radius:4px;padding:24px 32px;width:480px;}
 .sc-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.sc-ship-preview{width:56px;height:56px;flex-shrink:0;border:1px solid #1a2030;border-radius:3px;
+  background:radial-gradient(ellipse at 50% 42%,#0d1a2a 0,#030810 90%);position:relative;overflow:hidden;}
+.sc-ship-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px;}
 .sc-row-lbl{font-size:10px;letter-spacing:2px;color:#ff9900;text-transform:uppercase;width:140px;}
 select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;font-family:'Courier New',monospace;font-size:11px;padding:6px 8px;border-radius:2px;}
 .sc-diff-wrap{flex:1;display:flex;flex-direction:column;gap:4px;}
@@ -94,16 +97,32 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
 /* ── TACTICAL MAP TAB ── */
 #v-tac{flex-direction:row;}
 #tac-log-panel{width:210px;background:#010810;border-right:1px solid #0d1a0d;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+#tac-log-resize{width:6px;flex-shrink:0;cursor:col-resize;background:#0d1a0d;position:relative;transition:background .15s;}
+#tac-log-resize:hover,#tac-log-resize.dragging{background:#2a5a2a;}
+#tac-log-resize::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:34px;background:#336633;border-radius:1px;}
+#tac-log-resize:hover::after,#tac-log-resize.dragging::after{background:#6bcf6b;}
 .tac-log-hdr{padding:6px 10px 5px;font-size:8px;letter-spacing:3px;color:#336633;text-transform:uppercase;border-bottom:1px solid #0d1a0d;display:flex;align-items:center;justify-content:space-between;background:#010a08;}
 .tac-log-entries{flex:1;overflow-y:auto;padding:0;display:flex;flex-direction:column;}
 .tac-log-entries .log-entry{padding:4px 8px;border-bottom:1px solid #050e08;font-size:8px;letter-spacing:.5px;line-height:1.6;}
 #tac-wrap{flex:1;position:relative;overflow:hidden;background:#010508;outline:none;}
 #tac-cv{display:block;cursor:crosshair;}
 #tac-zoom{position:absolute;bottom:9px;right:13px;font-size:9px;letter-spacing:2px;color:#232d38;pointer-events:none;}
-#tac-recenter{position:absolute;top:9px;right:11px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:1px;color:#8fbfff;background:rgba(8,16,28,.85);border:1px solid #2a4a7a;border-radius:3px;padding:5px 8px;cursor:pointer;z-index:5;transition:all .15s;}
-#tac-recenter:hover{background:rgba(20,36,60,.95);border-color:#4a7aca;color:#cfe4ff;}
+#tac-controls-bar{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;
+  display:flex;align-items:center;gap:10px;background:rgba(8,16,28,.92);
+  border:1px solid #3a6aaa;border-radius:4px;padding:6px 14px;box-shadow:0 2px 10px rgba(0,0,0,.5);}
+#tac-recenter{font-family:'Courier New',monospace;font-size:13px;letter-spacing:1px;font-weight:bold;
+  color:#8fbfff;background:transparent;border:none;padding:2px 4px;cursor:pointer;transition:color .15s;}
+#tac-recenter:hover{color:#cfe4ff;}
+#tac-recenter u{text-decoration-color:#4a7aca;}
+.tcb-sep{width:1px;height:18px;background:#2a4a7a;}
+.tcb-lbl{font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;font-weight:bold;color:#8fbfff;}
+.tcb-lbl u{text-decoration-color:#4a7aca;}
+.tcb-scale-btn{width:24px;height:24px;background:#0d1e33;border:1px solid #3a6aaa;color:#8fbfff;
+  font-size:15px;font-weight:bold;cursor:pointer;padding:0;line-height:1;border-radius:3px;transition:all .15s;}
+.tcb-scale-btn:hover{background:#173458;border-color:#5a8ada;color:#cfe4ff;}
+.tcb-scale-val{font-family:'Courier New',monospace;font-size:13px;letter-spacing:1px;color:#cfe4ff;width:36px;text-align:center;}
 #tac-hex{position:absolute;bottom:9px;left:13px;font-size:9px;letter-spacing:2px;color:#232d38;pointer-events:none;}
-#tac-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:2px;color:#445566;pointer-events:none;background:rgba(0,0,0,.6);padding:4px 12px;border:1px solid #1a2030;border-radius:2px;}
+#tac-hint{position:absolute;top:48px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:2px;color:#445566;pointer-events:none;background:rgba(0,0,0,.6);padding:4px 12px;border:1px solid #1a2030;border-radius:2px;}
 #tac-legend{position:absolute;bottom:28px;right:10px;background:rgba(1,4,12,.88);border:1px solid #1a2a3a;border-radius:3px;padding:8px 10px;pointer-events:none;min-width:148px;}
 .leg-title{font-size:8px;letter-spacing:3px;color:#ff9900;text-transform:uppercase;margin-bottom:7px;border-bottom:1px solid #1a2030;padding-bottom:4px;}
 .leg-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;}
@@ -516,12 +535,14 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
       <select class="sc-sel" id="player-ship">
         <option value="Constitution">USS Enterprise — Constitution Class</option>
       </select>
+      <div class="sc-ship-preview" id="player-ship-preview"></div>
     </div>
     <div class="sc-row">
       <div class="sc-row-lbl">Enemy Ship</div>
       <select class="sc-sel" id="enemy-ship">
         <option value="D7">IKS Kronos — D-7 Class</option>
       </select>
+      <div class="sc-ship-preview" id="enemy-ship-preview"></div>
     </div>
     <div class="sc-row">
       <div class="sc-row-lbl">AI Difficulty</div>
@@ -566,7 +587,7 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.48-S59</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.50-S61</div>
 </div>
 
 <!-- TABS -->
@@ -591,9 +612,17 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
     </div>
     <div id="combat-log" class="tac-log-entries"></div>
   </div>
+  <div id="tac-log-resize" title="Drag to resize the combat log"></div>
   <div id="tac-wrap" tabindex="0">
     <canvas id="tac-cv"></canvas>
-    <button id="tac-recenter" onclick="recenterView()" title="Recenter — frame both ships">⊕ RECENTER</button>
+    <div id="tac-controls-bar">
+      <button id="tac-recenter" onclick="recenterView()" title="Recenter — frame both ships">⊕ <u>RECENTER</u></button>
+      <div class="tcb-sep"></div>
+      <span class="tcb-lbl"><u>UI SCALE</u></span>
+      <button class="tcb-scale-btn" onclick="adjustUIScale(-0.1)" title="Smaller text">−</button>
+      <span id="ui-scale-lbl" class="tcb-scale-val">100%</span>
+      <button class="tcb-scale-btn" onclick="adjustUIScale(0.1)" title="Bigger text">+</button>
+    </div>
     <div id="tac-zoom">TACTICAL VIEW</div>
     <div id="tac-hex"></div>
     <div id="tac-hint">POWER ALLOCATION PHASE — Go to ◈ Power Allocation tab</div>
@@ -805,11 +834,6 @@ select.sc-sel{flex:1;background:#040c18;border:1px solid #334455;color:#c8d8f0;f
   <div class="sb-sys"><div class="sb-lbl">Weapons</div><div class="sb-bar"><div class="sb-fil" id="sbf-wpn"></div></div><div class="sb-val" id="sbv-wpn"></div></div>
   <div class="sb-sys"><div class="sb-lbl">Sensors</div><div class="sb-bar"><div class="sb-fil" id="sbf-sens"></div></div><div class="sb-val" id="sbv-sens"></div></div>
   <div id="sb-id">USS ENTERPRISE · NCC-1701</div>
-  <div id="ui-scale-ctrl" style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
-    <span style="font-size:7px;letter-spacing:2px;color:#334455;text-transform:uppercase;">UI Scale</span>
-    <button onclick="adjustUIScale(-0.1)" style="width:18px;height:18px;background:#0a0a12;border:1px solid #334455;color:#6688aa;font-size:11px;cursor:pointer;padding:0;line-height:1;border-radius:2px;">−</button>
-    <span id="ui-scale-lbl" style="font-size:8px;letter-spacing:1px;color:#556677;width:28px;text-align:center;">100%</span>
-    <button onclick="adjustUIScale(0.1)" style="width:18px;height:18px;background:#0a0a12;border:1px solid #334455;color:#6688aa;font-size:11px;cursor:pointer;padding:0;line-height:1;border-radius:2px;">+</button>
   </div>
 </div>
 <script>
@@ -1906,7 +1930,7 @@ function launchGame() {
   if(zl) zl.textContent='TACTICAL VIEW';
 
   // Place ships: left side faces right (facing 1=E), right side faces left (facing 4=W)
-  log('BUILD v1.48-S59 — Recognition Manual overhaul: added Gorn/Orion faction filter buttons; rebuilt the SPRITES artwork lookup from a 3-entry stub to all 19 live ships across all 5 factions (most ships were silently showing a procedural placeholder instead of their real art); fixed 2 more stale CATALOG entries (rom_BirdOfPrey, rom_WingedDefender) and added a missing kli_K22 entry; added a hover tooltip on the roster showing artwork + stats','info');
+  log('BUILD v1.50-S61 — consolidated Recenter and UI Scale controls (previously buried in the bottom status bar, easy to miss entirely) into one prominent bar at top-center of the tactical map, bigger underlined labels','info');
   const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -6582,6 +6606,14 @@ function shipOptionHTML(key){
   const r=SHIP_REGISTRY[key]; if(!r) return '';
   return `<option value="${key}">${r.name} — ${r.cls}</option>`;
 }
+function updateShipPreview(selectId, previewId){
+  const sel=document.getElementById(selectId);
+  const prev=document.getElementById(previewId);
+  if(!sel||!prev) return;
+  const reg=SHIP_REGISTRY[sel.value];
+  const art=reg && SHIP_SPRITES[reg.spriteKey];
+  prev.innerHTML = art ? `<img src="${art}" alt="${reg.name}">` : '';
+}
 function populateShipSelectors(f){
   const pSel=document.getElementById('player-ship');
   const eSel=document.getElementById('enemy-ship');
@@ -6591,6 +6623,8 @@ function populateShipSelectors(f){
   eSel.innerHTML = enemyFactions.map(ef=>
     PLAYABLE_BY_FACTION[ef].map(shipOptionHTML).join('')).join('');
   eSel.value = CANON_KEY[enemyFactions[0]];
+  updateShipPreview('player-ship','player-ship-preview');
+  updateShipPreview('enemy-ship','enemy-ship-preview');
 }
 function chooseFaction(f){
   playerFaction=f;
@@ -6657,6 +6691,8 @@ function setAllHouseRules(on){ HOUSE_RULES.forEach(r=>{customState[r.id]=on;}); 
 updDiffLabel();
 renderCustomPanel();
 populateShipSelectors('fed'); // fill Your Ship / Enemy Ship dropdowns with all playable variants
+document.getElementById('player-ship').addEventListener('change', ()=>updateShipPreview('player-ship','player-ship-preview'));
+document.getElementById('enemy-ship').addEventListener('change', ()=>updateShipPreview('enemy-ship','enemy-ship-preview'));
 // Pre-init canvases so they resize correctly
 initTac();
 initDmg();
@@ -6898,6 +6934,39 @@ window.openShipDatabase=function(){ const ov=document.getElementById('shipdb-ove
   ov.style.display='block';
   if(!__dbInstance){ __dbInstance=mountShipDatabase(ov,{catalog:CATALOG,onSelect:dbOnSelect}); } };
 window.closeShipDatabase=function(){ const ov=document.getElementById('shipdb-overlay'); if(ov) ov.style.display='none'; };
+
+// Combat log panel resize — drag the handle between the log and the tactical map to
+// widen/narrow it. Text reflows naturally (it's just a text-wrapping div), so widening
+// mainly reduces awkward line-wraps; for genuinely bigger glyphs, the existing "UI Scale"
+// control in the status bar (adjustUIScale()) is the complementary fix — the two are
+// independent and meant to be used together. Width is session-only, not persisted
+// (this file deliberately avoids localStorage — see the note near the selection-state
+// comment earlier in this script).
+(function initLogPanelResize(){
+  const panel=document.getElementById('tac-log-panel');
+  const handle=document.getElementById('tac-log-resize');
+  if(!panel||!handle) return;
+  const MIN_W=180, MAX_W=560;
+  let dragging=false, startX=0, startW=0;
+  handle.addEventListener('mousedown', e=>{
+    dragging=true; startX=e.clientX; startW=panel.getBoundingClientRect().width;
+    handle.classList.add('dragging');
+    document.body.style.userSelect='none';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    const proposed=startW+(e.clientX-startX);
+    const clamped=Math.max(MIN_W, Math.min(MAX_W, proposed));
+    panel.style.width=clamped+'px';
+  });
+  window.addEventListener('mouseup', ()=>{
+    if(!dragging) return;
+    dragging=false;
+    handle.classList.remove('dragging');
+    document.body.style.userSelect='';
+  });
+})();
 
 })();
 
