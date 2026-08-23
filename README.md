@@ -71,6 +71,13 @@ L-42 Great Bird (large frigate), D-2 Stingtongue (destroyer, missile-heavy), T-5
 (assault ship), L-24 Ever-Victorious (battleship — the largest Klingon hull in the fleet), D-18
 Gull (cloak-capable destroyer), L-9 Saber (frigate). 14 Klingon hulls in total.
 
+The two D-7 hulls aren't just a visual choice — they line up with real in-universe dates derived
+from this project's own FASA stardate research. The classic hull (A/C/G) spans roughly 2186-2210,
+a generation before Kirk's five-year mission through the TOS/TAS window itself; the hybrid hull
+(M/R/S) picks up right after and runs through 2219, past *The Motion Picture*'s 2217. It's a nice
+coincidence that the cloak-bearing marks (R, S) also turned out to be the chronologically latest —
+that wasn't planned when the hulls were split, it just checked out later.
+
 **Romulan** — V-8 Bird of Prey "RIS Talon" (2 marks, cloak-capable), V-30 Winged Defender (2
 marks, heavy cruiser), V-11 Stormbird (3 types — Type 1 is documented in the sourcebook as
 literally flying on Klingon-built engines, a real in-canon precursor to the Klingon tech-exchange
