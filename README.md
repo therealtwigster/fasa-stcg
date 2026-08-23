@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command
 
-**Build v1.50-S61**
+**Build v1.52-S63**
 
 A hex-grid starship combat simulator built on the FASA *Star Trek: Starship Tactical Combat
 Simulator* (2nd Edition, 1983) rules — the tabletop game, not a re-skin of a video game. Fly a
@@ -69,7 +69,9 @@ this is the one place to expect a genuine divergence, not a bug.
 ## The fleet
 
 **Federation** — Constitution (3 marks), Enterprise refit (3 marks), Federation II "Dreadnought"
-(2 marks, triple-nacelle design), Chandley Class frigate (3 marks).
+(2 marks, triple-nacelle design), Chandley Class frigate (3 marks), Excelsior Class battleship
+(2 marks — the largest and most heavily-armed Federation hull in the fleet, "The Great
+Experiment," fitted with a classified TransWarp drive per the sourcebook's own notes).
 
 **Klingon** — D-7 Battle Cruiser (6 marks: A/C/G on the classic hull, M/R/S on a distinct
 hybrid-tech hull reflecting a Klingon-Romulan technology exchange — R and S are the marks that
