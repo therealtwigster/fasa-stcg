@@ -1,6 +1,6 @@
 # Star Trek: Tactical Command
 
-**Build v1.49-S60**
+**Build v1.50-S61**
 
 A hex-grid starship combat simulator built on the FASA *Star Trek: Starship Tactical Combat
 Simulator* (2nd Edition, 1983) rules — the tabletop game, not a re-skin of a video game. Fly a
@@ -29,8 +29,10 @@ desktop or mobile). There's nothing to install and nothing to configure to get s
 6. **Repeat until one side's superstructure hits zero**, or you disengage.
 
 The combat log panel on the left can be resized by dragging the handle on its right edge, and its
-text size is controlled separately by the "UI Scale" control in the status bar (70%-160%) — the
-two work together if the default is too cramped to read comfortably.
+text size is controlled separately by the "UI Scale" +/− control at the top-center of the
+tactical map (70%-160%) — the two work together if the default is too cramped to read comfortably.
+That same control bar also holds "Recenter," which frames both ships back in view if you've
+scrolled or zoomed away from the action.
 
 Combat logs can be exported from the victory/defeat screen — useful for reviewing a fight, or (see
 below) for teaching the AI.
