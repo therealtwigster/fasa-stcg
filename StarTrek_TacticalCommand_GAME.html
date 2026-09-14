@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v1.91-S102</title>
+<title>Star Trek: Tactical Command — v1.92-S103</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -622,7 +622,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.91-S102</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v1.92-S103</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -1759,10 +1759,10 @@ Object.assign(SHIP_REGISTRY, {
     totalPower:79, moveRatio:5, shieldRatio:0.333, maxShieldPerFace:15,
     superstructureMax:38,
     enginePower:{warp:56,impulse:23},
-    weapons:[ buildWeapon('KD-8',[5],'KD-8 F/P 1'), buildWeapon('KD-8',[5],'KD-8 F/P 2'), buildWeapon('KD-8',[5],'KD-8 F/P 3'), buildWeapon('KD-8',[5],'KD-8 F/P 4'),
-              buildWeapon('KD-8',[1],'KD-8 F/S 1'), buildWeapon('KD-8',[1],'KD-8 F/S 2'), buildWeapon('KD-8',[1],'KD-8 F/S 3'), buildWeapon('KD-8',[1],'KD-8 F/S 4'),
-              buildWeapon('KD-13',[4],'KD-13 Port-Aft 1'), buildWeapon('KD-13',[4],'KD-13 Port-Aft 2'),
-              buildWeapon('KD-13',[2],'KD-13 Stbd-Aft 1'), buildWeapon('KD-13',[2],'KD-13 Stbd-Aft 2'),
+    weapons:[ buildWeapon('KD-8',[0,5],'KD-8 F/P 1'), buildWeapon('KD-8',[0,5],'KD-8 F/P 2'), buildWeapon('KD-8',[0,5],'KD-8 F/P 3'), buildWeapon('KD-8',[0,5],'KD-8 F/P 4'),
+              buildWeapon('KD-8',[0,1],'KD-8 F/S 1'), buildWeapon('KD-8',[0,1],'KD-8 F/S 2'), buildWeapon('KD-8',[0,1],'KD-8 F/S 3'), buildWeapon('KD-8',[0,1],'KD-8 F/S 4'),
+              buildWeapon('KD-13',[3,4],'KD-13 Port-Aft 1'), buildWeapon('KD-13',[3,4],'KD-13 Port-Aft 2'),
+              buildWeapon('KD-13',[2,3],'KD-13 Stbd-Aft 1'), buildWeapon('KD-13',[2,3],'KD-13 Stbd-Aft 2'),
               buildWeapon('KP-6',[0],'KP-6 Fwd 1'), buildWeapon('KP-6',[0],'KP-6 Fwd 2'),
               buildWeapon('KP-6',[3],'KP-6 Aft 1'), buildWeapon('KP-6',[3],'KP-6 Aft 2') ]
   },
@@ -1772,9 +1772,9 @@ Object.assign(SHIP_REGISTRY, {
     superstructureMax:14,
     cloakCost:32,
     enginePower:{warp:40,impulse:2},
-    weapons:[ buildWeapon('KD-5',[5],'KD-5 F/P 1'), buildWeapon('KD-5',[5],'KD-5 F/P 2'),
+    weapons:[ buildWeapon('KD-5',[0,5],'KD-5 F/P 1'), buildWeapon('KD-5',[0,5],'KD-5 F/P 2'),
               buildWeapon('KD-5',[0],'KD-5 Fwd 1'), buildWeapon('KD-5',[0],'KD-5 Fwd 2'),
-              buildWeapon('KD-5',[1],'KD-5 F/S 1'), buildWeapon('KD-5',[1],'KD-5 F/S 2'),
+              buildWeapon('KD-5',[0,1],'KD-5 F/S 1'), buildWeapon('KD-5',[0,1],'KD-5 F/S 2'),
               buildWeapon('KD-14',[3],'KD-14 Aft'), buildWeapon('KP-5',[3],'KP-5 Aft Tube') ]
   },
   L9_Saber: {   // Class X Frigate — "fast-sword"
@@ -1782,9 +1782,9 @@ Object.assign(SHIP_REGISTRY, {
     totalPower:42, moveRatio:4, shieldRatio:0.333, maxShieldPerFace:15,
     superstructureMax:25,
     enginePower:{warp:36,impulse:6},
-    weapons:[ buildWeapon('KD-8',[5],'KD-8 F/P'), buildWeapon('KD-8',[0],'KD-8 Fwd 1'), buildWeapon('KD-8',[0],'KD-8 Fwd 2'), buildWeapon('KD-8',[1],'KD-8 F/S'),
+    weapons:[ buildWeapon('KD-8',[0,5],'KD-8 F/P'), buildWeapon('KD-8',[0],'KD-8 Fwd 1'), buildWeapon('KD-8',[0],'KD-8 Fwd 2'), buildWeapon('KD-8',[0,1],'KD-8 F/S'),
               buildWeapon('KD-8',[3],'KD-8 Aft 1'), buildWeapon('KD-8',[3],'KD-8 Aft 2'),
-              buildWeapon('KD-13',[5],'KD-13 F/P'), buildWeapon('KD-13',[0],'KD-13 Fwd 1'), buildWeapon('KD-13',[0],'KD-13 Fwd 2'), buildWeapon('KD-13',[1],'KD-13 F/S') ]
+              buildWeapon('KD-13',[0,5],'KD-13 F/P'), buildWeapon('KD-13',[0],'KD-13 Fwd 1'), buildWeapon('KD-13',[0],'KD-13 Fwd 2'), buildWeapon('KD-13',[0,1],'KD-13 F/S') ]
   },
   // D-10 (Riskadh) — "Queen of Battle," Class VIII-X Cruiser (FASA 2301, p.12).
   // Named for the Riskadh family line, founder Kahless the Unforgettable. Built
@@ -2143,6 +2143,7 @@ function launchGame() {
 
   // Place ships: left side faces right (facing 1=E), right side faces left (facing 4=W)
   log('BUILD v1.91-S102 — Three things investigated from user playtesting reports, one real bug found and fixed. First: a reported contradiction -- a ship could fire on a target despite a planet blocking sensor lock earlier that same power-allocation round. Traced through the code: canFireOnTarget() already calls the same losBlocked() function the sensor-lock code uses, evaluated fresh against CURRENT positions each time it runs. The sensor block happened in Sensors Phase 1 at that round\'s starting positions; the successful shot happened in Firing Phase 3, after three full movement phases had shifted both ships\' positions enough to clear the line of sight. Not a bug -- both systems are already consistent with each other, just evaluated at different moments as the tactical situation changed. Second: checked the rulebook directly on whether planets/moons/ships should be impassable to movement, rather than assume. Confirmed textually that FASA\'s own rules explicitly ALLOW two ships to occupy the same hex (they simply can\'t fire at each other while doing so) -- so ship-into-ship movement being unblocked is correct, not a bug. For planets/moons specifically, the rulebook blocks weapons fire and sensors through them but never states they block movement -- however, checking this project\'s OWN existing code found reachableHexes() (the click-to-move system) already correctly treats them as impassable via celBlocked(), which is a reasonable design choice beyond the letter of the rulebook. What was NOT consistent: playerStep(), the separate "move forward/reverse one hex" button, never checked celBlocked() at all -- a real, confirmed gap letting a ship step directly into a planet/moon\'s hex through that specific control, now fixed to match reachableHexes()\'s existing behavior. Third: added a minimize toggle to the end-of-combat victory/defeat panel, which can cover up to 78% of the combat-log column when shown -- reported directly as blocking review of dice-roll entries right when a player would most want to scroll back through them. Also reviewed the three attached combat logs for AI-tuning purposes: worth flagging honestly that none of the three show adaptive Legend-tier allocation -- one repeats the well-documented "Move 8, Shields 10" Ensign-tier fixed formula throughout, and the other two show different but equally static per-round formulas, consistent with the difficulty-reset issue already tracked elsewhere in this project rather than genuine Legend-tier play worth analyzing as such.','info');
+  log('BUILD v1.92-S103 — User reported the IKV Ever-Victorious (L-24 battleship) barely fired across an entire match and asked whether its firing arcs were being misread. Checked the rulebook directly rather than assume: a compound arc like "f/p" is explicitly defined as the weapon ALSO covering the second named arc (forward AND port), not a narrow slice between the two. Confirmed against this ship\'s own live weapon list that its 8 KD-8 beams and 4 KD-13 beams were each given only ONE arc index -- never arc 0 (Forward) on any KD-8, never arc 3 (Aft) on any KD-13 -- meaning this ship\'s entire beam armament genuinely could not fire dead ahead or dead astern at any facing. This is inconsistent with both the rulebook\'s own definition and this project\'s OWN reference catalog for the same hull (which correctly lists KD-8 arcs [0,1,5] and KD-13 arcs [2,3,4]), and with how every other Klingon ship\'s quarter-arc mounts are built elsewhere in this file (e.g. K-22\'s KD-8 mounts are [0,5] and [0,1], always including the pure arc). Fixed Ever-Victorious\'s 12 beam mounts to match: F/P mounts now [0,5], F/S mounts now [0,1], Port-Aft mounts now [3,4], Stbd-Aft mounts now [2,3] -- restoring pure Forward and Aft coverage to a battleship that previously had none. Also swept the rest of the live ship roster for the same authoring pattern: found it on two more ships (D-18 Gull\'s KD-5 F/P and F/S mounts; L-9 Saber\'s KD-8 and KD-13 F/P and F/S mounts), both fixed the same way for consistency, though on those two ships the SHIP-LEVEL bug was milder -- each already carries separate dedicated Forward-only mounts, so their aggregate arc coverage already matched the catalog even before this fix; only the per-weapon arc data was incomplete. Separately, and left UNCHANGED pending explicit direction: the user\'s combat log power-allocation signature (Move 8, Shields 10 every round, unvarying) is the literal Ensign (D===2) formula, confirmed by reading aiAllocatePower() directly. At that difficulty, aiDecideFire() (search for "D===2") fires on any armed-and-alive weapon with no arc check at all, and aiDoMove()\'s arc-aware re-facing correction (search for "D===5" near the "See HANDOVER for the combat" comment) is scoped to Admiral difficulty only. Both are plausibly intentional difficulty-tier scaling rather than bugs, so left as-is -- flagged here and in HANDOVER for whoever next tunes AI difficulty, since the Ever-Victorious fix alone will not fully explain improved firing rates at Ensign tier.','info');
   const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
