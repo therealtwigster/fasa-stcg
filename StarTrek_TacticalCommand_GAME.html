@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.10-S121</title>
+<title>Star Trek: Tactical Command — v2.12-S123</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -622,7 +622,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.10-S121</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.12-S123</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -2197,6 +2197,8 @@ function launchGame() {
   log('BUILD v2.08-S119 -- USS Federation NCC-2100 (Dreadnought, Federation Class Mk II; spriteKey Federation2, the Mk I/II line already in the fed roster) received real high-detail art -- SHIP_SPRITES.Federation2 REPLACED (previous art was a plain but real placeholder-tier sprite) and new FRONT_VIEW_ART.Federation2 added (this hull had no viewscreen art before -- procedural fallback until now). \'Source sheet used a dark navy schematic-panel background (a gradient between two close navy shades) rather than white, checkerboard, or black-backdrop -- none of the three background-removal methods used on prior ships (checkerboard brightness mask, black-blob/white-canvas thresholding) applied directly. Classified background by hue instead of brightness: navy pixels have blue meaningfully higher than red (b-r>15) while every ship-hull color in this source (white/gray hull, black stripes, red accents) does not. Had to add a brightness ceiling to that rule after the first pass ate the front view\'s glowing deflector dish -- a bright near-white pixel with a slight blue tint (e.g. 233,247,255) satisfied the raw hue test but is obviously not background; capping the rule to only classify pixels below a moderate brightness fixed it without needing a second special-cased rule for the dish specifically. Also excluded the sheet\'s decorative blue frame border and its bottom identification plaque (ship name/registry/faction placard) from extraction the same way profile views are always excluded -- neither has a slot in this game\'s asset pipeline. Front was on the RIGHT in this source (matching Enterprise last build, not the left-facing convention most other ships used) -- rotated the top-down view 90\u00b0 counter-clockwise again, per-source as always rather than assumed from a recent pattern. Fit to a 512\u00d7512 canvas at near-edge-to-edge scale (505px), matching the large/detailed-hull convention. Front-view art kept at its native extracted size (337\u00d7212) -- well within the existing roster\'s normal size range, no downscale needed this time unlike Enterprise. Zero partial-alpha pixels on both extracted panels (hard mask by construction). Both re-verified by decoding straight out of the shipped file and compositing against the real viewscreen background (#050608) before calling this done.','info');
   log('BUILD v2.09-S120 -- RIS Stormbird (V-11, spriteKey RomulanStormbird) received new FRONT_VIEW_ART -- this was the very FIRST asset gap reported back at the start of this whole art-fixing thread, and the last of the original three-item list (Stormbird front view, the RIS Talon halo, and the cloak-effect settings) to actually get closed. Per explicit instruction, SHIP_SPRITES.RomulanStormbird (the top-down sprite) was NOT touched -- verified byte-for-byte identical against the pre-edit file before and after this change, not just assumed. \'Source sheet supplied all four standard views plus a separate faction emblem graphic; only the front-elevation panel (bottom-right) was extracted, per instruction -- top-down, profile, and the emblem were all left alone. \'Color treatment was the new part of this task: the user asked for the front view to carry hints of the top-down sprite\'s existing color scheme (a vivid green-to-purple-to-orange-to-gold-to-green-to-teal-to-blue vertical gradient already baked into that sprite, sampled directly from it in bands rather than guessed) without matching its full vibrancy. Built a per-row gradient matched to that sampled palette, then applied it as an HSV hue/saturation blend (hue mostly replaced, saturation blended toward a capped target, value/brightness left almost entirely from the source line art) rather than a flat RGB tint, since blending in RGB space just muddied the source\'s dark green linework into brown mush on the first attempt. Tint is skipped entirely for near-black outline pixels and near-white highlights so linework stays crisp. Tried three strength levels side by side against the actual top-down sprite before picking the middle one -- visibly carries the same green-dome/purple-hull/gold-strut/teal-tip color story at a clearly calmer saturation, not just a uniform recolor. Re-verified by decoding straight out of the shipped file and compositing against the real viewscreen background (#050608) before calling this done.','info');
   log('BUILD v2.10-S121 -- generate_ship_art_master_list.py gained a --fix-catalog mode and was run against this file: the in-game Recognition Database (CATALOG array + its SPRITES image-lookup table) is a SEPARATE data structure from SHIP_REGISTRY/SHIP_SPRITES/FRONT_VIEW_ART, with its own sprite/live/ingame flags per entry, and nothing kept it in sync with the actual game state -- confirmed genuinely stale on inspection, not just theoretically driftable: fed_Constitution\'s SPRITES entry pointed at the known-generic SHIP_SPRITES.Constitution placeholder instead of the real Constitution_NCC1700 art the playable Constitution_MkI/II/III ships actually use; fed_Reliant, fed_Chandley, fed_Baker, and kli_D10 were all flagged not-live/not-playable in the Recognition Database despite being fully playable with real art; fed_Loknar\'s CATALOG flags were already correct but it was missing from the SPRITES lookup entirely, so the database would have shown no image for it regardless of what its flags claimed. Fix: added a CATALOG_ID_TO_SPRITEKEY correspondence table to the generator script (the one fact that can\'t be mechanically derived from names alone) and a reconciliation pass that verifies each mapped spriteKey actually exists in SHIP_SPRITES AND is actually used by a roster-reachable SHIP_REGISTRY entry before trusting it -- a wrong or stale line in that table gets flagged as a warning, not silently believed. Verified sprite/live/ingame now True for exactly the 6 stale entries above (kli_K23, a genuine not-yet-built gap, correctly left untouched) and the SPRITES object was fully rebuilt from the verified set. Replaced the hand-written comment above SPRITES (which described it as a manually-audited block) with one pointing at the script instead, since hand-editing it now just means it gets silently overwritten -- and drifts again -- the next time the script runs. Validated with node --check before calling this done.','info');
+  log('BUILD v2.11-S122 -- Two things from a user-submitted combat log (D-7 vs Enterprise-class, Captain difficulty, decisive Klingon win): a sprite-overflow report and a real AI gap this exact log exposed. \'1) SPRITE_SCALE_OVERRIDE.Enterprise added (0.74) -- the Enterprise art added in v2.07-S118 fills 98.2% of its own 512x512 canvas height (measured directly), essentially the same overflow class as T5_ThroneSeeker (v1.94-S105, 0.75) and V8BirdOfPrey (v1.98-S109, 0.72); interpolated between those two known-good values rather than guessing fresh, since Enterprise\'s fill ratio sits almost exactly between them. Same disclosed caveat as the original T5 entry: not independently verified against a live render in this environment (no browser here) -- a one-line number to adjust further if 0.74 still isn\'t quite right. 2) A real, previously-flagged-and-deferred AI gap, now confirmed by direct evidence: aiDoMove()\'s arc-aware re-facing correction (verifies a chosen heading actually keeps a surviving weapon\'s arc on the target, not just the right distance/angle) was scoped to Admiral (D===5) only. The v1.92-S103 log had already flagged this exact scoping question as an open item pending real evidence (\'Both are plausibly intentional difficulty-tier scaling rather than bugs... flagged here for whoever next tunes AI difficulty\'). This log is that evidence: Enterprise-class carries NO aft weapons at all (every mount is arcs [0,1,5] or [0], confirmed directly against SHIP_REGISTRY, not assumed from the user\'s description) -- once the Klingon reached its aft quarter at close range, the Captain-tier (D===4) AI kept choosing facing by pure angle-to-target with no arc verification, and separately, its close-range power formula allocated a flat move=4 (often converting to just 1 actual move point), leaving it structurally unable to complete even one re-facing correction. The log shows the Enterprise absorbing unanswered hits to its Aft shield face for the rest of the match after being flanked, weapons repeatedly destroyed, ending in total power failure. Fix: extended the arc-aware facing correction to D>=4 (Captain and up), and added a companion check in aiAllocatePower\'s D===4 branch -- when no surviving weapon currently bears on the target at all, move power is boosted to at least 12 (up from the flat 4) so the ship actually has the points needed to act on the facing correction, not just the theoretical ability to. Scoped narrowly to the exact condition diagnosed (arc coverage lost, this tier only); the close-in/back-off branches and other difficulty tiers are unchanged. Validated with node --check before calling this done -- not independently playtested in this environment, per standing limitation; the user\'s next Captain-difficulty match against a forward-arc-limited ship is the real test.','info');
+  log('BUILD v2.12-S123 -- Same gap as v2.11-S122, confirmed one difficulty tier further down by a third combat log (BH-2 vs USS Constitution Mk II, Lt Cmdr difficulty -- identified from the raw power-allocation numbers themselves, not asserted: shields=12 flat and move=6/12 by range are the literal Lt Cmdr (D===3) formula, not Captain\'s). \'Constitution Mk II is ANOTHER forward-arc-only Federation hull -- FH-3 beam banks and FP-1 tubes are all arcs [0,1,5] or [0], confirmed against SHIP_REGISTRY, zero aft coverage, same structural pattern as the Enterprise-class in the prior log. This is now the SECOND distinct Federation hull confirmed to have this trait -- worth treating as a real, load-bearing characteristic of this era of Federation ship design in this ruleset, not a data-entry gap to \'fix\' by giving them aft weapons FASA never gave them. The fix belongs on the AI side, which is what this build does. \'The v2.11-S122 fix (arc-aware facing correction + move-power boost when arc coverage is lost) was scoped to D>=4, so it did not apply here at Lt Cmdr (D===3) -- this log is direct evidence the same failure mode reaches one tier further down: flat move=6 at close range converts to as little as 1 actual move point, and the pre-existing D===3 movement logic had no arc-verification at all, so the Constitution sat with Aft shield taking hit after hit for the rest of the match once flanked, ending in a cascade-destroyed superstructure. Fix: extended both halves of the v2.11-S122 remedy down to D>=3 -- aiDoMove()\'s facing correction now applies from Lt Cmdr up (previously Captain up), and aiAllocatePower()\'s D===3 branch now boosts move to at least 12 when no surviving weapon bears on the target, mirroring the D===4 branch exactly. Cadet (D===1) and Ensign (D===2) remain untouched, consistent with their own doc comments describing those tiers as intentionally basic/random rather than optimised. Validated with node --check; not independently playtested in this environment, same standing caveat as v2.11-S122 -- now applies to two confirmed difficulty tiers instead of one, both awaiting real-match confirmation.','info');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -4342,13 +4344,43 @@ function aiAllocatePower(){
     move=8; shields=10; weapPwr=tot-move-shields;
   } else if(D===3){ // Lt Cmdr: range-aware
     const range=hexDist(s.col,s.row,p.col,p.row);
+    const alive=s.weapons.filter(w=>w.alive);
+    const covered=alive.some(w=>weaponArcCoversTarget(w,{col:s.col,row:s.row,facing:s.facing},{col:p.col,row:p.row}));
     move=range>6?12:6;
+    // Fix (user combat log, BH-2 vs Constitution Mk II, Lt Cmdr difficulty, 2026-09-20):
+    // same gap as the Captain-tier fix in v2.11-S122, one tier down. Constitution Mk II
+    // is another forward-arc-only hull (FH-3 banks and FP-1 tubes all arcs [0,1,5]/[0],
+    // no aft coverage whatsoever) -- once flanked, the flat move=6 here converts to as
+    // little as 1 actual move point, nowhere near enough to turn back around, and this
+    // tier had no arc-awareness check at all (see the D>=3 -> D>=4 change below). Same
+    // remedy: if no surviving weapon currently bears on the target, prioritize regaining
+    // a firing solution over the normal range-based move value.
+    if(!covered && alive.length>0){
+      move=Math.max(move, 12);
+    }
     shields=12;
     weapPwr=tot-move-shields;
   } else if(D===4){ // Captain: optimised
     const range=hexDist(s.col,s.row,p.col,p.row);
+    const alive=s.weapons.filter(w=>w.alive);
+    const covered=alive.some(w=>weaponArcCoversTarget(w,{col:s.col,row:s.row,facing:s.facing},{col:p.col,row:p.row}));
     // Target optimal range 4-6 for beams
     move=range>6?Math.min(16,range*2):range<3?4:8;
+    // Fix (user combat log, D-7 vs Enterprise-class, Captain difficulty, 2026-09-18): a
+    // forward-arc-only ship (Enterprise-class carries no aft weapons at all — every
+    // mount is arcs [0,1,5] or [0]) that gets flanked at close range previously still
+    // received the flat move=4 close-range allocation above, which converts to as
+    // little as 1 actual move point — nowhere near enough to complete even a single
+    // re-facing correction, let alone the 2-3 rotation steps often needed. The result,
+    // confirmed in that log: the enemy sat in the ship's aft arc for the rest of the
+    // match, landing hit after hit while every one of the ship's own weapons logged
+    // "not in arc," because it could never afford to turn back around. If NO surviving
+    // weapon can currently bear on the target at all, prioritize regaining a firing
+    // solution over the normal range-based formula, same spirit as the D===5 branch's
+    // own arc-aware facing correction below (now extended to this tier too).
+    if(!covered && alive.length>0){
+      move=Math.max(move, 12);
+    }
     // Shield toward player facing
     shields=Math.floor(tot*0.35);
     weapPwr=tot-move-shields;
@@ -4568,10 +4600,19 @@ function aiDoMove(subPhaseIdx){
       // for range, so once flanked (e.g. after a shield arc's weapon mounts died) it
       // could sit turned toward the player by distance alone while every remaining
       // weapon logged "not in arc" for turns at a time. See HANDOVER for the combat
-      // log that exposed this. Scoped to this branch only, matching the diagnosed case;
-      // the close-in/back-off branches above still use pure-distance facing.
+      // log that exposed this. Extended to Captain (D===4) after a second, more severe
+      // combat log (D-7 vs Enterprise-class, forward-arc-only ship flanked at Captain
+      // difficulty, 2026-09-18) showed the same gap one tier down -- Captain gets both
+      // this correction AND a movement-power boost when arc coverage is lost (see the
+      // D===4 branch of aiAllocatePower). Extended again to Lt Cmdr (D===3) after a
+      // THIRD log (BH-2 vs Constitution Mk II, Lt Cmdr difficulty, 2026-09-20) showed
+      // the identical failure one tier further down -- same fix, same reasoning, same
+      // paired move-power boost now added to the D===3 branch too. The close-in/
+      // back-off branches above still use pure-distance facing at every tier; only
+      // Cadet (D===1) and Ensign (D===2) remain without this correction, consistent
+      // with their own doc comments describing those two as intentionally basic/random.
       let targetFacing=wf;
-      if(D===5){
+      if(D>=3){
         const alive=s.weapons.filter(w=>w.alive);
         const tgt={col:goal.col,row:goal.row};
         const coversNow=alive.some(w=>weaponArcCoversTarget(w,{col,row,facing},tgt));
@@ -5582,6 +5623,13 @@ function playDestructionSequence(ship, onComplete){
 const SPRITE_SCALE_OVERRIDE = {
   T5_ThroneSeeker: 0.75,   // nose-to-tail content fills ~99% of its canvas; pulls it comfortably inside the hex
   V8BirdOfPrey: 0.72,      // wingtip-to-wingtip content fills ~98% of its canvas width; same overflow risk as T5_ThroneSeeker above
+  Enterprise: 0.74,        // user-reported overflow (v2.11-S122): saucer-to-nacelle content fills 98.2% of its
+                           // canvas height (measured directly, not assumed) -- almost exactly between the two
+                           // cases above, so interpolated between their two scales rather than guessing fresh.
+                           // Same disclosed caveat as T5_ThroneSeeker's original entry: not independently
+                           // verified against a live render in this environment (no browser here) -- if 0.74
+                           // still clips a corner or looks too small, it's a one-line number to adjust, not a
+                           // structural fix.
 };
 
 function drawShipSprite(g, shipKey, sz, damaged) {
