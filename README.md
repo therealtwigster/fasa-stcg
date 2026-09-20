@@ -1,4 +1,4 @@
-> **Build v2.10-S121** · Enterprise, the Dreadnought, and the Romulan Stormbird all got real viewscreen art — and the ship browser's own status flags got fixed to match reality — 2026-09-18
+> **Build v2.12-S123** · The AI flanking fix from the last build now works at Lt. Cmdr difficulty too, not just Captain — 2026-09-20
 
 # Star Trek: Tactical Command
 
@@ -54,6 +54,26 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.12-S123)
+
+- **The AI flanking fix from the last build now also works at Lt. Commander difficulty** — a
+  second combat log showed the same "can't turn back around after being flanked" problem
+  happening one difficulty level down from where it was first fixed. Same fix, extended down.
+  Ships with no rear weapons are supposed to have that weakness — the fix is about the AI
+  reacting sensibly to it, never about changing the ship.
+
+## Recent fixes (v2.11-S122)
+
+- **Fixed a real AI weakness, confirmed by a player combat log**: ships with no rear-facing
+  weapons (like the Enterprise-class) could get flanked and then just sit there taking hits
+  without trying to turn and fight back, because the AI wasn't checking whether it could
+  actually shoot from the direction it was facing — only whether that direction was roughly
+  "toward the enemy." It now checks for real, and gives itself the extra maneuvering power
+  needed to act on it, at Captain difficulty and above. Not yet confirmed in a live match —
+  worth trying the same matchup again to see how it holds up.
+- **Fixed the Enterprise's sprite extending past its hex** on the tactical map — same class of
+  sizing fix as two earlier ships that had the same issue.
 
 ## Recent fixes (v2.10-S121)
 
