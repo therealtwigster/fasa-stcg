@@ -1,4 +1,4 @@
-> **Build v2.12-S123** · The AI flanking fix from the last build now works at Lt. Cmdr difficulty too, not just Captain — 2026-09-20
+> **Build v2.18-S129** · Four real fixed defense stations (Alamo, R-1, X-3 Aviary, Z-4 Deathgame) now have real artwork in the Ship Recognition Database — 2026-09-21
 
 # Star Trek: Tactical Command
 
@@ -19,15 +19,15 @@ one HTML file.
   Mk IV), a real FASA Class IX Destroyer.
 - **Tactical viewscreen**: the enemy contact panel shows a live bow-on portrait of the ship
   you're facing instead of just text. No sensor lock yet? The portrait is genuinely blurred,
-  overlaid with sensor static, and the status readout blinks like a warning light. 19 hulls now
+  overlaid with sensor static, and the status readout blinks like a warning light. 21 hulls now
   have real artwork (Reliant, D-10, Chandley, both D-7 marks, the Romulan Winged Defender,
   Bird of Prey, and Stormbird, Loknar, Excelsior, both Klingon Throne Seeker/Ever-Victorious
   hulls, three more Klingon Bird of Prey classes, the Klingon Sting Tongue, Constitution,
-  Enterprise, Federation, and the new Baker); every other ship still shows a generated
-  silhouette in its own faction's style. Federation, Klingon, Romulan, Orion, and Gorn each
-  get distinct type, framing, and phrasing on this screen — not just a different color, a
-  different instrument culture. Viewing as Federation also shows an independent
-  transponder-signal readout, separate from sensor lock.
+  Enterprise, Federation, Baker, and both Orion blockade runners — Wanderer and Lightning);
+  every other ship still shows a generated silhouette in its own faction's style. Federation,
+  Klingon, Romulan, Orion, and Gorn each get distinct type, framing, and phrasing on this
+  screen — not just a different color, a different instrument culture. Viewing as Federation
+  also shows an independent transponder-signal readout, separate from sensor lock.
 - **FASA-faithful turn structure**: Power Allocation → Tactical Advantage → three rounds of
   Sensors/Movement/Firing → Shield Repowering. Commit your power allocation, then confirm with
   **Proceed to Combat** or catch a mistake with **Revise Allocation** before the fight begins.
@@ -52,8 +52,49 @@ one HTML file.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
   screen narrates the killing blow along with turn and shots-fired statistics.
-- **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
-  including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+- **Ship Recognition Database**: browse all 101 catalogued entries from the recognition
+  manuals, including hulls not yet flyable in-game, with full stat and weapon-loadout
+  dossiers. This now includes **4 real fixed defense stations** — Federation Alamo and R-1,
+  Romulan X-3 (Aviary), and Klingon Z-4 (Deathgame) — each with genuine top-down and
+  viewscreen artwork. Stations are browsable like any other entry but aren't flyable; they're
+  being held in reserve for a future scenario/campaign system where fixed objectives make
+  sense.
+
+## Recent fixes (v2.18-S129)
+
+- **The fourth and final flagged fixed station, Klingon Z-4 (Deathgame), now has real artwork**
+  in the Recognition Database — top-down and viewscreen images, plus real stats from the
+  original sourcebook. This completes the set: all four stations identified early in this
+  project (Federation Alamo and R-1, Romulan X-3, and now Z-4) have real art.
+
+## Recent fixes (v2.17-S128)
+
+- **The Romulan X-3 (Aviary) border station now has real artwork** in the Recognition Database.
+  This one already existed in the database with full stats from an earlier import — just
+  needed the pictures.
+
+## Recent fixes (v2.16-S127)
+
+- **The Federation R-1 orbital defense station now has real artwork** in the Recognition
+  Database — the second fixed station added, following the same not-yet-playable approach as
+  the Alamo.
+
+## Recent fixes (v2.15-S126)
+
+- **The first fixed station is in the game**: the Federation Alamo defense outpost now has
+  real artwork in the Ship Recognition Database. It's not a flyable ship — it's being held in
+  reserve for when scenarios and campaign objectives get built out — but you can browse it like
+  any other entry.
+
+## Recent fixes (v2.14-S125)
+
+- **The Orion Lightning has real ship art now** — both its top-down sprite and its viewscreen
+  portrait. This completes real artwork for the entire Orion Syndicate.
+
+## Recent fixes (v2.13-S124)
+
+- **The Orion Wanderer has real ship art now** — both its top-down sprite and its viewscreen
+  portrait, replacing an older, lower-detail placeholder.
 
 ## Recent fixes (v2.12-S123)
 
