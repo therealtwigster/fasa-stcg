@@ -1,4 +1,4 @@
-> **Build v2.18-S129** · Four real fixed defense stations (Alamo, R-1, X-3 Aviary, Z-4 Deathgame) now have real artwork in the Ship Recognition Database — 2026-09-21
+> **Build v2.37-S148** · New playable Romulan ship: the RIS Whitewind cruiser — completes the full FASA ship roster! — 2026-09-26
 
 # Star Trek: Tactical Command
 
@@ -19,15 +19,16 @@ one HTML file.
   Mk IV), a real FASA Class IX Destroyer.
 - **Tactical viewscreen**: the enemy contact panel shows a live bow-on portrait of the ship
   you're facing instead of just text. No sensor lock yet? The portrait is genuinely blurred,
-  overlaid with sensor static, and the status readout blinks like a warning light. 21 hulls now
+  overlaid with sensor static, and the status readout blinks like a warning light. 22 hulls now
   have real artwork (Reliant, D-10, Chandley, both D-7 marks, the Romulan Winged Defender,
   Bird of Prey, and Stormbird, Loknar, Excelsior, both Klingon Throne Seeker/Ever-Victorious
   hulls, three more Klingon Bird of Prey classes, the Klingon Sting Tongue, Constitution,
-  Enterprise, Federation, Baker, and both Orion blockade runners — Wanderer and Lightning);
-  every other ship still shows a generated silhouette in its own faction's style. Federation,
-  Klingon, Romulan, Orion, and Gorn each get distinct type, framing, and phrasing on this
-  screen — not just a different color, a different instrument culture. Viewing as Federation
-  also shows an independent transponder-signal readout, separate from sensor lock.
+  Enterprise, Federation, Baker, both Orion ships — Wanderer and Lightning — and the new Klingon
+  Little Killer); the Klingon Saber and Gull and all three Gorn ships still show a generated
+  silhouette in their own faction's style. Federation, Klingon, Romulan, Orion, and Gorn each
+  get distinct type, framing, and phrasing on this screen — not just a different color, a
+  different instrument culture. Viewing as Federation also shows an independent
+  transponder-signal readout, separate from sensor lock.
 - **FASA-faithful turn structure**: Power Allocation → Tactical Advantage → three rounds of
   Sensors/Movement/Firing → Shield Repowering. Commit your power allocation, then confirm with
   **Proceed to Combat** or catch a mistake with **Revise Allocation** before the fight begins.
@@ -52,49 +53,192 @@ one HTML file.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
   screen narrates the killing blow along with turn and shots-fired statistics.
-- **Ship Recognition Database**: browse all 101 catalogued entries from the recognition
-  manuals, including hulls not yet flyable in-game, with full stat and weapon-loadout
-  dossiers. This now includes **4 real fixed defense stations** — Federation Alamo and R-1,
-  Romulan X-3 (Aviary), and Klingon Z-4 (Deathgame) — each with genuine top-down and
-  viewscreen artwork. Stations are browsable like any other entry but aren't flyable; they're
-  being held in reserve for a future scenario/campaign system where fixed objectives make
-  sense.
+- **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
+  including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.37-S148)
+- **New playable ship: RIS Whitewind (V-7, Class X Cruiser)** — a Romulan cruiser with a mixed
+  weapons battery: two disruptors covering the port side, two more covering the aft-starboard
+  quarter, two forward disruptors of a second type, three torpedoes (two forward, one aft), and
+  a cloaking device. Its firing arcs are genuinely lopsided rather than mirrored side to side —
+  a deliberate, unusual design straight from the source material. Comes with real ship art.
+- **This completes every ship identified from the FASA Star Trek Starship Combat Simulator
+  rulebook that wasn't already in the game.** Eight new ships have joined the fleet over the
+  past few days: the Andor, Larson, Remora, Northampton, Nova, Graceful Flyer, Bright One, and
+  now the Whitewind.
+
+## Recent fixes (v2.36-S147)
+- **New playable ship: RIS Gallant Wing (V-6, Class X Cruiser)** — a Romulan cruiser with six
+  disruptors (a swivelling forward/port bank plus dedicated forward and starboard guns), a
+  forward plasma torpedo, and a cloaking device. Comes with real ship art: a top-down tactical
+  sprite and a bow-on viewscreen portrait.
+
+## Recent fixes (v2.35-S146)
+- **New playable ship: RIS Bright One (T-10, Class VI Destroyer)** — a Romulan raider with four
+  disruptors in two swivelling pairs and a single forward torpedo. It's also the first of this
+  batch of new ships to carry a real cloaking device. Comes with real ship art: a top-down
+  tactical sprite and a bow-on viewscreen portrait.
+- This is the sixth and final ship from the recent run of Romulan and Federation additions —
+  the full set (Larson, Remora, Northampton, Nova, Graceful Flyer, Bright One) is now complete.
+
+## Recent fixes (v2.34-S145)
+- **New playable ship: RIS Graceful Flyer (CS-2, Class V Scout)** — a fast, lightly-armed Romulan
+  scout with four disruptors in two swivelling banks covering the front and both flanks. It has no
+  weapon at all covering its rear — a scout built to outrun trouble, not fight it out. Comes with
+  real ship art: a top-down tactical sprite and a bow-on viewscreen portrait.
+- **A mismatched "FASA Canonical" mark in the Ship Recognition Database has been fixed.** The star
+  had been pointing at a version of this ship whose numbers didn't actually match the rulebook; it
+  now correctly shows as a rulebook-confirmed hull without over-claiming which exact version.
+
+## Recent fixes (v2.33-S144)
+- **The RIS Nova's torpedo tubes now match the rulebook too.** One bank was a swivelling
+  forward/starboard pair, not a single fixed starboard tube — a small but real difference in how
+  it can defend that side. The Nova is now fully accurate to its source material.
+
+## Recent fixes (v2.32-S143)
+- **The RIS Nova's disruptor banks now match the real FASA rulebook exactly**, thanks to the player
+  checking their own physical copy. Its firepower is forward-heavy rather than evenly spread: the bow
+  arc alone is covered by four of its six banks, with the rest guarding the flanks and rear.
+- Confirmed: the Nova has no cloaking device.
+
+## Recent fixes (v2.31-S142)
+- **New playable ship: RIS Nova (Z-1, Class XIII Battleship)** — the Romulan Star Empire's heaviest
+  hull yet. Twelve disruptors give it full coverage in every direction, backed by eight plasma
+  torpedoes forward, to both sides, and aft. Comes with a striking, real ship — a top-down tactical
+  sprite and a bow-on viewscreen portrait.
+
+## Recent fixes (v2.30-S141)
+- **New playable ship: UFS Northampton (Class X Frigate)** — a Federation frigate with six phasers
+  covering forward and both aft quarters, plus three forward torpedoes; its flanks are its weak
+  point. Comes with real ship art: a top-down tactical sprite and a bow-on viewscreen portrait.
+
+## Recent fixes (v2.29-S140)
+- **New playable ship: UFS Remora (Class VII Escort)** — a Federation escort bristling with eight
+  phasers in four swivelling pairs, though both of its aft quarters are blind spots. Comes with real
+  ship art: a top-down tactical sprite and a bow-on viewscreen portrait.
+- **A mismatched "FASA Canonical" mark in the Ship Recognition Database has been fixed.** The star
+  on the Remora was pointing at the wrong version; it now correctly marks the version the rulebook
+  prints.
+
+## Recent fixes (v2.28-S139)
+- **New playable ship: UFS Larson (Larson Mk VII, Class VII Destroyer)** — a Federation destroyer with
+  six phasers (including a swivelling forward/port bank) and two forward torpedoes. Comes with real
+  ship art: a top-down tactical sprite and a bow-on viewscreen portrait, from a user-supplied render.
+
+## Recent fixes (v2.27-S138)
+- **The USS Andor has real ship art.** A detailed top-down sprite on the tactical map and a
+  bow-on viewscreen portrait (deflector glowing), replacing the generated silhouette. It also
+  shows in the ship preview on the mission screen and in the Ship Recognition Database.
+
+## Recent fixes (v2.26-S137)
+- **FASA Canonical is now easy to spot in the Ship Recognition Database.** The exact version the
+  rulebook prints gets a glowing blue ★ on its version line (e.g. "★ Mk II · Class IX · Cruiser"),
+  and a blue **FASA CANONICAL** badge sits beside PLAYABLE. Viewing a different version of a
+  rulebook ship? The badge tells you which version the rulebook prints instead. Works for
+  single-version ships like the Andor too.
+
+## Recent fixes (v2.25-S136)
+- **New playable ship: USS Andor (Andor Mk II, Class IX Cruiser)** — the Federation's missile
+  boat, straight from the FASA combat rulebook. Two forward phasers and **eight photon torpedo
+  tubes**: four forward, one port, one starboard, two aft. Its weak spots are the aft quarters,
+  which no tube covers. It uses the game's generated Federation silhouette until real ship art
+  is added.
+- **FASA Canonical marks in the Ship Recognition Database.** Every ship printed in the FASA
+  Starship Combat rulebook now carries a **blue ★** — next to its name in the list, on its file
+  header, and on the exact variant the rulebook prints (alongside the existing amber ★ for the
+  catalog's default variant; one button can show both). Hover the star to see the rulebook page.
+
+## Recent fixes (v2.24-S135)
+- **Fixed: enemy ships could leave their rear guns switched off.** The AI powered its weapons in a
+  fixed order, so ships whose aft guns come last — like the Klingon Little Killer — often never
+  powered them. You could sit right behind one and never draw fire. From Lt. Cmdr difficulty up,
+  the AI now powers the guns that can actually bear on you first. (Cadet and Ensign crews still
+  make that rookie mistake, on purpose.)
+- **The AI anticipates a faster opponent at close range** (Lt. Cmdr, Captain, Admiral). If you
+  out-manoeuvred it last turn, it now puts more power into movement — within limits — instead
+  of letting you swing onto its tail every turn. It only knows what you did last turn, never
+  what you've just committed.
+- Ship stats and weapons are unchanged.
+
+## Recent fixes (v2.23-S134)
+- **Nebulae have a new look: fine, wispy filaments** that spill well past their hexes, instead of
+  soft billows.
+- **Nebulae now roll instead of drifting.** Each cloud stays exactly where it is while currents
+  inside it churn the mist around like a slow boil — some pockets barely stir, others churn hard.
+- **Nebula lightning** flickers a little more often and a little brighter.
+- As before, the dashed outline shows exactly which hexes count as nebula for the rules.
+
+## Recent fixes (v2.22-S133)
+- **Gravity wells look like black holes now.** Each one is a perfectly black shadow ringed by a
+  thin photon ring, inside a slowly swirling accretion vortex in the well's own colour.
+- **They bend light.** Stars and nebula gas right around a black hole are gravitationally lensed
+  — pulled into arcs around the shadow — while the hex grid stays straight so the map is still
+  easy to read.
+- **A bold dashed outline marks every gravity-well hex**, so it's always clear exactly which hex
+  is affected — the art spills over the edges, the rules don't.
+- **The rules haven't changed:** a gravity well still costs 2 movement points to enter, and
+  nothing more (for now — some fun ideas are bookmarked for later).
+
+## Recent fixes (v2.21-S132)
+- **Nebulae look like nebulae now.** Instead of hex-shaped tiles, each nebula is one soft,
+  billowing cloud that spills naturally past the hex borders and slowly churns.
+- **Faint lightning flickers inside the clouds** now and then — the flash lights up the gas
+  itself, not the empty space around it. Bigger, denser clouds storm more often.
+- **You always know exactly which hexes count.** Every hex that's actually nebula (for sensor and
+  to-hit rules) has a dashed outline in the cloud's own colour, since the gas drifts past the
+  real boundary.
+- **Viewscreen:** only the enemy you're looking at being inside a nebula thins out the stars on
+  the viewscreen now — your own position doesn't. A nebula-heavy map still dims the sky overall.
+
+## Recent fixes (v2.20-S131)
+- **The enemy-contact viewscreen now has stars behind the ship.** Mostly faint white pinpricks,
+  a few red giants and blue-white stars, none larger than 7 pixels across — and the ship
+  properly blocks the stars behind it. Each battle rolls its own sky.
+- **The sky reacts to the battle.** Nebulae on the map thin out the stars you can see — one big
+  dense cloud hides more than a small wisp, and if either ship is sitting inside a nebula, only
+  the brightest stars punch through. Stars fade rather than blink out.
+- **Stars drift with your speed.** The more power both ships put into movement, the faster the
+  starfield slides past; if both ships hold still, so do the stars.
+- No twinkling, on purpose — stars only twinkle through an atmosphere.
+- The USS Constitution's viewscreen portrait had two stray dark smudges at its edge that would
+  have blotted out stars; they're gone (the ship itself is untouched).
+
+## Recent fixes (v2.19-S130)
+- **New playable ship: IKV Little Killer (K-23), Klingon Class VII Escort** — the single K-23
+  from the FASA rulebook. Six disruptors (two in a swivelling forward bank, two fixed forward, two
+  aft) and no torpedoes, so it can bite back when flanked. Comes with a real top-down tactical
+  sprite and a bow-on viewscreen portrait; the artist's glowing red "torpedo" light on the bow
+  was painted out to match the ship's beams-only loadout. Also shows as flyable, with its
+  picture, in the Ship Recognition Database.
 
 ## Recent fixes (v2.18-S129)
-
-- **The fourth and final flagged fixed station, Klingon Z-4 (Deathgame), now has real artwork**
-  in the Recognition Database — top-down and viewscreen images, plus real stats from the
-  original sourcebook. This completes the set: all four stations identified early in this
-  project (Federation Alamo and R-1, Romulan X-3, and now Z-4) have real art.
+- **The Klingon Z-4 "Deathgame" defense outpost is in the Ship Recognition Database with real
+  art** — the fourth and last of the fixed stations flagged as missing early in the project.
+  Two extra views from its reference sheet (the station rotating, and a mobile/in-transit
+  configuration with lit engines) were saved separately for a possible future feature, not
+  added to the game.
 
 ## Recent fixes (v2.17-S128)
-
-- **The Romulan X-3 (Aviary) border station now has real artwork** in the Recognition Database.
-  This one already existed in the database with full stats from an earlier import — just
-  needed the pictures.
+- **The Romulan X-3 "Aviary" border outpost now shows real art** in the Ship Recognition
+  Database. Its existing entry was updated in place rather than duplicated.
 
 ## Recent fixes (v2.16-S127)
-
-- **The Federation R-1 orbital defense station now has real artwork** in the Recognition
-  Database — the second fixed station added, following the same not-yet-playable approach as
-  the Alamo.
+- **The Federation R-1 orbital defense outpost joins the Ship Recognition Database** with real
+  art. Some of its source numbers are uncertain in the original scan and are shown as given,
+  not smoothed over.
 
 ## Recent fixes (v2.15-S126)
-
-- **The first fixed station is in the game**: the Federation Alamo defense outpost now has
-  real artwork in the Ship Recognition Database. It's not a flyable ship — it's being held in
-  reserve for when scenarios and campaign objectives get built out — but you can browse it like
-  any other entry.
+- **New kind of entry: fixed stations.** Starbase Alamo, a Federation defense outpost, is now in
+  the Ship Recognition Database with real art and full FASA stats (two marks). Stations are
+  browse-only — they can't be flown, since they don't move.
 
 ## Recent fixes (v2.14-S125)
-
-- **The Orion Lightning has real ship art now** — both its top-down sprite and its viewscreen
-  portrait. This completes real artwork for the entire Orion Syndicate.
+- **The Orion Lightning has real ship art** — top-down sprite and viewscreen portrait. That
+  completes the Orion faction: both playable Orion ships now have full real artwork.
 
 ## Recent fixes (v2.13-S124)
-
-- **The Orion Wanderer has real ship art now** — both its top-down sprite and its viewscreen
-  portrait, replacing an older, lower-detail placeholder.
+- **The Orion Wanderer has real high-detail art** — a new top-down sprite plus its first-ever
+  viewscreen portrait (it was showing a generated silhouette before).
 
 ## Recent fixes (v2.12-S123)
 
@@ -576,6 +720,22 @@ one HTML file.
   reference bundles holding every extracted view for each ship's art, including angles not
   currently used in the game. Kept so that extraction work never has to be repeated if a future
   session wants a different angle or livery than what's currently wired in.
+- `Whitewind_art.zip` — the Whitewind's profile view, saved for later use.
+- `GallantWing_art.zip` — the Gallant Wing's bottom, back and profile views, saved for later use.
+- `BrightOne_art.zip` — every angle from both reference sheets supplied for this ship, including
+  the earlier sheet's views that weren't used in the end, saved for the record.
+- `CS2_art.zip` — the Graceful Flyer's profile view, saved for later use.
+- `Nova_art.zip` — the Nova's profile, aft and bottom views, saved for later use.
+- `Northampton_art.zip` — the Northampton's profile view, saved for later use.
+- `Remora_art.zip` — the Remora's profile view, saved for later use.
+- `Larson_art.zip` — the Larson's bottom, profile and aft views, saved for later use (the top and
+  front views are already in the game).
+- `Andor_art.zip` — all five views of the USS Andor (top, bottom, front, aft, profile) as transparent
+  cut-outs, plus the two in-game images and the original sheet; the extra angles are saved for later use.
+- `K23_LittleKiller_art.zip` — the K-23 art package (now embedded in the game as of v2.19-S130);
+  kept for its archived aft, profile, and bottom views.
+- `Z4_turning_profile_SAVED.png`, `Z4_mobile_deployed_config_SAVED.png` — extra Z-4 station views
+  saved for a possible future station-movement feature; not used in the game.
 - `generate_ship_art_master_list.py` — run this any time ship art changes. It reads the game
   file directly and produces `Ship_Art_Master_List.html`, a checklist of every playable ship's
   art status (top-down sprite, viewscreen portrait, or still-generated) so you always know
@@ -592,4 +752,6 @@ roster, weapon system, viewscreen, AI logic, and house rules, plus two genuinely
 resolving before this build shipped but are worth knowing about. If you're picking this project
 up in a new conversation, upload the current game HTML file, `HANDOVER.md`, and the FASA source
 `.md` files together so the assistant works from your actual current build rather than a stale
-copy.
+copy. Easiest: keep the game HTML in the Project's files and replace it with each new build —
+the assistant has no memory between conversations, so whatever is in the Project is what it
+starts from.
