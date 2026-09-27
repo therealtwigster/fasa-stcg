@@ -1,4 +1,4 @@
-> **Build v2.37-S148** · New playable Romulan ship: the RIS Whitewind cruiser — completes the full FASA ship roster! — 2026-09-26
+> **Build v2.41-S152** · K-22 Bird of Prey now shows its name in the Recognition Manual too — 2026-09-27
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,40 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.41-S152)
+- **The K-22 now shows "Bird of Prey" in the Recognition Manual**, matching its two lineage-mates
+  "Stronger Bird" and "Great Bird" — it already had the name everywhere else in the game, this was
+  just a missing entry in the manual's own listing.
+
+## Recent fixes (v2.40-S151)
+- **The K-22 scout, D-32 "Stronger Bird," and L-42 "Great Bird" now explain their shared look.**
+  Hover over any of the three on the tactical map, or open any of them in the Ship Recognition
+  Manual, and you'll see: *"One hull, three scales — the design proved so sound the Empire never
+  replaced it, only grew it: barely a dozen officers and men crew the K-22 scout, while the same
+  silhouette scales up into the D-32 cruiser and the L-42 frigate."*
+
+## Recent fixes (v2.39-S150)
+- **Fixed ship icons that were drawing outside their hex, or way too small.** Reported: the new
+  Federation dreadnought's sprite was poking past its hex edge. A full check of every ship turned
+  up eight more with the same issue (Saber, Wanderer, Sting Tongue, Lightning, Baker) plus one
+  ship rendering as a tiny speck (the K-22 Bird of Prey). All nine are now sized correctly.
+- **The Romulan Nova battleship now looks appropriately massive** — it was technically fine by the
+  numbers, but its wide wing shape made it look small for a Class XIII ship. Bumped up to fill its
+  hex properly.
+- **New house rule:** no ship should ever be drawn bigger than its hex without a clear reason the
+  player can see. That plumbing is now in place for the future, even though every case found this
+  time turned out to be a simple bug rather than an intentional design choice.
+- **Correction, same build:** the K-22 Bird of Prey's small size was reverted back — it was never
+  a bug. The K-22, D-32 "Stronger Bird," and L-42 "Great Bird" deliberately share one piece of art
+  scaled to show a real size family, smallest to largest, matching their very different crew
+  complements. Fixing it before it shipped to more than this conversation was quick because you
+  caught it immediately.
+
+## Recent fixes (v2.38-S149)
+- **The IKV Gull (D-18) has new ship art**, including a viewscreen portrait for the first time —
+  it never had one before. Its stats and weapons are unchanged; this was an art-only update to a
+  ship that's been playable for a while.
 
 ## Recent fixes (v2.37-S148)
 - **New playable ship: RIS Whitewind (V-7, Class X Cruiser)** — a Romulan cruiser with a mixed
@@ -720,6 +754,7 @@ one HTML file.
   reference bundles holding every extracted view for each ship's art, including angles not
   currently used in the game. Kept so that extraction work never has to be repeated if a future
   session wants a different angle or livery than what's currently wired in.
+- `D18_art.zip` — the Gull's profile view, saved for later use.
 - `Whitewind_art.zip` — the Whitewind's profile view, saved for later use.
 - `GallantWing_art.zip` — the Gallant Wing's bottom, back and profile views, saved for later use.
 - `BrightOne_art.zip` — every angle from both reference sheets supplied for this ship, including
