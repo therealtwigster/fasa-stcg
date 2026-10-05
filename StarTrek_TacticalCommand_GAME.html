@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.41-S152</title>
+<title>Star Trek: Tactical Command — v2.42-S153</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -72,6 +72,9 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
 #diff-slider{width:100%;accent-color:#ff9900;}
 @keyframes pdetblink{0%,100%{opacity:1;}50%{opacity:0.35;}}
 .sc-diff-labels{display:flex;justify-content:space-between;font-size:8px;color:#445566;letter-spacing:1px;}
+.sc-diff-desc{margin-top:6px;font-size:10px;line-height:1.55;color:#8fa3b8;letter-spacing:.2px;min-height:62px;}
+.sc-diff-desc b{color:#ffb84d;letter-spacing:1px;font-weight:normal;text-transform:uppercase;font-size:9px;}
+.sc-diff-desc i{color:#6f8296;}
 .sc-launch{display:block;width:100%;padding:13px;background:#1a0800;border:2px solid #ff9900;border-radius:3px;color:#ff9900;font-family:'Courier New',monospace;font-size:14px;letter-spacing:5px;text-transform:uppercase;cursor:pointer;text-align:center;transition:all .15s;margin-top:8px;}
 .faction-btn{flex:1;min-width:110px;padding:10px 12px;background:#030810;border:1px solid #1a2030;border-radius:3px;cursor:pointer;transition:all .15s;text-align:left;}
 .faction-btn:hover{background:#070f1e;}
@@ -93,7 +96,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
    would most want to scroll back through what just happened. */
 #eg-panel.minimized{max-height:34px;padding-bottom:8px;overflow:hidden;}
 #eg-panel.minimized .eg-sub,#eg-panel.minimized .eg-narrative,#eg-panel.minimized .eg-links,
-#eg-panel.minimized .eg-stats,#eg-panel.minimized .eg-newmission{display:none;}
+#eg-panel.minimized .eg-stats,#eg-panel.minimized .eg-debrief,#eg-panel.minimized .eg-newmission{display:none;}
 .eg-hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .eg-min-btn{background:#0a1424;border:1px solid #2a4a7a;color:#8fbfff;font-family:'Courier New',monospace;
   font-size:11px;line-height:1;padding:3px 8px;border-radius:3px;cursor:pointer;flex-shrink:0;}
@@ -109,6 +112,13 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
 .eg-links a.narrative-link{color:#ff9900;}
 .eg-links a.export-link{color:#88bbff;}
 .eg-stats{font-size:8.5px;color:#7d8fa3;letter-spacing:.5px;line-height:1.7;margin-bottom:10px;}
+.eg-debrief{font-size:9px;line-height:1.55;color:#a9b8c8;margin:0 0 10px;border-top:1px dashed #2a3a4c;padding-top:8px;}
+.eg-debrief .dh{color:#ff9900;letter-spacing:1.5px;font-size:9px;text-transform:uppercase;margin-bottom:5px;}
+.eg-debrief .dl{margin:3px 0;}
+.eg-debrief .good{color:#5fe08a;}
+.eg-debrief .warn{color:#ffb347;}
+.eg-debrief .dim{color:#6f8296;}
+.eg-debrief .lesson{color:#8fd0ff;font-style:italic;}
 .eg-newmission{width:100%;padding:8px 0;background:#030810;border:1.5px solid #ff9900;color:#ff9900;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;text-transform:uppercase;border-radius:3px;transition:all .15s;}
 .eg-newmission:hover{background:#1a0800;}
 
@@ -615,6 +625,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
           <span>Cadet</span><span>Ensign</span><span>Lt. Cmdr</span><span>Captain</span><span>Admiral</span><span>Legend</span>
         </div>
         <div style="font-size:10px;color:#ff9900;letter-spacing:2px;margin-top:4px" id="diff-label">ENSIGN</div>
+        <div class="sc-diff-desc" id="diff-desc"></div>
       </div>
     </div>
     <div class="sc-row" style="align-items:flex-start">
@@ -637,7 +648,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.41-S152</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.42-S153</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -688,6 +699,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
         <a class="export-link" onclick="exportCombatLog()">⤓ Download combat log</a>
       </div>
       <div class="eg-stats" id="eg-stats"></div>
+      <div class="eg-debrief" id="eg-debrief"></div>
       <button class="eg-newmission" onclick="location.reload()">⬡ New Mission</button>
     </div>
   </div>
@@ -2555,6 +2567,7 @@ function launchGame() {
   log('BUILD v2.39-S150 -- SHIP ICON SIZING AUDIT: a user-reported overflow on the Federation-class dreadnought turned up eight more sprites with the same uncaught issue (or its opposite -- one ship rendering far too small). All nine now render correctly within their hex, verified against the actual hex outline rather than assumed. A new house policy is in force: no ship may exceed its hex boundary unless deliberately chosen and disclosed via an on-hover tooltip explaining why -- the plumbing for that now exists, currently unused since every known case turned out to be a bug rather than a real exception.');
   log('BUILD v2.40-S151 -- KLINGON BIRD-OF-PREY LINEAGE NOTE: the K-22 scout, D-32 Stronger Bird cruiser, and L-42 Great Bird frigate share one hull design at three different scales -- a fact that already lived in a code comment but nowhere the player could see it. Now shown two places: hover over any of the three on the tactical map for an in-universe note on why the same silhouette recurs at such different sizes, and the same note appears under a new \'Hull Lineage\' section in each ship\'s Recognition Manual entry.');
   log('BUILD v2.41-S152 -- Recognition Manual: the K-22 catalog entry was missing the nickname (\'nick\') its own registry and roster carry everywhere else -- IKV Bird of Prey shows that name in-game and in the tactical-map tooltip, but the recognition listing showed a bare \'K-22\' where D-32 shows \'Stronger Bird\' and L-42 shows \'Great Bird\'. Added \'Bird of Prey\' as its nick so all three of this lineage display consistently.');
+  log('BUILD v2.42-S153 -- SMARTER AI TIERS. From Captain up, an enemy that holds a sensor lock now reads YOUR ship: it works out which of your weapon arcs can bear on a position and swings round to the quarter your guns cannot cover, paying for the manoeuvre with weapon power and giving up after a few failed flanks. Lt Cmdr and below fight as before. The difficulty slider now says what each tier actually does, and the end screen (and combat log) carries a tactical debrief: where the enemy sat relative to your arcs, which shield facing took the hits, and the lesson of the tier.');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -2579,6 +2592,8 @@ function launchGame() {
     combatLog: [],
     dmgLog: [],
     turn_stats: { playerShotsFired:0, playerShotsHit:0, enemyShotsFired:0, enemyShotsHit:0 },
+    // v2.42-S153: raw material for the end-of-battle tactical debrief (see buildDebrief)
+    debrief: { snaps:[], faceHits:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]}, faceDmg:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]} },
   };
 
   document.getElementById('scenario-screen').style.display='none';
@@ -2713,6 +2728,7 @@ function enterPhase(phase) {
     // Reset fire declarations
     GS.playerFireDeclared = null;
     GS.enemyFireDeclared = null;
+    debriefSnapshot(idx);   // v2.42-S153: where is everyone, and who can shoot whom, going into this firing window
     // AI decides secretly
     aiDecideFire();
     showHint('Select weapons to fire · or No Fire to skip this phase');
@@ -4282,6 +4298,7 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
           const hitFace=getHitFace(shooter,target);
           const faceName=SHIELD_NAMES[hitFace];
           log(`  Hits ${faceName} shield (face ${hitFace})`,'info');
+          if(GS.debrief){ const side=(target===GS.player)?'onPlayer':'onEnemy'; GS.debrief.faceHits[side][hitFace]++; GS.debrief.faceDmg[side][hitFace]+=dmg; }
 
           // Shield absorption
           let absorbedAmt=0, genWasDead=!target.shieldGenAlive[hitFace];
@@ -4541,6 +4558,95 @@ function buildKillNarrative(kb, winnerWasPlayer){
   return `${openLine} ${shieldClause} ${aftermath}`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// TACTICAL DEBRIEF (v2.42-S153)
+// A snapshot is taken at the start of every firing window: where the enemy sits relative to the PLAYER's arcs, how
+// much of each side's firepower bears on the other, and whether the enemy holds a sensor lock. Together with a
+// tally of which shield facings took hits, that is enough to say, at the end, what the AI actually did to you and
+// what to try next time -- so the difficulty tiers teach rather than just hit harder. Shown on the end screen and
+// ALSO written to the combat log, so exported logs carry it.
+// ═══════════════════════════════════════════════════════════════════════════
+const ARC_PHRASE=['forward arc','forward-starboard quarter','aft-starboard quarter','aft arc','aft-port quarter','forward-port quarter'];
+const TIER_RATING={
+  1:['CADET','erratic pursuit with no real plan'],
+  2:['ENSIGN','a by-the-book pursuit: close to range, face the target, fire'],
+  3:['LT. COMMANDER','kept its guns on you and fought head-on'],
+  4:['CAPTAIN','hunted the quarters your weapons could not cover'],
+  5:['ADMIRAL','planned around your turning radius and your shield state'],
+  6:['LEGEND','point-blank, relentless, and gave you no room to breathe'],
+};
+const TIER_LESSON={
+  1:'Practise the controls; nothing here punishes a mistake.',
+  2:'Range and facing: keep your guns pointed at it as it closes.',
+  3:'Aim and economy: it only fires what bears, so make sure its arc is not the one you are showing it.',
+  4:'Guard your blind arcs: turn to keep weapons on it, or put a hit on it to break its sensor lock.',
+  5:'Facing and shield discipline: it will find the facing you neglect.',
+  6:'Control the range: it wants point-blank. Deny it, or make point-blank expensive.',
+};
+function debriefSnapshot(idx){
+  if(!GS||!GS.debrief||GS.over) return;
+  const s=GS.enemy,p=GS.player;
+  if(s.superstructure<=0||p.superstructure<=0) return;
+  const bearN=(a,b)=>a.weapons.filter(w=>w.alive&&weaponArcCoversTarget(w,a,b)).length;
+  GS.debrief.snaps.push({
+    turn:GS.turn, sub:idx, range:hexDist(s.col,s.row,p.col,p.row),
+    arc:arcOfTargetFrom({col:p.col,row:p.row,facing:p.facing},{col:s.col,row:s.row}),   // which of the PLAYER's arcs holds the enemy
+    pBearN:bearN(p,s), eBearN:bearN(s,p),
+    lock: !interMode() || !!(s.locked||s.detectedCloaked),
+    cloak: !!(p.cloaked||s.cloaked)                                                       // weapons are offline: not a meaningful window
+  });
+}
+function buildDebrief(win,mutual){
+  const D=aiDifficulty, db=GS.debrief, out=[];
+  const rate=TIER_RATING[D]||['?',''];
+  out.push({k:'h',t:`Tactical debrief \u2014 adversary rated ${rate[0]}: ${rate[1]}.`});
+  const eng=db.snaps.filter(x=>!x.cloak&&x.range<=12);
+  const N=eng.length;
+  let blindW=[];
+  if(N<2){
+    out.push({k:'l',t:'The engagement was too brief for a full positional assessment.'});
+  } else {
+    const answered=eng.filter(x=>x.pBearN>0).length;
+    blindW=eng.filter(x=>x.pBearN===0&&x.eBearN>0);
+    out.push({k:'l',t:`Across ${N} firing window${N>1?'s':''}, your weapons could answer the enemy's position in ${answered}.`});
+    if(blindW.length){
+      const cnt={}; blindW.forEach(x=>{cnt[x.arc]=(cnt[x.arc]||0)+1;});
+      const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+      out.push({k:'warn',t:`The enemy held your ${ARC_PHRASE[top]} for ${cnt[top]} window${cnt[top]>1?'s':''}: a firing position where none of your weapons could bear.`});
+    } else if(answered===N){
+      out.push({k:'good',t:'You kept guns on the enemy in every firing window \u2014 clean arc discipline.'});
+    }
+    const youBlind=eng.filter(x=>x.eBearN===0&&x.pBearN>0).length;
+    if(youBlind) out.push({k:'good',t:`You held the enemy's blind side for ${youBlind} window${youBlind>1?'s':''}.`});
+    const fh=db.faceHits.onPlayer, H=fh.reduce((a,b)=>a+b,0);
+    if(H>=3){
+      let tf=0; fh.forEach((v,i)=>{ if(v>fh[tf]) tf=i; });
+      const share=fh[tf]/H;
+      out.push(share>=0.5
+        ? {k:'warn',t:`${Math.round(share*100)}% of the hits you took (${fh[tf]} of ${H}) landed on your ${SHIELD_NAMES[tf]} shield: the enemy chose its facing.`}
+        : {k:'l',t:`The ${H} hits you took were spread across your shields; no single facing was singled out.`});
+    }
+    if(interMode()){
+      const lk=eng.filter(x=>x.lock).length;
+      out.push({k:'dim',t:`Enemy sensor lock held in ${lk} of ${N} windows.`+(D>=4&&lk<N?' A window without a lock was a window it could not hunt your weak side.':'')});
+    }
+    out.push({k:'dim',t:`Average engagement range: ${(eng.reduce((a,x)=>a+x.range,0)/N).toFixed(1)} hexes.`});
+  }
+  // How it ended, in the voice of the tier.
+  if(!mutual){
+    if(win && D>=4) out.push({k:'good',t: blindW.length ? 'You won even though you gave it a blind quarter to work with.' : 'You denied it a blind quarter, and won.'});
+    else if(win && D<=2) out.push({k:'dim',t:'A clean win. Raise the difficulty when you want the AI to start pushing back.'});
+    else if(!win && D>=3) out.push(blindW.length>=2 ? {k:'warn',t:'It found your blind side and lived there.'} : {k:'l',t:'It out-gunned you rather than out-flanked you.'});
+  }
+  out.push({k:'lesson',t:`Lesson of this tier: ${TIER_LESSON[D]||''}`});
+  if(D>=4 && blindW.length>=2) out.push({k:'lesson',t:'Next time: turn to keep guns bearing, or put a hit on it to break its lock (Intermediate rules).'});
+  return out;
+}
+function renderDebriefHTML(lines){
+  return lines.map(l=> l.k==='h' ? `<div class="dh">${l.t}</div>` : `<div class="dl ${l.k}">${l.t}</div>`).join('');
+}
+function logDebrief(lines){ lines.forEach(l=> log((l.k==='h'?'':'\u25B8 ')+l.t, l.k==='h'?'phase':'info')); }
+
 function checkVictory(){
   const pd=GS.player.superstructure<=0, ed=GS.enemy.superstructure<=0;
   const pp=GS.player.currentPower<=0, ep=GS.enemy.currentPower<=0;
@@ -4551,6 +4657,8 @@ function checkVictory(){
     const isPowerLoss=(!pd&&!ed)&&(pp||ep);
     const mutual=pd&&ed; // both hulls destroyed -- neither side "won" this one
     const win=isPowerLoss?(ep&&!pp):(!mutual&&!pd&&ed);
+    const debriefLines=buildDebrief(win,mutual);
+    if(!GS.debriefLogged){ GS.debriefLogged=true; logDebrief(debriefLines); }   // into the combat log too, so exports carry it
 
     function showEndgamePanel(){
       const eg=document.getElementById('eg-panel');
@@ -4583,6 +4691,7 @@ function checkVictory(){
       const st=GS.turn_stats;
       document.getElementById('eg-stats').innerHTML=
         `Turns: ${GS.turn} &middot; Shots fired: ${st.playerShotsFired} &middot; Hits: ${st.playerShotsHit}<br>Enemy shots: ${st.enemyShotsFired} &middot; Enemy hits: ${st.enemyShotsHit}`;
+      document.getElementById('eg-debrief').innerHTML=renderDebriefHTML(debriefLines);
       snd(mutual?'defeat':(win?'victory':'defeat'));
       eg.style.transform='translateY(0)';
     }
@@ -4838,6 +4947,7 @@ function aiAllocatePower(){
 
   weapPwr=Math.max(0,weapPwr);
   if(cloaking) weapPwr=0;   // cloaked ships fire no weapons this turn
+  { const boost=aiExploitMoveBoost(s,p,move,weapPwr); if(boost>0){ move+=boost; weapPwr-=boost; } }   // v2.42-S153: pay for a worthwhile flank
   const mp=Math.floor(move/s.moveRatio);
   const [p1,p2,p3]=movePtsPerPhase(mp);
   s.movePts=[p1,p2,p3]; s.movePtsUsed=[0,0,0];
@@ -4885,6 +4995,24 @@ function aiAllocatePower(){
   log(`AI allocated: Move ${move}→${mp}pts, Shields ${shields}→${spts}pts, Weapons ${weapPwr}`,'ai');
 }
 
+// Plan-aware movement budget (v2.42-S153): a flank that needs more movement than the AI would normally allocate
+// would otherwise never be attempted (found by test: at ~1.7 move pts/phase a trip to the blind quarter takes more
+// phases than any planning horizon justifies). So when the planner -- assuming the move budget the tier is willing to
+// buy -- finds a worthwhile trip, power is shifted from WEAPONS to MOVEMENT for the turn, never dropping below a third
+// of full firepower. Same lock gate as the movement itself.
+function aiExploitMoveBoost(s,p,move,weapPwr){
+  const D=aiDifficulty; if(D<4 || p.cloaked) return 0;
+  if(interMode() && !(s.locked||s.detectedCloaked)) return 0;
+  const cap=[0,0,0,4,5,6,4][D];                       // pts per sub-phase it is willing to buy for a trip
+  const est=aiPlanExploit(s,p,1,0,{estimate:true,ptsPerPhase:cap});
+  if(!est||!est.worthwhile) return 0;
+  const wantRaw=Math.min(est.cost,cap*3)*s.moveRatio;
+  if(wantRaw<=move) return 0;
+  const armable=s.weapons.filter(w=>w.alive).reduce((a,w)=>a+weaponPowerCap(w),0);
+  const spare=Math.max(0,weapPwr-Math.floor(armable*0.35));
+  return Math.max(0,Math.min(wantRaw-move,spare));
+}
+
 // Cloak detection by difficulty — how well the AI can locate a CLOAKED player:
 //   Cadet / Ensign (1-2): last-known position only — cloak fully hides you as you move.
 //   Lt. Cmdr / Captain (3-4): periodic APPROXIMATE reacquire (Captain more often & tighter).
@@ -4903,6 +5031,222 @@ function cloakTrackTarget(s,p){
     return s._reacq || lk;
   }
   return lk;                                                   // Cadet / Ensign: last-known only
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AI EXPLOIT LAYER  (v2.42-S153)
+// Lt. Cmdr and up, and ONLY while the AI holds a sensor lock on the player (the Basic ruleset has no lock
+// mechanic, so there the AI is assumed to have contact). Before this, every tier steered at the player's
+// hex and faced it -- it never looked at the PLAYER's weapon arcs or shield state, so every tier arrived
+// along the same line and met a forward-armed ship's bow guns. Now the AI scores candidate positions by
+// how much of ITS firepower would bear there versus how much of the PLAYER's would bear on it, and moves
+// to the best (hex, facing) it can reach with this sub-phase's move points (BFS, 1 pt per rotate or step,
+// the real movement rules). Against a ship with an uncovered quarter -- most Constitution-type designs
+// have no aft weapons -- that produces a flank into the blind arc; against a ship with all-round coverage
+// there is nothing to exploit, the penalty is measured RELATIVE to the best exposure available on the
+// ring, and it just closes to range as before.
+//   Lt Cmdr : fine-tunes only once on station (slides along the ring it is already on, max 2 pts).
+//   Captain : free manoeuvre to the best reachable position, judged against the player's CURRENT facing --
+//             so a timely turn by the player defeats it (that is the lesson of the tier).
+//   Admiral : also assumes the player will turn to answer (worst case over the facings the player's
+//             remaining move points can reach), rewards positions that need MORE turning to cover,
+//             prefers the shield facing that is weakest or knocked out, and looks one hop ahead.
+//   Legend  : Admiral's logic at point-blank range (2 hexes).
+// Cadet / Ensign are untouched on purpose: they are the "no plan" end of the ladder.
+// A successful hit on the AI breaks its lock (existing rule), so hitting it blinds this behaviour until
+// it re-acquires -- real counterplay, and it is surfaced in the tier descriptions and the debrief.
+// ═══════════════════════════════════════════════════════════════════════════
+const AI_EXPLOIT = {
+  // B = weight on the player's firepower that can bear; maxPts = longest trip (move points) it will consider;
+  // horizon = how many sub-phases ahead it plans -- a flank costs T phases of reduced effectiveness (guns pointed
+  // away while it maneuvers) and pays off for the remaining (horizon-T) phases, so a longer horizon makes a
+  // longer flank worthwhile. baseGain = minimum payoff before it will try; failLimit = failed flanks tolerated
+  // before it stops trying for the rest of the match.
+  // NO ENTRY FOR 3 (Lt Cmdr) ON PURPOSE: tested in three start geometries it never found a flank worth taking, and
+  // an entry that never fires only risks changing behaviour for nothing -- Lt Cmdr keeps its legacy movement.
+  4:{ B:1.00, horizon:8, maxPts:22, baseGain:0.5, failLimit:3, needBonus:0,    shieldBonus:0,    minimax:false },
+  5:{ B:1.10, horizon:9, maxPts:24, baseGain:0.5, failLimit:3, needBonus:0.30, shieldBonus:0.40, minimax:true  },
+  6:{ B:1.10, horizon:6, maxPts:14, baseGain:1.0, failLimit:2, needBonus:0.30, shieldBonus:0.40, minimax:true  },
+};
+function aiFirepower(w){ return Math.max(1, weaponPowerCap(w)); }
+function aiBearingPower(ship,pos,tgt){ let sum=0; for(const w of ship.weapons){ if(w.alive && weaponArcCoversTarget(w,pos,tgt)) sum+=aiFirepower(w); } return sum; }
+function aiTotalFirepower(ship){ let sum=0; for(const w of ship.weapons){ if(w.alive) sum+=aiFirepower(w); } return sum||1; }
+function aiFacingDist(a,b){ const d=Math.abs(a-b)%6; return Math.min(d,6-d); }
+function aiRangeWeight(dp){ return Math.max(0.2, Math.min(1, 1.15-dp/10)); }   // exposure matters less at long range
+
+// Returns {col,row,facing,path:[{col,row,facing}...],score,blind,hold,goal} or null (fall back to legacy movement).
+// Two levels: (1) STRATEGIC -- pick the best position on the ring around the player (value of the position
+// minus a charge per move point of travel to reach it, within a per-tier horizon); (2) TACTICAL -- hop toward it
+// with this sub-phase's move points, preferring hops that do not sit in the player's fire on the way.
+// (A one-step greedy planner was tried first and found by test to be inert: the boundary of a blind arc is
+// usually several hexes away, so no single hop ever improved on holding station.)
+function aiPlanExploit(s,p,pts,subIdx,opts){
+  opts=opts||{};
+  const D=aiDifficulty, cfg=AI_EXPLOIT[D];
+  if(!cfg || pts<=0 || !s.weapons.some(w=>w.alive)) return null;
+  const targetRange=D>=6?2:D>=4?4:D>=3?5:6;
+  const tgt={col:p.col,row:p.row};
+  const myTot=aiTotalFirepower(s), plTot=aiTotalFirepower(p);
+  const curDp=hexDist(s.col,s.row,p.col,p.row);
+  // APPROACH: far from the ring the legacy straight-line pursuit closes the distance (found by test: with the
+  // planner active at long range, Captain/Admiral stalled outside weapon range).
+  if(curDp>targetRange+4) return null;
+
+  // Full BFS over (hex,facing): 1 pt per rotate or step -- the real movement rules.
+  const key=(c,r,f)=>(r*COLS+c)*6+f;
+  const dist=new Int16Array(COLS*ROWS*6).fill(-1), prev=new Int32Array(COLS*ROWS*6).fill(-1);
+  const startK=key(s.col,s.row,s.facing);
+  dist[startK]=0; const q=[startK];
+  for(let h=0; h<q.length; h++){
+    const k=q[h], d=dist[k];
+    const f=k%6, cell=(k-f)/6, c=cell%COLS, r=(cell-c)/COLS;
+    for(const nf of [(f+1)%6,(f+5)%6]){ const nk=key(c,r,nf); if(dist[nk]<0){ dist[nk]=d+1; prev[nk]=k; q.push(nk); } }
+    const nb=neighbour(c,r,f);
+    if(inBounds(nb.col,nb.row) && !celBlocked(nb.col,nb.row) && !(nb.col===p.col&&nb.row===p.row)){
+      const nk=key(nb.col,nb.row,f); if(dist[nk]<0){ dist[nk]=d+1; prev[nk]=k; q.push(nk); }
+    }
+  }
+  const hexCost=(c,r)=>{ let m=-1; for(let f=0;f<6;f++){ const d=dist[key(c,r,f)]; if(d>=0 && (m<0||d<m)) m=d; } return m; };
+
+  // How far the player can afford to turn in answer: its average move points per sub-phase this turn (public once
+  // tactical advantage has resolved). Deliberately NOT its remaining points in this particular sub-phase: that
+  // differs depending on whether the AI moves first or last, and using it made Admiral flip between two goals
+  // every phase and go nowhere (found by trace).
+  const pRot = Math.floor(((p.movePts||[0,0,0]).reduce((a,b)=>a+b,0))/3);
+
+  const memo={};
+  function info(c,r){
+    const mk=c+','+r; if(memo[mk]) return memo[mk];
+    const h={col:c,row:r};
+    const cur0=aiBearingPower(p,{col:p.col,row:p.row,facing:p.facing},h);
+    let exp=cur0, needed=0;
+    if(cfg.minimax){
+      let worst=cur0, nd=4;
+      for(let f=0;f<6;f++){
+        const fd=aiFacingDist(p.facing,f);
+        const cv=(f===p.facing)?cur0:aiBearingPower(p,{col:p.col,row:p.row,facing:f},h);
+        if(cv>0 && fd<nd) nd=fd;                 // fewest turns the player needs to bring a gun to bear
+        if(fd<=pRot && cv>worst) worst=cv;       // worst case over what the player can afford to turn to
+      }
+      exp=cur0+0.3*(worst-cur0); needed=nd;   // hedge: mostly 'player holds its facing', 30% toward 'player turns perfectly' (at 50% Admiral exploited LESS than Captain: the hedge must refine Captain's logic, not replace it)
+    }
+    let weak=0;
+    if(cfg.shieldBonus>0){
+      const face=getHitFace(h,{col:p.col,row:p.row,facing:p.facing});
+      weak = p.shieldGenAlive[face] ? 1-Math.min(1,p.shields[face]/Math.max(1,p.maxShieldPerFace)) : 1;
+    }
+    return memo[mk]={expN:exp/plTot, needed, dp:hexDist(c,r,p.col,p.row), weak};
+  }
+  const bestBearing=(c,r)=>{ let m=0; for(let f=0;f<6;f++){ const v=aiBearingPower(s,{col:c,row:r,facing:f},tgt); if(v>m) m=v; } return m; };
+
+  // Ring positions the AI would be content to hold.
+  const lo=Math.max(1,targetRange-1), hi=targetRange+1;
+  let baseExpo=1;
+  const ring=[];
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+    if(celBlocked(c,r)||(c===p.col&&r===p.row)) continue;
+    const dp=hexDist(c,r,p.col,p.row);
+    if(dp<lo||dp>hi) continue;
+    const inf=info(c,r); if(inf.expN<baseExpo) baseExpo=inf.expN;
+    ring.push({c,r,inf});
+  }
+  // FLANK FEEDBACK (first piece of in-match adaptation): if the goal chosen last phase has since stopped being
+  // blind -- the player turned to cover it -- that flank failed. Each failure makes the AI more skeptical of the
+  // next one, and after FAIL_LIMIT it stops trying for the rest of the match (found by test: against a player
+  // who answers every flank, chasing a moving blind spot left the AI's guns pointing the wrong way and it was
+  // measurably WORSE than before this layer existed).
+  const FAIL_LIMIT=cfg.failLimit||3;
+  if(!opts.estimate && s._goalCheck){
+    const gc=s._goalCheck, now=info(gc.col,gc.row).expN;
+    if(now-gc.exp0>0.30){ s._flankFails=(s._flankFails||0)+1; s._exploitGoal=null; }
+    else if(s.col===gc.col && s.row===gc.row && now<=gc.exp0+0.05){ s._flankFails=Math.max(0,(s._flankFails||0)-1); }
+    s._goalCheck=null;
+  }
+  const fails=s._flankFails||0;
+  function posValue(mineN,inf){
+    const rf=aiRangeWeight(inf.dp);
+    let v = mineN - cfg.B*Math.max(0,inf.expN-baseExpo)*rf - 0.12*Math.abs(inf.dp-targetRange);
+    if(cfg.needBonus) v += cfg.needBonus*Math.min(inf.needed,3)/3*rf;
+    if(cfg.shieldBonus && mineN>0) v += cfg.shieldBonus*inf.weak*rf;
+    return v;
+  }
+
+  // STRATEGIC: cost/benefit over the tier's planning horizon. Staying put is worth Vcur every phase. A trip of
+  // T phases to ring position G is worth Vtrip (a little less than Vcur: guns pointed away while maneuvering) for
+  // T phases and V_G for the remaining (horizon-T). Pick the G with the best gain; below a minimum gain, stay.
+  const ptsPerPhase=opts.ptsPerPhase || Math.max(1,(s.movePts||[0,0,0]).reduce((a,b)=>a+b,0)/3);
+  const mbCur=bestBearing(s.col,s.row);
+  const Vcur=posValue(mbCur/myTot,info(s.col,s.row));
+  const Vtrip=Vcur-0.50;   // while maneuvering its guns are pointed away AND the player's still bear on it: costly
+  const H=cfg.horizon;
+  let goal=null, goalS=-1e9;
+  for(const g of ring){
+    const cost=hexCost(g.c,g.r); if(cost<0 || cost>cfg.maxPts) continue;
+    const T=cost/ptsPerPhase; if(T>=H) continue;
+    const mb=bestBearing(g.c,g.r); if(mb<=0) continue;
+    const VG=posValue(mb/myTot,g.inf);
+    let gain=(H-T)*VG + T*Vtrip - H*Vcur;
+    if(s._exploitGoal && s._exploitGoal.col===g.c && s._exploitGoal.row===g.r) gain+=0.4;   // hysteresis: don't dither
+    if(gain>goalS){ goalS=gain; goal=g; }
+  }
+  const stay={c:s.col,r:s.row,inf:info(s.col,s.row)};
+  const minGain=(cfg.baseGain||0.5)+1.2*fails;
+  if(fails>=FAIL_LIMIT || !goal || goalS<minGain){
+    // Not worth a trip. If already on station: hold and keep guns on the target. If NOT yet on station, defer to
+    // the legacy pursuit so the AI still closes to range (without this, Lt Cmdr/Captain/Admiral froze just outside it).
+    // (Only hold once it has closed to its preferred range; between that and the ring's outer edge the legacy
+    // pursuit keeps closing -- holding at the ring edge left Lt Cmdr standing off at ~6 hexes instead of 5.)
+    if(curDp>targetRange){ s._exploitGoal=null; return null; }
+    goal=stay; goalS=0;
+  }
+  if(opts.estimate){ return {estimate:true, worthwhile: goal!==stay, cost: goal===stay?0:hexCost(goal.c,goal.r), gain:goalS}; }   // used by power allocation: plan, then pay for the plan
+  s._exploitGoal={col:goal.c,row:goal.r};
+  if(goal!==stay) s._goalCheck={col:goal.c,row:goal.r,exp0:goal.inf.expN};
+
+  // TACTICAL: follow the cheapest path to the goal -- cost is 1 per action plus a hazard surcharge for entering
+  // hexes where the player's guns bear -- for as many actions as this sub-phase affords, spending any leftover
+  // points rotating to keep guns on the target. (A hop chosen by straight-line distance to the goal was tried
+  // first and stalled: the first action on a path is usually a rotation, which makes no progress in hexes.)
+  const hazard=(c,r)=>{ const inf=info(c,r);
+    // exposure on the way, plus a steep surcharge for transiting within 2 hexes of the player: the shortest
+    // route to the far side runs through point-blank range of its guns (found by trace), where a turning ship
+    // also out-rotates a circling one. Better to swing wide.
+    return 1.0*cfg.B*Math.max(0,inf.expN-baseExpo)*aiRangeWeight(inf.dp) + (inf.dp<3?(3-inf.dp)*0.7:0); };
+  const goalKs=[]; for(let f=0;f<6;f++) goalKs.push(key(goal.c,goal.r,f));
+  const dj=new Float64Array(COLS*ROWS*6).fill(1e9), pj=new Int32Array(COLS*ROWS*6).fill(-1);
+  // tiny binary heap of [cost,key]
+  const heap=[]; const hpush=(c,k)=>{ heap.push([c,k]); let i=heap.length-1; while(i>0){ const p2=(i-1)>>1; if(heap[p2][0]<=heap[i][0]) break; [heap[p2],heap[i]]=[heap[i],heap[p2]]; i=p2; } };
+  const hpop=()=>{ const top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; let i=0; for(;;){ let l=2*i+1, r2=l+1, m=i; if(l<heap.length&&heap[l][0]<heap[m][0]) m=l; if(r2<heap.length&&heap[r2][0]<heap[m][0]) m=r2; if(m===i) break; [heap[m],heap[i]]=[heap[i],heap[m]]; i=m; } } return top; };
+  dj[startK]=0; hpush(0,startK);
+  while(heap.length){
+    const [cst,k]=hpop(); if(cst>dj[k]) continue;
+    const f=k%6, cell=(k-f)/6, c=cell%COLS, r=(cell-c)/COLS;
+    for(const nf of [(f+1)%6,(f+5)%6]){ const nk=key(c,r,nf), nc=cst+1; if(nc<dj[nk]){ dj[nk]=nc; pj[nk]=k; hpush(nc,nk); } }
+    const nb=neighbour(c,r,f);
+    if(inBounds(nb.col,nb.row) && !celBlocked(nb.col,nb.row) && !(nb.col===p.col&&nb.row===p.row)){
+      const nk=key(nb.col,nb.row,f), nc=cst+1+hazard(nb.col,nb.row); if(nc<dj[nk]){ dj[nk]=nc; pj[nk]=k; hpush(nc,nk); }
+    }
+  }
+  let gk=goalKs[0]; for(const k of goalKs) if(dj[k]<dj[gk]) gk=k;
+  let full=[]; if(dj[gk]<1e8){ for(let k=gk; k!==startK; k=pj[k]){ const f=k%6, cell=(k-f)/6, c=cell%COLS, r=(cell-c)/COLS; full.push({col:c,row:r,facing:f}); } full.reverse(); }
+  const L=full.length;
+  // Commit to the path for every point this sub-phase affords (no second-guessing: that dithered in testing).
+  // On arrival, or when holding, spend the leftover points rotating to the facing that keeps guns on the target.
+  const bestJ=Math.min(pts,L);
+  let bestFacing; {
+    const st=(bestJ===0)?{col:s.col,row:s.row,facing:s.facing}:full[bestJ-1];
+    const left=pts-bestJ; let bm=-1; bestFacing=st.facing;
+    for(let f=0;f<6;f++){ if(aiFacingDist(st.facing,f)>left) continue; const m=aiBearingPower(s,{col:st.col,row:st.row,facing:f},tgt); if(m>bm){ bm=m; bestFacing=f; } }
+  }
+  const path=full.slice(0,bestJ);
+  let cur=bestJ===0?{col:s.col,row:s.row,facing:s.facing}:full[bestJ-1];
+  while(cur.facing!==bestFacing){                       // rotate (shortest way) to the facing that keeps guns on the target
+    const d=((bestFacing-cur.facing)+6)%6, nf=d<=3?(cur.facing+1)%6:(cur.facing+5)%6;
+    cur={col:cur.col,row:cur.row,facing:nf}; path.push(cur);
+  }
+  const gi=goal.inf;
+  return { col:cur.col, row:cur.row, facing:cur.facing, path, score:goalS, blind: gi.expN<=0.0001, hold: path.length===0,
+           expN:gi.expN, baseExpo, goal:{col:goal.c,row:goal.r} };
 }
 
 function aiDoMove(subPhaseIdx){
@@ -5040,7 +5384,23 @@ function aiDoMove(subPhaseIdx){
     }
   }
 
-  while(movesLeft>0) tryMove();
+  // v2.42-S153 EXPLOIT LAYER (see AI_EXPLOIT): Lt Cmdr+, only with a sensor lock (always, in Basic).
+  let exploitDone=false;
+  if(D>=3 && targetKnown && !p.cloaked){
+    const hasLock = !interMode() || s.locked || s.detectedCloaked;
+    if(hasLock){
+      const plan=aiPlanExploit(s,p,pts,subPhaseIdx);
+      if(plan){
+        for(const st of plan.path){ if(movesLeft<=0) break; col=st.col; row=st.row; facing=st.facing; movesLeft--; }
+        movesLeft=0;
+        s._exploitHex={col:plan.goal.col,row:plan.goal.row};
+        s._exploitLast={turn:GS.turn,sub:subPhaseIdx,blind:plan.blind,hold:plan.hold,score:plan.score};
+        exploitDone=true;
+      }
+    }
+  }
+  if(!exploitDone){ s._exploitHex=null; s._exploitGoal=null; s._exploitLast=null; }
+  if(!exploitDone) while(movesLeft>0) tryMove();
   if(col!==s.col||row!==s.row) s.movedThisTurn=true;   // for cloak +3 moving / +5 stationary
   s.col=col; s.row=row; s.facing=facing;
   s.movePtsUsed[subPhaseIdx]=pts;
@@ -8524,9 +8884,24 @@ function addDmgLog(msg,cls){
   const d=document.createElement('div');d.className='dlog-e '+cls;d.textContent=msg;el.prepend(d);
 }
 
+// What each tier ACTUALLY does, as of v2.42-S153 -- keep this in step with the AI code (aiAllocatePower, aiDoMove,
+// aiDecideFire, AI_EXPLOIT). Every claim below maps to a branch in that code; do not describe behaviour that isn't built.
+const DIFF_DESC = ['',
+  ['Learn the controls','Wobbly pursuit, shots fired at random and a haphazard power split. It loses track of you the moment you cloak.'],
+  ['Range and facing','Closes to 6 hexes, turns to face you and fires whenever a gun is armed, whether or not that gun can bear. Predictable power split. Your cloak hides you from it completely.'],
+  ['Aim and economy','Arms and aims only the guns that can bear and keeps them on you; reads how hard you moved last turn. Partly tracks you through a cloak. It fights head-on, with no flanking.'],
+  ['Guard your blind arcs','With a sensor lock it swings round to the arc your weapons cannot cover, judged by the way you face right now, so a timely turn beats it. It buys the movement by cutting weapon power, and gives up after three failed flanks. <i>A hit on it breaks its lock.</i>'],
+  ['Facing and shield discipline','Captain\'s flanking with more patience: plans further ahead, allows for how far your move points let you turn, favours positions that cost you the most turning, and goes for your weakest or knocked-out shield. Sees through your cloak, though it cannot fire at you while you are cloaked.'],
+  ['No mercy at point-blank','Admiral\'s logic at two hexes: fires the instant any gun bears and keeps a cloak-capable ship hidden until it is in strike range. Quicker to abandon a flank that is not working (two failures).'],
+];
 function updDiffLabel(){
-  const v=document.getElementById('diff-slider').value;
-  document.getElementById('diff-label').textContent=DIFF_NAMES[parseInt(v)].toUpperCase();
+  const v=parseInt(document.getElementById('diff-slider').value);
+  document.getElementById('diff-label').textContent=DIFF_NAMES[v].toUpperCase();
+  const d=DIFF_DESC[v], el=document.getElementById('diff-desc');
+  if(el&&d){
+    const lockNote = v>=4 ? '<br><i>Flanking needs a sensor lock (Intermediate rules); Basic rules give the AI contact at all times.</i>' : '';
+    el.innerHTML='<b>'+d[0]+'</b> &mdash; '+d[1]+lockNote;
+  }
 }
 
 let playerFaction='fed'; // 'fed' or 'kli' or 'rom'
