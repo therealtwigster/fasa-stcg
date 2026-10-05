@@ -1,4 +1,4 @@
-> **Build v2.41-S152** · K-22 Bird of Prey now shows its name in the Recognition Manual too — 2026-09-27
+> **Build v2.42-S153** · Smarter Captain/Admiral/Legend AI, tier descriptions on the setup screen, and a tactical debrief — 2026-10-04
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,15 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.42-S153)
+- **The higher AI difficulties now read your ship.** From Captain up, an enemy that has a sensor lock works out which
+  of your weapon arcs can reach a position and swings round to the quarter your guns can't cover — for a
+  Constitution-type ship, that's behind it. It pays for the manoeuvre by cutting weapon power, and gives up if you
+  keep turning to answer. A hit on it breaks its lock. Lt Cmdr and below fight as before.
+- **The difficulty slider now tells you what each level actually does**, and what it's trying to teach you.
+- **A tactical debrief on the end screen** (and in the exported combat log): where the enemy sat relative to your
+  arcs, whether any of your weapons could answer, which shield facing took the hits, and the lesson of the tier.
 
 ## Recent fixes (v2.41-S152)
 - **The K-22 now shows "Bird of Prey" in the Recognition Manual**, matching its two lineage-mates
