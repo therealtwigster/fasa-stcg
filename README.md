@@ -1,4 +1,4 @@
-> **Build v2.42-S153** · Smarter Captain/Admiral/Legend AI, tier descriptions on the setup screen, and a tactical debrief — 2026-10-04
+> **Build v2.46-S157** · Every ship now has a matchup rating — 2026-10-07
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,40 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.46-S157)
+- **The USS Federation dreadnought (both marks) now has its matchup rating**, taken from the published Federation II stat block, which
+  matches the game's ship exactly. All 54 selectable ships are rated now, so the Matchup readout never says "not rated" any more.
+  For example the Federation II Mk II against the Nova reads "slight edge, you", and the Mk I against the Nova reads "even match".
+
+## Recent fixes (v2.45-S156)
+- **The start menu now uses the whole screen.** It used to be a narrow 480-pixel column with tiny text in the middle of the monitor.
+  It is now a wide dashboard: your ship, the matchup and the enemy ship side by side, with AI difficulty, ruleset and terrain
+  below, and the larger ship pictures you'd expect on a 27-inch screen. It scales with your window, fits on one screen without
+  scrolling (all the way down to a small laptop), and stacks into one column on narrow screens.
+- **The matchup rating is much more compact.** A verdict, a ratio, a balance bar and a three-row table replace the paragraph of
+  text; the explanations are one hover (or tap) away on the "i" button.
+- **Room has been left for what's coming.** Multiplayer, fleet and Advanced/RPG options will slot in as extra panels without
+  another redesign.
+
+## Recent fixes (v2.44-S155)
+- **The matchup rating now covers 52 of the 54 ships.** The Chandley, Northampton, CS-2, L-9, D-10, K-22, Nova, L-42 and
+  Whitewind all turned out to have ratings in the book data; the first version had only looked in the game's own catalog.
+  Where the game's ship differs slightly from the book's stat block (usually hull strength) the rating is marked
+  *approximate* and says why. The two Federation dreadnoughts are still unrated: their numbers aren't in any of the data
+  files.
+- **The D-7 M and D-10 ratings were corrected**, which brings the rulebook's own claim — that the Constitution, D-7 M and
+  D-10 are "nearly equal" — out right in the game's numbers (within about 6% of each other).
+
+## Recent fixes (v2.43-S154)
+- **New "Matchup" row on the setup screen** rates your ship against the enemy using the FASA rulebook's own Combat
+  Efficiency method (Defense Factor x Weapon Damage Factor), so you can see whether a fight is even, lopsided or a
+  mismatch before you launch it. Pick whoever you like; it just tells you what you're getting into. After the battle the
+  debrief tells you whether you beat the odds. (At first only 41 of the 54 ships were rated — see v2.44 below.)
+- **The AI no longer turns its stern to a ship it can already shoot.** A log showed a Great Bird at 2 hull boxes spinning
+  away at point-blank and exposing its aft. Nearly-dead ships also no longer set off on long flanks.
+- **The debrief is honest about fights it can't analyse** (mostly-cloaked or very short fights), no longer says things it
+  has no data for, and now appears at the END of the exported combat log.
 
 ## Recent fixes (v2.42-S153)
 - **The higher AI difficulties now read your ship.** From Captain up, an enemy that has a sensor lock works out which
