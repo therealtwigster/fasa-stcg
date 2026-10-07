@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.42-S153</title>
+<title>Star Trek: Tactical Command — v2.46-S157</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -38,52 +38,118 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#
 #sb-id{margin-left:auto;font-size:10px;letter-spacing:3px;color:#ff9900;}
 
 /* ── SCENARIO SCREEN ── */
-#scenario-screen{position:fixed;inset:0;background:#000;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;}
-.sc-title{font-size:28px;letter-spacing:8px;color:#ff9900;text-transform:uppercase;}
-.sc-sub{font-size:11px;letter-spacing:4px;color:#445566;text-transform:uppercase;}
-.sc-panel{background:#030810;border:1px solid #ff9900;border-radius:4px;padding:24px 32px;width:480px;}
-.sc-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
-.sc-ship-preview{width:56px;height:56px;flex-shrink:0;border:1px solid #1a2030;border-radius:3px;
-  background:radial-gradient(ellipse at 50% 42%,#0d1a2a 0,#030810 90%);position:relative;overflow:hidden;}
-.sc-ship-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px;}
-.sc-row-lbl{font-size:10px;letter-spacing:2px;color:#ff9900;text-transform:uppercase;width:140px;}
-select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;color:#c8d8f0;font-family:'Courier New',monospace;font-size:11px;padding:6px 8px;border-radius:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sc-diff-wrap{flex:1;display:flex;flex-direction:column;gap:4px;}
-/* ── Customization panel (house-rules registry) ── */
-#sc-custom{display:flex;flex-direction:column;gap:8px;}
-.cx-ruleset{display:flex;gap:6px;}
-.cx-rbtn{flex:1;background:#050d18;border:1px solid #22303f;border-radius:3px;padding:7px 8px;cursor:pointer;transition:all .15s;text-align:left;}
-.cx-rbtn:hover{border-color:#3a5570;}
-.cx-rbtn.active{background:#0a1a2c;border-color:#3aa0ff;box-shadow:0 0 0 1px #1a4a7a inset;}
-.cx-rbtn .cx-rt{font-size:10px;letter-spacing:2px;color:#66aaff;}
-.cx-rbtn.active .cx-rt{color:#8fd0ff;}
-.cx-rbtn .cx-rd{font-size:8px;letter-spacing:.5px;color:#44607a;margin-top:2px;line-height:1.35;}
-.cx-toggles{display:flex;flex-direction:column;gap:5px;border-top:1px solid #16202c;padding-top:7px;}
-.cx-tog{display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:3px 2px;border-radius:2px;}
-.cx-tog:hover{background:#060f1a;}
-.cx-box{flex:none;width:15px;height:15px;margin-top:1px;border:1px solid #33557a;border-radius:2px;background:#040c18;display:flex;align-items:center;justify-content:center;font-size:11px;color:#3aa0ff;line-height:1;}
-.cx-tog.on .cx-box{background:#0a2038;border-color:#3aa0ff;}
-.cx-tl{font-size:10px;letter-spacing:1px;color:#9fc0e0;}
-.cx-td{font-size:8px;color:#44607a;letter-spacing:.3px;line-height:1.3;}
-.cx-hr{font-size:7px;letter-spacing:1px;color:#000;background:#caa030;border-radius:2px;padding:1px 4px;margin-left:5px;vertical-align:middle;}
-.cx-allnone{display:flex;gap:6px;margin-top:2px;}
-.cx-allnone button{flex:1;background:#08131f;border:1px solid #24384c;color:#6a90b4;font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:4px 0;border-radius:2px;cursor:pointer;}
-.cx-allnone button:hover{border-color:#3a5570;color:#9fc0e0;}
-#diff-slider{width:100%;accent-color:#ff9900;}
-@keyframes pdetblink{0%,100%{opacity:1;}50%{opacity:0.35;}}
-.sc-diff-labels{display:flex;justify-content:space-between;font-size:8px;color:#445566;letter-spacing:1px;}
-.sc-diff-desc{margin-top:6px;font-size:10px;line-height:1.55;color:#8fa3b8;letter-spacing:.2px;min-height:62px;}
-.sc-diff-desc b{color:#ffb84d;letter-spacing:1px;font-weight:normal;text-transform:uppercase;font-size:9px;}
-.sc-diff-desc i{color:#6f8296;}
-.sc-launch{display:block;width:100%;padding:13px;background:#1a0800;border:2px solid #ff9900;border-radius:3px;color:#ff9900;font-family:'Courier New',monospace;font-size:14px;letter-spacing:5px;text-transform:uppercase;cursor:pointer;text-align:center;transition:all .15s;margin-top:8px;}
-.faction-btn{flex:1;min-width:110px;padding:10px 12px;background:#030810;border:1px solid #1a2030;border-radius:3px;cursor:pointer;transition:all .15s;text-align:left;}
-.faction-btn:hover{background:#070f1e;}
+/* ══ SETUP SCREEN (v2.45): a responsive dashboard instead of a narrow column ═══════════════════════════════════
+   ONE scalable unit --u drives every size on this screen. It grows with the viewport WIDTH (a 27" monitor gets readable type
+   instead of 9px text in a 480px column) but is also capped by viewport HEIGHT so the whole screen always fits without
+   scrolling. Layout: header, a 3-column "stage" (your ship | matchup | enemy ship), then an auto-fit row of cards (AI
+   difficulty, ruleset, terrain & house rules). FUTURE PANELS (game mode / multiplayer, fleet builder, advanced & RPG options)
+   are simply more `.sc-card` elements inside `.sc-lower`: the grid flows them into columns by itself. For fleet-vs-fleet,
+   each side card's single ship slot becomes a list. Below ~1000px wide it stacks to one scrolling column (phone-usable). */
+#scenario-screen{position:fixed;inset:0;background:#000;z-index:500;display:flex;flex-direction:column;align-items:center;
+  --u:clamp(10px,min(calc(.5vw + 4px),1.4vh),24px);font-size:var(--u);font-family:'Courier New',monospace;
+  padding:calc(var(--u)*1.1) calc(var(--u)*2);gap:calc(var(--u)*1);overflow:auto;}
+.sc-head{text-align:center;flex:none;margin-top:auto;}
+.sc-title{font-size:calc(var(--u)*2.1);letter-spacing:.28em;color:#ff9900;text-transform:uppercase;line-height:1.1;}
+.sc-sub{font-size:calc(var(--u)*.85);letter-spacing:.4em;color:#556677;text-transform:uppercase;margin-top:.35em;}
+.sc-panel{flex:none;width:min(94vw,3000px);margin-block:0;background:#030810;border:1px solid #ff9900;border-radius:4px;
+  padding:calc(var(--u)*1.4) calc(var(--u)*1.7);display:flex;flex-direction:column;gap:calc(var(--u)*1.2);}
+.sc-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1fr);gap:calc(var(--u)*1.1);}
+.sc-lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26em),1fr));gap:calc(var(--u)*1.1);}
+.sc-card{background:#040b14;border:1px solid #14222f;border-radius:4px;padding:calc(var(--u)*1) calc(var(--u)*1.2);
+  display:flex;flex-direction:column;gap:calc(var(--u)*.75);min-width:0;}
+.sc-card>h3,.sc-card-head h3{margin:0;font-size:calc(var(--u)*.85);font-weight:normal;letter-spacing:.25em;color:#ff9900;text-transform:uppercase;}
+.sc-card-head{display:flex;align-items:center;justify-content:space-between;}
+/* ship slots */
+.sc-factions{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.45);}
+.faction-btn{flex:1 1 calc(var(--u)*6.6);min-width:0;padding:calc(var(--u)*.55) calc(var(--u)*.3);background:#030810;border:1px solid #1a2030;border-radius:3px;
+  cursor:pointer;transition:all .15s;text-align:center;font-size:calc(var(--u)*.78);letter-spacing:.07em;white-space:nowrap;opacity:.6;}
+.faction-btn:hover{background:#070f1e;opacity:.9;}
+.faction-btn.active{opacity:1;}
+.faction-btn.fed{color:#4499ff;}.faction-btn.kli{color:#cc5522;}.faction-btn.rom{color:#33bb66;}.faction-btn.gor{color:#ccb244;}.faction-btn.ori{color:#aa55cc;}
 .faction-btn.fed.active{border-color:#2255aa;background:#030c1a;}
 .faction-btn.kli.active{border-color:#882200;background:#140600;}
 .faction-btn.rom.active{border-color:#228844;background:#021408;}
 .faction-btn.gor.active{border-color:#8a7622;background:#1c1806;}
 .faction-btn.ori.active{border-color:#6f2a80;background:#180620;}
+.sc-enemy-faction{padding:calc(var(--u)*.55) calc(var(--u)*.7);border:1px solid #1a2030;border-radius:3px;background:#030810;text-align:center;
+  font-size:calc(var(--u)*.74);letter-spacing:.14em;color:#556677;min-height:calc(var(--u)*2.2);display:flex;align-items:center;justify-content:center;}
+.sc-enemy-faction.fed{color:#4499ff;border-color:#2255aa;}.sc-enemy-faction.kli{color:#cc5522;border-color:#882200;}.sc-enemy-faction.rom{color:#33bb66;border-color:#228844;}
+.sc-enemy-faction.gor{color:#ccb244;border-color:#8a7622;}.sc-enemy-faction.ori{color:#aa55cc;border-color:#6f2a80;}
+select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455;color:#c8d8f0;font-family:inherit;font-size:calc(var(--u)*.95);
+  padding:.55em .7em;border-radius:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sc-ship-preview{height:calc(var(--u)*16);border:1px solid #1a2030;border-radius:3px;
+  background:radial-gradient(ellipse at 50% 42%,#0d1a2a 0,#030810 90%);position:relative;overflow:hidden;}
+.sc-ship-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:calc(var(--u)*.3);}
+.sc-stats{display:flex;gap:calc(var(--u)*.45);flex-wrap:wrap;min-height:calc(var(--u)*1.7);}
+.sc-stat{font-size:calc(var(--u)*.74);color:#6f8296;background:#06101c;border:1px solid #14222f;border-radius:2px;padding:.2em .6em;letter-spacing:.08em;}
+.sc-stat b{color:#c8d8f0;font-weight:normal;}
+.sc-stat.cloak{color:#33bb66;border-color:#1a4428;}
+/* matchup (compact; the explanations live in the info popover) */
+.sc-balance{display:flex;flex-direction:column;gap:calc(var(--u)*.85);flex:1;justify-content:center;}
+.mb-verdict{font-size:calc(var(--u)*1.9);letter-spacing:.1em;line-height:1.15;text-align:center;}
+.mb-verdict.even{color:#5fe08a;}.mb-verdict.edge{color:#d4e05f;}.mb-verdict.lop{color:#ffb347;}.mb-verdict.mis{color:#ff6a5a;}.mb-verdict.none{color:#556677;}
+.mb-sub{font-size:calc(var(--u)*1.1);color:#8fa3b8;text-align:center;letter-spacing:.1em;}
+.mb-approx{color:#caa030;margin-left:.6em;}
+.mb-bar{position:relative;height:calc(var(--u)*1.1);background:#b8502a;border-radius:2px;overflow:hidden;}
+.mb-bar .mb-you{position:absolute;left:0;top:0;bottom:0;background:#2f7fe0;}
+.mb-bar .mb-mid{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#000;opacity:.75;}
+.mb-bar-lbl{display:flex;justify-content:space-between;font-size:calc(var(--u)*.74);letter-spacing:.2em;color:#556677;margin-top:-.15em;}
+.mb-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:.35em .9em;align-items:baseline;margin-top:calc(var(--u)*.3);}
+.mb-grid .v{font-size:calc(var(--u)*1.3);color:#9fb0c2;text-align:right;}
+.mb-grid .v.r{text-align:left;}
+.mb-grid .v.lead{color:#fff;font-weight:bold;}
+.mb-grid .k{font-size:calc(var(--u)*.74);color:#6f8296;letter-spacing:.14em;text-align:center;white-space:nowrap;}
+.mb-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.7em;height:1.7em;border:1px solid #33557a;border-radius:50%;
+  color:#6a90b4;font-size:calc(var(--u)*.8);cursor:help;outline:none;font-style:italic;}
+.mb-info:hover,.mb-info:focus{color:#9fc0e0;border-color:#5a8fc4;}
+.mb-pop{display:none;position:absolute;z-index:8;right:0;top:135%;width:min(28em,80vw);padding:.8em 1em;background:#06101c;border:1px solid #33557a;
+  color:#a9b8c8;font-size:calc(var(--u)*.85);line-height:1.5;text-align:left;border-radius:3px;letter-spacing:.03em;font-style:normal;cursor:default;}
+.mb-info:hover .mb-pop,.mb-info:focus .mb-pop{display:block;}
+/* difficulty */
+#diff-slider{width:100%;accent-color:#ff9900;margin:0;}
+.sc-diff-labels{display:flex;justify-content:space-between;font-size:calc(var(--u)*.7);color:#445566;letter-spacing:.08em;}
+.sc-diff-labels span{cursor:pointer;padding:.15em .1em;}
+.sc-diff-labels span:hover{color:#8fa3b8;}
+.sc-diff-labels span.on{color:#ff9900;}
+.sc-diff-name{font-size:calc(var(--u)*1.1);color:#ff9900;letter-spacing:.2em;}
+.sc-diff-desc{font-size:calc(var(--u)*.88);line-height:1.55;color:#8fa3b8;letter-spacing:.02em;}
+.sc-diff-desc b{color:#ffb84d;letter-spacing:.1em;font-weight:normal;text-transform:uppercase;font-size:.95em;}
+.sc-diff-desc i{color:#6f8296;}
+/* ruleset + terrain (house-rules registry) */
+#sc-ruleset{display:flex;gap:calc(var(--u)*.6);}
+#sc-terrain{display:flex;flex-direction:column;gap:calc(var(--u)*.6);}
+.cx-toggles{display:grid;grid-template-columns:repeat(auto-fit,minmax(15em,1fr));gap:calc(var(--u)*.5) calc(var(--u)*1);}
+.cx-rbtn{flex:1;background:#050d18;border:1px solid #22303f;border-radius:3px;padding:calc(var(--u)*.7) calc(var(--u)*.8);cursor:pointer;transition:all .15s;text-align:left;}
+.cx-rbtn:hover{border-color:#3a5570;}
+.cx-rbtn.active{background:#0a1a2c;border-color:#3aa0ff;box-shadow:0 0 0 1px #1a4a7a inset;}
+.cx-rbtn .cx-rt{font-size:calc(var(--u)*.95);letter-spacing:.15em;color:#66aaff;}
+.cx-rbtn.active .cx-rt{color:#8fd0ff;}
+.cx-rbtn .cx-rd{font-size:calc(var(--u)*.78);letter-spacing:.02em;color:#5a7a96;margin-top:.3em;line-height:1.4;}
+.cx-tog{display:flex;align-items:flex-start;gap:calc(var(--u)*.7);cursor:pointer;padding:.25em .2em;border-radius:2px;}
+.cx-tog:hover{background:#060f1a;}
+.cx-box{flex:none;width:1.45em;height:1.45em;margin-top:.1em;border:1px solid #33557a;border-radius:2px;background:#040c18;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*1);color:#3aa0ff;line-height:1;}
+.cx-tog.on .cx-box{background:#0a2038;border-color:#3aa0ff;}
+.cx-tl{font-size:calc(var(--u)*.95);letter-spacing:.08em;color:#9fc0e0;}
+.cx-td{font-size:calc(var(--u)*.78);color:#5a7a96;letter-spacing:.02em;line-height:1.4;}
+.cx-hr{font-size:calc(var(--u)*.6);letter-spacing:.1em;color:#000;background:#caa030;border-radius:2px;padding:.1em .45em;margin-left:.6em;vertical-align:middle;}
+.cx-allnone{display:flex;gap:calc(var(--u)*.5);margin-top:calc(var(--u)*.2);}
+.cx-allnone button{flex:1;background:#08131f;border:1px solid #24384c;color:#6a90b4;font-family:inherit;font-size:calc(var(--u)*.74);letter-spacing:.1em;padding:.5em 0;border-radius:2px;cursor:pointer;}
+.cx-allnone button:hover{border-color:#3a5570;color:#9fc0e0;}
+/* actions */
+.sc-actions{display:flex;gap:calc(var(--u)*1);}
+.sc-launch{display:block;flex:2;padding:calc(var(--u)*.95);background:#1a0800;border:2px solid #ff9900;border-radius:3px;color:#ff9900;font-family:inherit;
+  font-size:calc(var(--u)*1.2);letter-spacing:.35em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
 .sc-launch:hover{background:#2a1200;box-shadow:0 0 20px rgba(255,153,0,.25);}
+.sc-launch.sc-db{flex:1;background:#0a1826;border-color:#33557a;color:#88bbff;font-size:calc(var(--u)*.95);letter-spacing:.2em;}
+.sc-launch.sc-db:hover{background:#0e2238;box-shadow:0 0 16px rgba(80,140,220,.2);}
+.sc-hint{flex:none;margin-bottom:auto;font-size:calc(var(--u)*.75);color:#334455;letter-spacing:.2em;text-align:center;}
+@media (max-width:1000px){
+  #scenario-screen{--u:13px;justify-content:flex-start;}
+  .sc-stage{grid-template-columns:1fr;}
+  .sc-actions{flex-direction:column;}
+  .sc-ship-preview{height:calc(var(--u)*9);}
+}
+@keyframes pdetblink{0%,100%{opacity:1;}50%{opacity:0.35;}}
 
 /* ── ENDGAME PANEL — scoped to the combat-log column, map stays visible ── */
 #eg-panel{position:absolute;left:0;right:0;bottom:0;z-index:6;background:#05070af5;padding:10px 12px 12px;transform:translateY(100%);transition:transform .55s cubic-bezier(.2,.8,.3,1);border-top:1px solid #445566;max-height:78%;overflow-y:auto;}
@@ -574,68 +640,62 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
 
 <!-- SCENARIO SCREEN -->
 <div id="scenario-screen">
-  <div class="sc-title">Star Trek</div>
-  <div class="sc-sub">Tactical Command Simulator</div>
+  <div class="sc-head">
+    <div class="sc-title">Star Trek</div>
+    <div class="sc-sub">Tactical Command Simulator</div>
+  </div>
   <div class="sc-panel">
-    <div class="sc-row">
-      <div class="sc-row-lbl">Play As</div>
-      <div style="flex:1;display:flex;gap:8px;flex-wrap:wrap;">
-        <!-- 5 faction buttons at flex:1 with min-width -- wraps to 2 rows (3+2) on
-             narrow/mobile viewports rather than squeezing all 5 into an unreadable row --><div class="faction-btn fed active" id="fb-fed" onclick="chooseFaction('fed')">
-          <div style="font-size:11px;letter-spacing:2px;color:#4499ff;margin-bottom:3px">⬡ FEDERATION</div>
-          <div style="font-size:9px;color:#334466;letter-spacing:1px">USS Enterprise · Constitution</div>
+    <div class="sc-stage">
+      <div class="sc-card sc-side" id="card-player">
+        <h3>Your Ship</h3>
+        <div class="sc-factions">
+          <div class="faction-btn fed active" id="fb-fed" onclick="chooseFaction('fed')" title="USS Enterprise · Constitution Class">FEDERATION</div>
+          <div class="faction-btn kli" id="fb-kli" onclick="chooseFaction('kli')" title="IKS Kronos · D-7 Class">KLINGON</div>
+          <div class="faction-btn rom" id="fb-rom" onclick="chooseFaction('rom')" title="RIS Talon · V-8 Bird of Prey">ROMULAN</div>
+          <div class="faction-btn gor" id="fb-gor" onclick="chooseFaction('gor')" title="SS-3 · Class VI Destroyer">GORN</div>
+          <div class="faction-btn ori" id="fb-ori" onclick="chooseFaction('ori')" title="Wanderer · Blockade Runner">ORION</div>
         </div>
-        <div class="faction-btn kli" id="fb-kli" onclick="chooseFaction('kli')">
-          <div style="font-size:11px;letter-spacing:2px;color:#cc5522;margin-bottom:3px">⬡ KLINGON</div>
-          <div style="font-size:9px;color:#442211;letter-spacing:1px">IKS Kronos · D-7 Class</div>
-        </div>
-        <div class="faction-btn rom" id="fb-rom" onclick="chooseFaction('rom')">
-          <div style="font-size:11px;letter-spacing:2px;color:#33bb66;margin-bottom:3px">⬡ ROMULAN</div>
-          <div style="font-size:9px;color:#1a4428;letter-spacing:1px">RIS Talon · V-8 Bird of Prey</div>
-        </div>
-        <div class="faction-btn gor" id="fb-gor" onclick="chooseFaction('gor')">
-          <div style="font-size:11px;letter-spacing:2px;color:#ccb244;margin-bottom:3px">⬡ GORN</div>
-          <div style="font-size:9px;color:#4a3f10;letter-spacing:1px">SS-3 · Class VI Destroyer</div>
-        </div>
-        <div class="faction-btn ori" id="fb-ori" onclick="chooseFaction('ori')">
-          <div style="font-size:11px;letter-spacing:2px;color:#aa55cc;margin-bottom:3px">⬡ ORION</div>
-          <div style="font-size:9px;color:#3a1544;letter-spacing:1px">Wanderer · Blockade Runner</div>
-        </div>
+        <select class="sc-sel" id="player-ship">
+          <option value="Constitution">USS Enterprise — Constitution Class</option>
+        </select>
+        <div class="sc-ship-preview" id="player-ship-preview"></div>
+        <div class="sc-stats" id="player-ship-stats"></div>
+      </div>
+      <div class="sc-card sc-match">
+        <div class="sc-card-head"><h3>Matchup</h3><span class="mb-info" tabindex="0" title="How even is this fight?">i<span class="mb-pop" id="mb-pop"></span></span></div>
+        <div class="sc-balance" id="matchup-balance"></div>
+      </div>
+      <div class="sc-card sc-side" id="card-enemy">
+        <h3>Enemy Ship</h3>
+        <div class="sc-enemy-faction" id="enemy-faction"></div>
+        <select class="sc-sel" id="enemy-ship">
+          <option value="D7">IKS Kronos — D-7 Class</option>
+        </select>
+        <div class="sc-ship-preview" id="enemy-ship-preview"></div>
+        <div class="sc-stats" id="enemy-ship-stats"></div>
       </div>
     </div>
-    <div class="sc-row">
-      <div class="sc-row-lbl">Your Ship</div>
-      <select class="sc-sel" id="player-ship">
-        <option value="Constitution">USS Enterprise — Constitution Class</option>
-      </select>
-      <div class="sc-ship-preview" id="player-ship-preview"></div>
-    </div>
-    <div class="sc-row">
-      <div class="sc-row-lbl">Enemy Ship</div>
-      <select class="sc-sel" id="enemy-ship">
-        <option value="D7">IKS Kronos — D-7 Class</option>
-      </select>
-      <div class="sc-ship-preview" id="enemy-ship-preview"></div>
-    </div>
-    <div class="sc-row">
-      <div class="sc-row-lbl">AI Difficulty</div>
-      <div class="sc-diff-wrap">
+    <div class="sc-lower">
+      <div class="sc-card" id="card-ai">
+        <h3>AI Difficulty</h3>
         <input type="range" id="diff-slider" min="1" max="6" value="2" oninput="updDiffLabel()">
         <div class="sc-diff-labels">
-          <span>Cadet</span><span>Ensign</span><span>Lt. Cmdr</span><span>Captain</span><span>Admiral</span><span>Legend</span>
+          <span onclick="setDiff(1)">Cadet</span><span onclick="setDiff(2)">Ensign</span><span onclick="setDiff(3)">Lt. Cmdr</span><span onclick="setDiff(4)">Captain</span><span onclick="setDiff(5)">Admiral</span><span onclick="setDiff(6)">Legend</span>
         </div>
-        <div style="font-size:10px;color:#ff9900;letter-spacing:2px;margin-top:4px" id="diff-label">ENSIGN</div>
+        <div class="sc-diff-name" id="diff-label">ENSIGN</div>
         <div class="sc-diff-desc" id="diff-desc"></div>
       </div>
+      <div class="sc-card" id="card-ruleset"><h3>Ruleset</h3><div id="sc-ruleset"></div></div>
+      <div class="sc-card" id="card-terrain"><h3>Terrain &amp; House Rules</h3><div id="sc-terrain"></div></div>
+      <!-- FUTURE PANELS go here as more .sc-card elements: game mode / multiplayer, fleet builder, advanced & RPG options.
+           The .sc-lower grid flows them into columns automatically; nothing else needs to change. -->
     </div>
-    <div class="sc-row" style="align-items:flex-start">
-      <div class="sc-row-lbl">Customization</div>
-      <div id="sc-custom" style="flex:1"></div>
+    <div class="sc-actions">
+      <button class="sc-launch sc-db" onclick="openShipDatabase()">◈ Ship Recognition Database</button>
+      <button class="sc-launch" onclick="launchGame()">⬡ Engage</button>
     </div>
-    <button class="sc-launch" style="background:#0a1826;border-color:#33557a;color:#88bbff;margin-bottom:8px" onclick="openShipDatabase()">◈ Ship Recognition Database</button>
-    <button class="sc-launch" onclick="launchGame()">⬡ Engage</button>
   </div>
-  <div style="font-size:9px;color:#334455;letter-spacing:2px">CLICK HEXES TO MOVE · ↑/↓ FORWARD/REVERSE · ←/→ ROTATE · SCROLL TO ZOOM</div>
+  <div class="sc-hint">CLICK HEXES TO MOVE · ↑/↓ FORWARD/REVERSE · ←/→ ROTATE · SCROLL TO ZOOM</div>
 </div>
 
 <!-- HEADER -->
@@ -648,7 +708,7 @@ select.sc-sel{flex:1;min-width:0;background:#040c18;border:1px solid #334455;col
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.42-S153</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.46-S157</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -2568,6 +2628,10 @@ function launchGame() {
   log('BUILD v2.40-S151 -- KLINGON BIRD-OF-PREY LINEAGE NOTE: the K-22 scout, D-32 Stronger Bird cruiser, and L-42 Great Bird frigate share one hull design at three different scales -- a fact that already lived in a code comment but nowhere the player could see it. Now shown two places: hover over any of the three on the tactical map for an in-universe note on why the same silhouette recurs at such different sizes, and the same note appears under a new \'Hull Lineage\' section in each ship\'s Recognition Manual entry.');
   log('BUILD v2.41-S152 -- Recognition Manual: the K-22 catalog entry was missing the nickname (\'nick\') its own registry and roster carry everywhere else -- IKV Bird of Prey shows that name in-game and in the tactical-map tooltip, but the recognition listing showed a bare \'K-22\' where D-32 shows \'Stronger Bird\' and L-42 shows \'Great Bird\'. Added \'Bird of Prey\' as its nick so all three of this lineage display consistently.');
   log('BUILD v2.42-S153 -- SMARTER AI TIERS. From Captain up, an enemy that holds a sensor lock now reads YOUR ship: it works out which of your weapon arcs can bear on a position and swings round to the quarter your guns cannot cover, paying for the manoeuvre with weapon power and giving up after a few failed flanks. Lt Cmdr and below fight as before. The difficulty slider now says what each tier actually does, and the end screen (and combat log) carries a tactical debrief: where the enemy sat relative to your arcs, which shield facing took the hits, and the lesson of the tier.');
+  log('BUILD v2.43-S154 -- MATCHUP BALANCE + AI/DEBRIEF FIXES. The setup screen now has a Matchup row that rates your ship against the enemy the way the FASA rulebook does (Defense Factor x Weapon Damage Factor), so you can see how fair a fight is before you launch it; the debrief compares that to how the fight went. Also: the AI no longer turns its stern to a ship it can already shoot (a log showed a Great Bird at 2 hull boxes doing exactly that), nearly-dead ships no longer set off on long flanks, and the debrief is honest about fights it cannot analyse (cloaked contact, very short fights) and now lands at the end of the combat log.');
+  log('BUILD v2.44-S155 -- MATCHUP RATINGS COMPLETED. A double-check found that the rulebook and Klingon/Federation book data DO contain Defense and Weapon-Damage ratings for the Chandley, Northampton, CS-2, L-9, D-10, K-22, Nova, L-42 and Whitewind -- the first pass had only searched the game catalog. Fifty-two of the fifty-four selectable ships are now rated; the two Federation dreadnoughts are not (no source exists in the project files). Where the game ship differs from the book stat block (usually hull strength) the rating is marked approximate and says why. The D-7 M now uses the rulebook page value.');
+  log('BUILD v2.45-S156 -- SETUP SCREEN REDESIGNED FOR REAL MONITORS. The start menu was a 480-pixel column with 9-11px type in the middle of the screen. It is now a responsive dashboard: your ship, a compact Matchup, and the enemy ship side by side, with AI difficulty, ruleset and terrain cards below. Everything scales with the window (readable on a 27-inch monitor, still fitting without scrolling down to a small laptop) and it stacks into one column on narrow screens. The D/WDF readout is now a verdict, a ratio, a balance bar and a three-row table, with the explanations moved into an info popover. Room is reserved for the coming multiplayer, fleet and Advanced/RPG panels: they will simply be more cards in the lower row.');
+  log('BUILD v2.46-S157 -- EVERY SHIP IS NOW RATED. The two Federation II dreadnought marks (the USS Federation) had no Defense/Weapon-Damage ratings anywhere in the project files; the stat block is published on fasaststcs.com and matches the game ship exactly (hull 62, power 82/86, shields, beams, missiles), giving Mk I D 190.7 / WDF 125.2 and Mk II D 200.7 / WDF 142.0. The Matchup readout now works for all 54 selectable ships.');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -2593,6 +2657,7 @@ function launchGame() {
     dmgLog: [],
     turn_stats: { playerShotsFired:0, playerShotsHit:0, enemyShotsFired:0, enemyShotsHit:0 },
     // v2.42-S153: raw material for the end-of-battle tactical debrief (see buildDebrief)
+    preBalance: compareSides([document.getElementById('player-ship').value],[document.getElementById('enemy-ship').value]),   // for the debrief: what the numbers said before the fight
     debrief: { snaps:[], faceHits:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]}, faceDmg:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]} },
   };
 
@@ -4576,12 +4641,12 @@ const TIER_RATING={
   6:['LEGEND','point-blank, relentless, and gave you no room to breathe'],
 };
 const TIER_LESSON={
-  1:'Practise the controls; nothing here punishes a mistake.',
-  2:'Range and facing: keep your guns pointed at it as it closes.',
-  3:'Aim and economy: it only fires what bears, so make sure its arc is not the one you are showing it.',
-  4:'Guard your blind arcs: turn to keep weapons on it, or put a hit on it to break its sensor lock.',
-  5:'Facing and shield discipline: it will find the facing you neglect.',
-  6:'Control the range: it wants point-blank. Deny it, or make point-blank expensive.',
+  1:'the basic controls; nothing here punishes a mistake.',
+  2:'range and facing: keeping your guns on a ship as it closes.',
+  3:'aim and economy: it only fires what bears, so the arc you show it matters.',
+  4:'whether you guard your blind arcs: turn to keep weapons on it, or hit it to break its sensor lock.',
+  5:'facing and shield discipline: it will find the facing you neglect.',
+  6:'range control: it wants point-blank. Deny it, or make point-blank expensive.',
 };
 function debriefSnapshot(idx){
   if(!GS||!GS.debrief||GS.over) return;
@@ -4600,21 +4665,25 @@ function buildDebrief(win,mutual){
   const D=aiDifficulty, db=GS.debrief, out=[];
   const rate=TIER_RATING[D]||['?',''];
   out.push({k:'h',t:`Tactical debrief \u2014 adversary rated ${rate[0]}: ${rate[1]}.`});
-  const eng=db.snaps.filter(x=>!x.cloak&&x.range<=12);
+  const all=db.snaps, cloakedN=all.filter(x=>x.cloak).length;
+  const eng=all.filter(x=>!x.cloak&&x.range<=12);          // open-contact windows only (weapons are offline while either ship is cloaked)
   const N=eng.length;
   let blindW=[];
   if(N<2){
-    out.push({k:'l',t:'The engagement was too brief for a full positional assessment.'});
+    // Be honest about WHY there is nothing to analyse, and say nothing about blind quarters we have no data on.
+    out.push({k:'l',t: cloakedN>0
+      ? `Most of this fight (${cloakedN} of ${all.length} firing windows) was against a cloaked ship, so there was too little open contact for a positional read.`
+      : `The fight was over in ${all.length} firing window${all.length===1?'':'s'}, too short for a positional read.`});
   } else {
     const answered=eng.filter(x=>x.pBearN>0).length;
     blindW=eng.filter(x=>x.pBearN===0&&x.eBearN>0);
-    out.push({k:'l',t:`Across ${N} firing window${N>1?'s':''}, your weapons could answer the enemy's position in ${answered}.`});
+    out.push({k:'l',t:`Across ${N} open firing window${N>1?'s':''}, your weapons could answer the enemy's position in ${answered}.`});
     if(blindW.length){
       const cnt={}; blindW.forEach(x=>{cnt[x.arc]=(cnt[x.arc]||0)+1;});
       const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
       out.push({k:'warn',t:`The enemy held your ${ARC_PHRASE[top]} for ${cnt[top]} window${cnt[top]>1?'s':''}: a firing position where none of your weapons could bear.`});
     } else if(answered===N){
-      out.push({k:'good',t:'You kept guns on the enemy in every firing window \u2014 clean arc discipline.'});
+      out.push({k:'good',t:'You kept guns on the enemy in every open firing window \u2014 clean arc discipline.'});
     }
     const youBlind=eng.filter(x=>x.eBearN===0&&x.pBearN>0).length;
     if(youBlind) out.push({k:'good',t:`You held the enemy's blind side for ${youBlind} window${youBlind>1?'s':''}.`});
@@ -4628,17 +4697,26 @@ function buildDebrief(win,mutual){
     }
     if(interMode()){
       const lk=eng.filter(x=>x.lock).length;
-      out.push({k:'dim',t:`Enemy sensor lock held in ${lk} of ${N} windows.`+(D>=4&&lk<N?' A window without a lock was a window it could not hunt your weak side.':'')});
+      out.push({k:'dim',t:`Enemy sensor lock held in ${lk} of ${N} open windows.`+(D>=4&&lk<N?' A window without a lock was a window it could not hunt your weak side.':'')});
     }
-    out.push({k:'dim',t:`Average engagement range: ${(eng.reduce((a,x)=>a+x.range,0)/N).toFixed(1)} hexes.`});
+    out.push({k:'dim',t:`Average engagement range: ${(eng.reduce((a,x)=>a+x.range,0)/N).toFixed(1)} hexes.`+(cloakedN?` (${cloakedN} cloaked window${cloakedN>1?'s':''} not counted.)`:'')});
+    // How it ended -- only said when there is evidence behind it.
+    if(!mutual){
+      if(win && D>=4) out.push({k:'good',t: blindW.length ? 'You won even though you gave it a blind quarter to work with.' : 'You denied it a blind quarter, and won.'});
+      else if(win && D<=2) out.push({k:'dim',t:'A clean win. Raise the difficulty when you want the AI to start pushing back.'});
+      else if(!win && D>=3) out.push(blindW.length>=2 ? {k:'warn',t:'It found your blind side and lived there.'} : {k:'l',t:'It out-gunned you rather than out-flanked you.'});
+    }
   }
-  // How it ended, in the voice of the tier.
-  if(!mutual){
-    if(win && D>=4) out.push({k:'good',t: blindW.length ? 'You won even though you gave it a blind quarter to work with.' : 'You denied it a blind quarter, and won.'});
-    else if(win && D<=2) out.push({k:'dim',t:'A clean win. Raise the difficulty when you want the AI to start pushing back.'});
-    else if(!win && D>=3) out.push(blindW.length>=2 ? {k:'warn',t:'It found your blind side and lived there.'} : {k:'l',t:'It out-gunned you rather than out-flanked you.'});
+  // Pre-battle balance vs how it actually went (only when both ships have rating data).
+  if(GS.preBalance){
+    const pv=fairnessVerdict(GS.preBalance), r=pv.r.toFixed(1)+(GS.preBalance.approx?' (approx.)':'');
+    if(pv.cls==='even') out.push({k:'dim',t:`On paper the ships were evenly matched (CE ratio ${r} : 1).`});
+    else if(mutual) out.push({k:'dim',t:`On paper ${pv.ahead==='you'?'you were':'the enemy was'} the stronger ship (${r} : 1).`});
+    else if(pv.ahead==='the enemy' && win) out.push({k:'good',t:`You beat the odds: on paper the enemy was the stronger ship (${r} : 1).`});
+    else if(pv.ahead==='you' && !win) out.push({k:'warn',t:`You lost a fight the numbers favoured you in (${r} : 1) \u2014 the ratings do not count arcs, cloaks or piloting.`});
+    else out.push({k:'dim',t:`${pv.ahead==='you'?'You were':'The enemy was'} the stronger ship on paper (${r} : 1), as the result bore out.`});
   }
-  out.push({k:'lesson',t:`Lesson of this tier: ${TIER_LESSON[D]||''}`});
+  out.push({k:'lesson',t:`What this tier tests: ${TIER_LESSON[D]||''}`});
   if(D>=4 && blindW.length>=2) out.push({k:'lesson',t:'Next time: turn to keep guns bearing, or put a hit on it to break its lock (Intermediate rules).'});
   return out;
 }
@@ -4657,8 +4735,6 @@ function checkVictory(){
     const isPowerLoss=(!pd&&!ed)&&(pp||ep);
     const mutual=pd&&ed; // both hulls destroyed -- neither side "won" this one
     const win=isPowerLoss?(ep&&!pp):(!mutual&&!pd&&ed);
-    const debriefLines=buildDebrief(win,mutual);
-    if(!GS.debriefLogged){ GS.debriefLogged=true; logDebrief(debriefLines); }   // into the combat log too, so exports carry it
 
     function showEndgamePanel(){
       const eg=document.getElementById('eg-panel');
@@ -4691,6 +4767,10 @@ function checkVictory(){
       const st=GS.turn_stats;
       document.getElementById('eg-stats').innerHTML=
         `Turns: ${GS.turn} &middot; Shots fired: ${st.playerShotsFired} &middot; Hits: ${st.playerShotsHit}<br>Enemy shots: ${st.enemyShotsFired} &middot; Enemy hits: ${st.enemyShotsHit}`;
+      // Built and logged HERE, after the final volley has resolved, so it lands at the END of an exported log (it used to be
+      // written the instant the kill registered, which put it in the middle of the last shots).
+      const debriefLines=buildDebrief(win,mutual);
+      if(!GS.debriefLogged){ GS.debriefLogged=true; logDebrief(debriefLines); }
       document.getElementById('eg-debrief').innerHTML=renderDebriefHTML(debriefLines);
       snd(mutual?'defeat':(win?'victory':'defeat'));
       eg.style.transform='translateY(0)';
@@ -5002,6 +5082,7 @@ function aiAllocatePower(){
 // of full firepower. Same lock gate as the movement itself.
 function aiExploitMoveBoost(s,p,move,weapPwr){
   const D=aiDifficulty; if(D<4 || p.cloaked) return 0;
+  if(s.superstructure/s.superstructureMax<0.40) return 0;   // nearly dead: never trade guns for a flank
   if(interMode() && !(s.locked||s.detectedCloaked)) return 0;
   const cap=[0,0,0,4,5,6,4][D];                       // pts per sub-phase it is willing to buy for a trip
   const est=aiPlanExploit(s,p,1,0,{estimate:true,ptsPerPhase:cap});
@@ -5088,6 +5169,12 @@ function aiPlanExploit(s,p,pts,subIdx,opts){
   const tgt={col:p.col,row:p.row};
   const myTot=aiTotalFirepower(s), plTot=aiTotalFirepower(p);
   const curDp=hexDist(s.col,s.row,p.col,p.row);
+  // SELF-PRESERVATION (found from a user log): a long flank is the wrong plan for a ship that is nearly dead -- the
+  // Great Bird at 2 of 18 hull boxes set off round the player's side. Below 40% hull the legacy logic handles it.
+  if(s.superstructure/s.superstructureMax<0.40) return null;
+  // Never retreat out of the ring while a gun already bears: turning the stern to the enemy forfeits shots and
+  // exposes the aft arc (the same reasoning as the legacy back-off guard above).
+  if(curDp<Math.max(1,targetRange-1) && s.weapons.some(w=>w.alive&&weaponArcCoversTarget(w,{col:s.col,row:s.row,facing:s.facing},tgt))) return null;
   // APPROACH: far from the ring the legacy straight-line pursuit closes the distance (found by test: with the
   // planner active at long range, Captain/Admiral stalled outside weapon range).
   if(curDp>targetRange+4) return null;
@@ -5336,8 +5423,12 @@ function aiDoMove(subPhaseIdx){
       // Close on player: turn to face then move
       if(facing!==wf){facing=((facing+rotDir(facing,wf))+6)%6;movesLeft--;}
       else{if(!moveForward()) turnTowardCenter();}
-    } else if(range<targetRange-1&&D>=3){
-      // Too close: turn away and back off
+    } else if(range<targetRange-1&&D>=3 && !s.weapons.some(w=>w.alive&&weaponArcCoversTarget(w,{col,row,facing},{col:goal.col,row:goal.row}))){
+      // Too close: turn away and back off -- BUT ONLY IF NO GUN OF OURS CURRENTLY BEARS (v2.42-S153). Ships cannot
+      // reverse, so backing off means rotating the stern toward the enemy for several phases with our guns
+      // pointing away: exposing the aft arc and forfeiting shots to gain a few hexes. A user log (Great Bird at 2
+      // hull boxes, point-blank, guns bearing) showed exactly that. If something bears, fall through to the
+      // optimal-range branch below: hold the arc and fight.
       const af=(wf+3)%6;
       if(facing!==af){facing=((facing+rotDir(facing,af))+6)%6;movesLeft--;}
       else{if(!moveForward()) turnTowardCenter();}
@@ -8902,7 +8993,10 @@ function updDiffLabel(){
     const lockNote = v>=4 ? '<br><i>Flanking needs a sensor lock (Intermediate rules); Basic rules give the AI contact at all times.</i>' : '';
     el.innerHTML='<b>'+d[0]+'</b> &mdash; '+d[1]+lockNote;
   }
+  document.querySelectorAll('.sc-diff-labels span').forEach((t,i)=>t.classList.toggle('on',i+1===v));
+  if(typeof updateMatchupBalance==='function') updateMatchupBalance();
 }
+function setDiff(v){ const sl=document.getElementById('diff-slider'); if(sl){ sl.value=v; updDiffLabel(); } }
 
 let playerFaction='fed'; // 'fed' or 'kli' or 'rom'
 // Playable ship variants selectable on the scenario screen, grouped by faction.
@@ -8919,6 +9013,146 @@ function shipOptionHTML(key){
   const r=SHIP_REGISTRY[key]; if(!r) return '';
   return `<option value="${key}">${r.name} — ${r.cls}</option>`;
 }
+// ═══════════════════════════════════════════════════════════════════════════
+// MATCHUP BALANCE (v2.42-S153, first cut) -- uses FASA's own method, not an invented one.
+// Rulebook, "Balancing Scenarios": D (Defense Factor) rates armour/shields/power efficiency, WDF (Weapon Damage Factor)
+// rates firepower. Two ships: Combat Efficiency CE = D x WDF; "the ship with the greater CE will, in general, last longer".
+// Two sides: FASA balances its published scenarios by comparing the TOTAL D and the TOTAL WDF of each side (both must
+// balance); the alternative is each side's (total D x total WDF). compareSides() computes both so the same code carries over
+// to fleet-vs-fleet later. The rulebook gives no numeric tolerance, but its own examples -- Constitution/D7-M "nearly
+// equal" (CE ratio 1.25 here) and Reliant vs L-9 (about 1.24) -- put "nearly equal" at roughly 25%, used for the band below.
+// SHIP_CE: where each rating comes from. Policy: (1) if the game's ship matches a RULEBOOK PAGE exactly (power and hull),
+// use the page's printed D/WDF; (2) else if it matches a CATALOG variant exactly, use that; (3) if it matches except for hull
+// strength, still rate it but mark it `approx` with the reason, shown in the UI; (4) otherwise leave it unrated. As of v2.46 every
+// selectable ship is rated. (The Federation II was the last: its stat block is not in the project files, but is published at
+// fasaststcs.com, which also lists D/WDF for Federation-class marks I-VI.) Where the rulebook page and a catalog disagree for the SAME stats, the page wins (D-7 M: page
+// WDF 42.2 vs catalog 33.4 -- the page also makes the Constitution and D-7 M "nearly equal", as the rulebook says).
+// CE rates the SHIPS, not the pilots: arcs, cloaks and the AI tier are not in it, so treat it as a guide, not a prediction.
+// ═══════════════════════════════════════════════════════════════════════════
+const SHIP_CE = {
+  Andor_MkII: {D:112.5, WDF:51.4},   // fed_Andor Mk II
+  BH2: {D:123.9, WDF:89},   // gor_BH2 Standard
+  Baker_MkII: {D:81.5, WDF:27.6},   // fed_Baker Mk II
+  Baker_MkIV: {D:96.3, WDF:34.8},   // fed_Baker Mk IV
+  BrightOne_TypeII: {D:57.7, WDF:33.1},   // rom_BrightOne Type 2
+  Constitution_MkI: {D:64.6, WDF:12.4},   // fed_Constitution Mk I
+  Constitution_MkII: {D:83.6, WDF:43.6},   // fed_Constitution Mk II
+  Constitution_MkIII: {D:97.5, WDF:53.8},   // fed_Constitution Mk III
+  D18_Gull: {D:71.0, WDF:26.2},   // kli_D18 C (IX)
+  // Federation II Mk I / Mk II: fasaststcs.com "Federation II Class XIV Dreadnought" (from Starfleet Prototype, Schmidt &
+  // Mastercom). EXACT on every comparable field: hull 62, power 82/86, impulse 16/20, 6:1 movement, 3x FWG-2 (22 each), shields 1/4 max
+  // 15/20, FH-11 beams max 10, missiles chart S arm 1 dmg 20. (The page also lists Mk III 246.7/173.8 and Mk V 265.2/242.6, not in the game.)
+  Federation2_MkI: {D:190.7, WDF:125.2},
+  Federation2_MkII: {D:200.7, WDF:142.0},
+  D2_StingTongue: {D:69.3, WDF:23.4},   // kli_D2 A and B (the catalog's two variants have identical D/WDF)
+  D32StrongerBird: {D:68.5, WDF:31},   // kli_D32 B
+  D7_A: {D:54.6, WDF:20.4},   // kli_D7 A (VIII)
+  D7_C: {D:53.2, WDF:35.7},   // kli_D7 C (VII)
+  D7_G: {D:54.6, WDF:24.3},   // kli_D7 G (VIII)
+  D7_M: {D:87.6, WDF:42.2},   // rulebook p.67 right (game stats match the page exactly; the Klingon catalog says WDF 33.4)
+  D7_R: {D:84.6, WDF:34.4},   // kli_D7 R (IX)
+  D7_S: {D:87.5, WDF:46.4},   // kli_D7 S (IX)
+  Enterprise_MkI: {D:145.2, WDF:89.2},   // fed_Enterprise Mk I
+  Enterprise_MkII: {D:152, WDF:89.2},   // fed_Enterprise Mk II
+  Enterprise_MkIII: {D:162.8, WDF:123.1},   // fed_Enterprise Mk III
+  Excelsior_MkI: {D:184.3, WDF:160.4},   // fed_Excelsior Mk I
+  Excelsior_MkII: {D:198, WDF:182},   // fed_Excelsior Mk II
+  GallantWing_Type5: {D:96, WDF:75.4},   // rom_GallantWing Type 5 (X)
+  K23_LittleKiller: {D:71.9, WDF:30},   // kli_K23 F (VII)
+  L24_EverVictorious: {D:153.3, WDF:95.2},   // kli_L24 A
+  Larson_MkVII: {D:77, WDF:23.2},   // fed_Larson Mk VII
+  Lightning: {D:81.4, WDF:18},   // ori_Lightning Standard
+  Loknar_MkII: {D:76.7, WDF:29.6},   // fed_Loknar Mk II (VIII)
+  MA12: {D:78.8, WDF:32.4},   // gor_MA12 Standard
+  Reliant_MkII: {D:110.8, WDF:67.8},   // fed_Reliant Mk II
+  Remora_MkIII: {D:80, WDF:20.8},   // fed_Remora Mk III (VII)
+  SS3: {D:58.6, WDF:21.5},   // gor_SS3 Standard
+  Stormbird_Type1: {D:58.6, WDF:30.8},   // rom_Stormbird Type 1 (VII)
+  Stormbird_Type2: {D:76.6, WDF:36.6},   // rom_Stormbird Type 2 (IX)
+  Stormbird_Type5: {D:93, WDF:58.2},   // rom_Stormbird Type 5 (X)
+  T5_ThroneSeeker: {D:53.3, WDF:4.2},   // kli_T5 A
+  V30WingedDefender_Type1: {D:129.8, WDF:98.9},   // rom_WingedDefender Type 1
+  V30WingedDefender_Type2: {D:131.3, WDF:103.3},   // rom_WingedDefender Type 2
+  V8BirdOfPrey: {D:57.5, WDF:21.4},   // rom_BirdOfPrey Type 1
+  V8BirdOfPrey_Type1: {D:57.5, WDF:21.4},   // rom_BirdOfPrey Type 1
+  V8BirdOfPrey_Type4: {D:63.5, WDF:32},   // rom_BirdOfPrey Type 4
+  Wanderer: {D:148, WDF:38.2},   // ori_Wanderer Standard
+  // ---- added v2.43: ratings that exist in the project's book data but were missed on the first pass ----
+  Northampton_MkII: {D:124.0, WDF:84.3},   // rulebook p.64 left (exact: pwr 56, hull 23)
+  L9_Saber: {D:101.8, WDF:59.4},   // rulebook p.70 right (exact: pwr 42, hull 25; the page's model letter "B" is flagged (?))
+  CS2_TypeII: {D:75.4, WDF:26.0},   // rulebook p.72 right (exact: pwr 30, hull 15)
+  Whitewind_Type3: {D:88.5, WDF:49.8, approx:'sources differ: Romulan catalog D 88.5, rulebook scan D 83.5'},   // catalog Type 3 matches the game exactly (pwr 44, hull 18)
+  K22BirdOfPrey: {D:45.8, WDF:17.7, approx:'game hull 9 vs book 10'},   // FASA 2301 K-22A (everything else matches exactly)
+  Chandley_MkI: {D:131.5, WDF:91, approx:'game hull 22 vs book 28'},   // FASA 2302 Mk I (pwr 48)
+  Chandley_MkII: {D:137.5, WDF:102.2, approx:'game hull 22 vs book 28'},   // FASA 2302 Mk III (pwr 52) -- the game calls it Mk II
+  Chandley_MkIII: {D:170.0, WDF:102.2, approx:'game hull 22 vs book 28'},   // FASA 2302 Mk IV = rulebook p.64 right (pwr 56) -- the game calls it Mk III
+  D10_D: {D:85.3, WDF:45.2},   // Klingon book (FASA 2301) D-10 MARK D: exact on power 46, hull 24, shields 1/2 max 15. (The catalog's own Mk D row says power 40 -- a catalog typo; the book says 46. An earlier pass wrongly used the rulebook page's Mk G values here.)
+  Nova_Type2: {D:147.0, WDF:136.8, approx:'game hull 35 vs book 40(?)'},   // rulebook p.72 left, Type 2
+  L42GreatBird: {D:130.5, WDF:40.1, approx:'game hull 18 vs catalog 22; the rulebook page is partly unreadable'},   // Klingon catalog L-42 A (pwr 55)
+};
+function shipRating(key){ const r=SHIP_CE[key]; return r?{D:r.D,WDF:r.WDF,CE:r.D*r.WDF,approx:r.approx||null}:null; }
+function compareSides(keysA,keysB){
+  const A=keysA.map(shipRating), B=keysB.map(shipRating);
+  if(A.some(x=>!x)||B.some(x=>!x)) return null;
+  const sum=(arr,k)=>arr.reduce((a,x)=>a+x[k],0);
+  const dA=sum(A,'D'), wA=sum(A,'WDF'), dB=sum(B,'D'), wB=sum(B,'WDF');
+  const ceA=dA*wA, ceB=dB*wB;
+  return {n:[A.length,B.length], dA,wA,dB,wB,ceA,ceB, ratio:ceA/ceB, approx:A.concat(B).some(x=>x.approx)};
+}
+function fairnessVerdict(c){
+  const hi=Math.max(c.ceA,c.ceB), lo=Math.min(c.ceA,c.ceB), r=hi/lo;
+  const ahead=c.ceA>=c.ceB ? 'you' : 'the enemy';
+  let cls,txt;
+  if(r<=1.25){ cls='even'; txt='EVEN MATCH \u2014 the rulebook would call these nearly equal.'; }
+  else if(r<=2){ cls='edge'; txt=`SLIGHT EDGE to ${ahead} (${r.toFixed(1)} : 1) \u2014 a fair fight, but not a coin-flip.`; }
+  else if(r<=4){ cls='lop'; txt=`LOPSIDED \u2014 ${ahead==='you'?'you are':'the enemy is'} the stronger ship (${r.toFixed(1)} : 1). Expect it to last much longer.`; }
+  else { cls='mis'; txt=`MISMATCH \u2014 ${ahead==='you'?'you outclass the enemy':'you are outclassed'} (${r.toFixed(0)} : 1). A rout unless the weaker side is very well played.`; }
+  return {r,cls,txt,ahead};
+}
+function fairnessShort(v){
+  const lab={even:'EVEN MATCH',edge:'SLIGHT EDGE',lop:'LOPSIDED',mis:'MISMATCH'}[v.cls];
+  return v.cls==='even' ? lab : lab+' \u2014 '+(v.ahead==='you'?'YOU':'ENEMY');
+}
+function updateMatchupBalance(){
+  const el=document.getElementById('matchup-balance'); if(!el||typeof SHIP_REGISTRY==='undefined') return;
+  const pop=document.getElementById('mb-pop');
+  const pk=document.getElementById('player-ship').value, ek=document.getElementById('enemy-ship').value;
+  const tier=(typeof DIFF_NAMES!=='undefined'&&document.getElementById('diff-slider'))?DIFF_NAMES[parseInt(document.getElementById('diff-slider').value)]:'';
+  // The long explanations live here, in the popover, so the card itself stays compact.
+  const baseNote=`CE = D \u00D7 WDF, FASA's Combat Efficiency. D rates armour, shields and power efficiency; WDF rates firepower. `+
+    `It rates the ships, not the pilots: firing arcs, cloaks and the AI tier${tier?' ('+tier+')':''} are not counted.`;
+  if(!SHIP_REGISTRY[pk]||!SHIP_REGISTRY[ek]){ el.innerHTML=''; if(pop) pop.textContent=baseNote; return; }
+  const c=compareSides([pk],[ek]);
+  if(!c){
+    const miss=[pk,ek].filter(k=>!SHIP_CE[k]).map(k=>SHIP_REGISTRY[k]?SHIP_REGISTRY[k].name:k);
+    el.innerHTML=`<div class="mb-verdict none">NOT RATED</div><div class="mb-sub">No rating data yet for ${miss.join(' and ')}</div>`;
+    if(pop) pop.textContent=baseNote; return;
+  }
+  const v=fairnessVerdict(c), fmt=n=>Math.round(n).toLocaleString();
+  const approxNotes=[pk,ek].filter(k=>SHIP_CE[k]&&SHIP_CE[k].approx).map(k=>SHIP_REGISTRY[k].name+': '+SHIP_CE[k].approx);
+  const youShare=100*c.ceA/(c.ceA+c.ceB), lead=(a,b)=>a>b?' lead':'';
+  el.innerHTML=`<div class="mb-verdict ${v.cls}">${fairnessShort(v)}</div>
+    <div class="mb-sub">${v.r.toFixed(1)} : 1${c.approx?'<span class="mb-approx">\u2248 approx.</span>':''}</div>
+    <div><div class="mb-bar"><div class="mb-you" style="width:${youShare.toFixed(1)}%"></div><div class="mb-mid"></div></div>
+      <div class="mb-bar-lbl"><span>YOU</span><span>ENEMY</span></div></div>
+    <div class="mb-grid">
+      <span class="v${lead(c.dA,c.dB)}">${c.dA}</span><span class="k">ARMOUR (D)</span><span class="v r${lead(c.dB,c.dA)}">${c.dB}</span>
+      <span class="v${lead(c.wA,c.wB)}">${c.wA}</span><span class="k">FIREPOWER (WDF)</span><span class="v r${lead(c.wB,c.wA)}">${c.wB}</span>
+      <span class="v${lead(c.ceA,c.ceB)}">${fmt(c.ceA)}</span><span class="k">COMBAT EFF. (CE)</span><span class="v r${lead(c.ceB,c.ceA)}">${fmt(c.ceB)}</span>
+    </div>`;
+  if(pop) pop.innerHTML=baseNote+(approxNotes.length?'<br><br>\u2248 Approximate \u2014 '+approxNotes.join('; ')+'.':'');
+}
+const FACTION_NAME={fed:'Federation',kli:'Klingon Empire',rom:'Romulan Star Empire',gor:'Gorn Hegemony',ori:'Orion Colonies'};
+function updateSideInfo(prefix,key){
+  const reg=SHIP_REGISTRY[key], st=document.getElementById(prefix+'-ship-stats');
+  if(st) st.innerHTML = reg ? `<span class="sc-stat">HULL <b>${reg.superstructureMax}</b></span><span class="sc-stat">POWER <b>${reg.totalPower}</b></span>`+
+    `<span class="sc-stat">SHIELD <b>${reg.maxShieldPerFace}</b></span><span class="sc-stat">GUNS <b>${reg.weapons.length}</b></span>`+
+    (reg.cloakCost?'<span class="sc-stat cloak">CLOAK</span>':'') : '';
+  if(prefix==='enemy'){
+    const f=document.getElementById('enemy-faction');
+    if(f){ f.className='sc-enemy-faction '+(reg?reg.faction:''); f.textContent=reg?'\u2B21 '+(FACTION_NAME[reg.faction]||reg.faction).toUpperCase():''; }
+  }
+}
 function updateShipPreview(selectId, previewId){
   const sel=document.getElementById(selectId);
   const prev=document.getElementById(previewId);
@@ -8926,6 +9160,8 @@ function updateShipPreview(selectId, previewId){
   const reg=SHIP_REGISTRY[sel.value];
   const art=reg && SHIP_SPRITES[reg.spriteKey];
   prev.innerHTML = art ? `<img src="${art}" alt="${reg.name}">` : '';
+  updateSideInfo(selectId==='player-ship'?'player':'enemy', sel.value);
+  updateMatchupBalance();
 }
 function populateShipSelectors(f){
   const pSel=document.getElementById('player-ship');
@@ -8970,28 +9206,24 @@ const customState = { ruleset:'basic' };
 HOUSE_RULES.forEach(r=>{ customState[r.id]=r.def; });
 
 function renderCustomPanel(){
-  const root=document.getElementById('sc-custom'); if(!root) return;
-  const rs = RULESETS.map(r=>`
+  const rsRoot=document.getElementById('sc-ruleset'), tgRoot=document.getElementById('sc-terrain'); if(!rsRoot||!tgRoot) return;
+  rsRoot.innerHTML = RULESETS.map(r=>`
     <div class="cx-rbtn ${customState.ruleset===r.id?'active':''}" onclick="setRuleset('${r.id}')">
-      <div class="cx-rt">${customState.ruleset===r.id?'◉':'○'} ${r.name}</div>
+      <div class="cx-rt">${customState.ruleset===r.id?'\u25C9':'\u25CB'} ${r.name}</div>
       <div class="cx-rd">${r.desc}</div>
     </div>`).join('');
   const togs = HOUSE_RULES.map(r=>`
     <div class="cx-tog ${customState[r.id]?'on':''}" onclick="toggleHouseRule('${r.id}')">
-      <div class="cx-box">${customState[r.id]?'✓':''}</div>
+      <div class="cx-box">${customState[r.id]?'\u2713':''}</div>
       <div>
         <div class="cx-tl">${r.label}${r.hr?'<span class="cx-hr">HOUSE RULE</span>':''}</div>
         <div class="cx-td">${r.desc}</div>
       </div>
     </div>`).join('');
-  root.innerHTML = `
-    <div class="cx-ruleset">${rs}</div>
-    <div class="cx-toggles">
-      ${togs}
-      <div class="cx-allnone">
-        <button onclick="setAllHouseRules(true)">ALL ON</button>
-        <button onclick="setAllHouseRules(false)">ALL OFF</button>
-      </div>
+  tgRoot.innerHTML = `<div class="cx-toggles">${togs}</div>
+    <div class="cx-allnone">
+      <button onclick="setAllHouseRules(true)">ALL ON</button>
+      <button onclick="setAllHouseRules(false)">ALL OFF</button>
     </div>`;
 }
 function setRuleset(id){ customState.ruleset=id; renderCustomPanel(); }
