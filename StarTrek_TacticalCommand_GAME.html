@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.59-S170</title>
+<title>Star Trek: Tactical Command — v2.63-S174</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -14,6 +14,50 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#
 .hdr-segs{display:flex;align-items:center;gap:5px;padding:0 16px;}
 .hdr-seg{height:30px;border-radius:15px;padding:0 13px;display:flex;align-items:center;font-size:9px;letter-spacing:2px;font-weight:bold;color:#000;}
 .seg-a{background:#cc6600;}.seg-b{background:#ff9900;}.seg-c{background:#ffcc44;}
+.seg-d{background:#e0b040;white-space:nowrap;}.seg-d.theirs{background:#c0604a;color:#fff;}
+/* v2.62-S173 INITIATIVE (Tactical Advantage) screen */
+#tacadv-ov{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;background:rgba(1,4,10,.84);font-family:'Courier New',monospace;color:#c8d8f0;}
+#tacadv-ov.on{display:flex;animation:taFade .25s ease-out;}
+@keyframes taFade{from{opacity:0}to{opacity:1}}
+.ta-card{width:min(860px,94vw);border:1px solid #2a4a7a;background:linear-gradient(180deg,#07101e,#030811);box-shadow:0 0 44px rgba(60,120,220,.28),inset 0 0 0 1px #0a1a30;padding:20px 24px 16px;border-radius:4px;cursor:default;}
+.ta-title{letter-spacing:7px;font-size:14px;color:#8fbfff;text-align:center;}
+.ta-sub{letter-spacing:2px;font-size:9px;color:#5a7090;text-align:center;margin-top:5px;}
+.ta-row{display:flex;align-items:stretch;gap:14px;margin-top:18px;}
+.ta-side{flex:1;min-width:0;border:1px solid #1a2a44;background:#050b16;padding:13px 16px 12px;position:relative;transition:box-shadow .4s,border-color .4s,opacity .4s;}
+.ta-side .lbl{font-size:9px;letter-spacing:3px;color:#6a7c98;}
+.ta-side .nm{font-size:14px;letter-spacing:2px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:bold;}
+.ta-side .cls{font-size:9px;letter-spacing:1px;color:#6a7c98;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ta-side .big{font-size:58px;line-height:1.05;margin-top:8px;font-weight:bold;letter-spacing:2px;color:#e8f0ff;}
+.ta-side .unit{font-size:9px;letter-spacing:2px;color:#5a7090;}
+.ta-bar{height:8px;background:#0b1424;margin-top:9px;border:1px solid #14223a;}
+.ta-bar i{display:block;height:100%;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1);}
+.ta-vs{display:flex;align-items:center;font-size:12px;letter-spacing:3px;color:#40597a;}
+.ta-tag{position:absolute;top:-10px;right:12px;font-size:9px;letter-spacing:2px;padding:2px 9px;font-weight:bold;opacity:0;transition:opacity .3s;background:#e0b040;color:#1a1000;}
+.ta-side.win{border-color:#e0b040;box-shadow:0 0 24px rgba(224,176,64,.38);}
+.ta-side.win .ta-tag{opacity:1;}
+.ta-side.lose{opacity:.55;}
+.ta-side.tie .ta-tag{opacity:1;background:#6a7c98;color:#050b16;}
+.ta-dice{display:none;margin-top:16px;text-align:center;}
+.ta-dice.on{display:block;}
+.ta-dice .msg{font-size:10px;letter-spacing:3px;color:#9db4d6;min-height:14px;}
+.ta-dicerow{display:flex;justify-content:center;gap:120px;margin-top:10px;}
+.ta-dcol{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;}
+.ta-dcol .who{font-size:9px;letter-spacing:3px;color:#6a7c98;}
+.ta-dcol .calc{font-size:10px;letter-spacing:1.5px;color:#8fa8cc;min-height:13px;}
+.ta-die polygon{fill:#0a1830;stroke:#3a6ab0;stroke-width:3;stroke-linejoin:round;}
+.ta-die text{fill:#dfe9ff;}
+.ta-die.rolling{animation:taWobble .13s linear infinite;}
+@keyframes taWobble{0%{transform:rotate(-9deg) scale(1.04)}50%{transform:rotate(9deg) scale(.97)}100%{transform:rotate(-9deg) scale(1.04)}}
+.ta-die.win polygon{stroke:#e0b040;fill:#241c06;}
+.ta-die.win text{fill:#ffe08a;}
+.ta-banner{margin-top:16px;text-align:center;opacity:0;transform:translateY(6px);transition:opacity .45s,transform .45s;}
+.ta-banner.on{opacity:1;transform:none;}
+.ta-banner .h{font-size:17px;letter-spacing:4px;color:#ffd470;font-weight:bold;}
+.ta-banner .why{font-size:10px;letter-spacing:2px;color:#8fa8cc;margin-top:6px;}
+.ta-banner .c{font-size:10px;letter-spacing:1px;color:#9db4d6;margin-top:7px;line-height:1.6;}
+.ta-foot{display:flex;justify-content:center;margin-top:18px;}
+.ta-btn{font-family:inherit;font-size:10px;letter-spacing:3px;padding:7px 18px;border:1px solid #2a4a7a;background:#0a1830;color:#8fbfff;cursor:pointer;}
+.ta-btn:hover{background:#12264a;}
 .hdr-alert{display:flex;align-items:center;padding:0 18px;font-size:10px;letter-spacing:3px;color:#dd2200;animation:ablink .55s step-end infinite;}
 .hdr-alert.off{display:none;}
 @keyframes ablink{0%,100%{opacity:1}50%{opacity:0}}
@@ -338,6 +382,8 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
 .sys-fi{height:100%;transition:width .5s;}
 .sys-pc{font-size:8px;width:36px;text-align:right;letter-spacing:1px;}
 .dlog-wrap{flex:1;overflow-y:auto;}
+/* v2.60-S171: the whole page is user-select:none (so the game UI never selects by accident); the LOGS must be selectable so their text can be copied */
+#combat-log,#combat-log *,#dmg-log,#dmg-log *,#dmg-log-enemy,#dmg-log-enemy *,#eg-panel .eg-narrative,#eg-panel .eg-sub,#eg-panel .eg-stats,#eg-panel .eg-debrief{user-select:text;-webkit-user-select:text;cursor:text;}
 .dlog-e{font-size:9px;letter-spacing:1px;line-height:1.7;padding:3px 12px;border-bottom:1px solid #060b14;}
 .dlog-e.crit{color:#bb2200;}.dlog-e.warn{color:#bb7700;}.dlog-e.ok{color:#2a6634;}.dlog-e.inf{color:#2a4880;}
 
@@ -706,9 +752,10 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
     <div class="hdr-seg seg-a" id="hdr-turn">TURN 1</div>
     <div class="hdr-seg seg-b" id="hdr-phase">POWER</div>
     <div class="hdr-seg seg-c" id="hdr-diff">ENSIGN</div>
+        <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.59-S170</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.63-S174</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -744,7 +791,8 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
     <div class="tac-log-hdr">
       <span>COMBAT LOG</span>
       <span id="tac-log-badge" style="background:#cc2200;color:#fff;font-size:7px;padding:1px 5px;border-radius:2px;display:none">NEW</span>
-      <button onclick="exportCombatLog()" title="Download the combat log as a .txt file" style="margin-left:auto;font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:2px 7px;border:1px solid #2a4a7a;border-radius:3px;background:#0a1424;color:#8fbfff;cursor:pointer">⤓ EXPORT</button>
+      <button onclick="copyCombatLog(this)" title="Copy the whole combat log to the clipboard (the same text as EXPORT)" style="margin-left:auto;font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:2px 7px;border:1px solid #2a4a7a;border-radius:3px;background:#0a1424;color:#8fbfff;cursor:pointer">COPY</button>
+      <button onclick="exportCombatLog()" title="Download the combat log as a .txt file" style="margin-left:6px;font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:2px 7px;border:1px solid #2a4a7a;border-radius:3px;background:#0a1424;color:#8fbfff;cursor:pointer">⤓ EXPORT</button>
     </div>
     <div id="combat-log" class="tac-log-entries"></div>
     <div id="eg-panel">
@@ -957,7 +1005,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
       <div class="s-lbl" style="margin-bottom:7px">Tactical Advantage</div>
       <div id="tac-adv-panel" style="font-size:9px;letter-spacing:1px;color:#384858;display:flex;flex-direction:column;gap:4px">
         <div>Your move pts: <span id="tac-p-mv" style="color:#bb7700">—</span></div>
-        <div>Enemy est.: <span id="tac-e-mv" style="color:#774433">?</span></div>
+        <div>Enemy move pts: <span id="tac-e-mv" style="color:#774433">?</span></div>
       </div>
     </div>
   </div>
@@ -971,9 +1019,9 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
       <div class="s-lbl">System Status</div>
       <div id="sys-rows"></div>
     </div>
-    <div style="padding:8px 12px 3px"><div class="s-lbl" id="dmg-log-lbl" style="white-space:normal;line-height:1.35">Damage Taken \u2014 Your Ship</div></div>
+    <div style="padding:8px 12px 3px;display:flex;align-items:center;gap:6px"><div class="s-lbl" id="dmg-log-lbl" style="flex:1;white-space:normal;line-height:1.35">Damage Taken \u2014 Your Ship</div><button onclick="copyDmgLog('player',this)" title="Copy this log to the clipboard" style="font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:2px 6px;border:1px solid #2a4a7a;border-radius:3px;background:#0a1424;color:#8fbfff;cursor:pointer">COPY</button></div>
     <div class="dlog-wrap" id="dmg-log"></div>
-    <div style="padding:8px 12px 3px;border-top:1px solid #0a1424"><div class="s-lbl" id="dmg-log-enemy-lbl" style="white-space:normal;line-height:1.35">Damage Dealt \u2014 Enemy</div></div>
+    <div style="padding:8px 12px 3px;border-top:1px solid #0a1424;display:flex;align-items:center;gap:6px"><div class="s-lbl" id="dmg-log-enemy-lbl" style="flex:1;white-space:normal;line-height:1.35">Damage Dealt \u2014 Enemy</div><button onclick="copyDmgLog('enemy',this)" title="Copy this log to the clipboard" style="font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;padding:2px 6px;border:1px solid #2a4a7a;border-radius:3px;background:#0a1424;color:#8fbfff;cursor:pointer">COPY</button></div>
     <div class="dlog-wrap" id="dmg-log-enemy"></div>
   </div>
 </div>
@@ -2776,6 +2824,10 @@ function launchGame() {
   log('BUILD v2.57-S168 -- Misses are tighter. In clear space the worst miss now passes about half a hex from the ship (it used to be as much as 1.35 hexes). A miss only goes wider when something in the environment is degrading the shot: either ship inside a nebula, a target in an asteroid field (beams), or a detected cloaked target. Graphics only.');
   log('BUILD v2.58-S169 -- Two things from your Remora play-test. (1) The Damage Control tab now has two clearly labelled logs: damage taken by your ship, and damage dealt to the enemy; before, both ships\' damage was mixed into one unlabelled list. (2) The shield shimmer is back, and now it is specific: when a shot hits and a shield takes the damage, the single shield arc that was struck shimmers, with a flare where the shot arrived and a small label showing the face and how much it absorbed. Cyan means the face is holding, amber that it is below half, red that the hit used it up. If damage gets through to the hull you also see the hull explosion; if there is no shield you see only the explosion; a full miss still just flies past.');
   log('BUILD v2.59-S170 -- Gravity wells (black holes) now keep three full empty hexes between themselves and every planet and moon (it was two). They can still sit right beside a nebula.');
+  log('BUILD v2.60-S171 -- Four fixes from your Constitution vs D-7 play-test. (1) A miss at point-blank range no longer swings wildly wide: the extra clearance is capped by how far away the target is, and the beam does not carry on as far when you are close. (2) Missed shots are never steered by a gravity well (they do not feel one); to stop a coin-flip looking like gravity, a miss is now sent to the side that keeps it clear of any nearby well. (3) The Damage Control logs now read oldest to newest, like the combat log, each line stamped with its turn, and the cascade entries show their amount and the hull left, so the running hull total adds up. (4) You can now select and copy text from the combat log and the damage logs, and there are COPY buttons on each.');
+  log('BUILD v2.61-S172 -- Missile and plasma results now post when the projectile LANDS. The die is still rolled when you fire, but the roll line, damage, shield absorption, damage location and hull remaining appear only once the shot has visibly hit the shield or hull, or visibly passed the ship on a miss; the shield shimmer or explosion appears at the same moment. A fire phase will not end while a missile is still in flight. Beams are unchanged (they are effectively instant).');
+  log('BUILD v2.62-S173 -- Initiative (the Tactical Advantage) is now shown instead of just logged. Each turn a screen shows both ships\' movement points counting up, rolls the dice in front of you if they are tied, and announces who holds the advantage and what it means (that ship moves last); a badge in the header keeps it in view for the rest of the turn. Click, press Space/Enter, or wait a few seconds to continue. An equal roll on a tie is now rolled again (it used to go to the player).');
+  log('BUILD v2.63-S174 -- The initiative (Tactical Advantage) screen no longer closes by itself and the progress bar is gone: it stays up until you press CONTINUE (or Space / Enter), so you can read the result at your own pace. Clicking the dark background no longer dismisses it either.');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -2805,6 +2857,7 @@ function launchGame() {
     debrief: { snaps:[], faceHits:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]}, faceDmg:{onPlayer:[0,0,0,0,0,0],onEnemy:[0,0,0,0,0,0]} },
   };
   labelDmgLogs();   // v2.58-S169: name the two damage logs and clear any entries left from a previous battle
+  hideInitiativeBadge();   // v2.62-S173: no tactical advantage until this battle's first Tactical Advantage phase
 
   document.getElementById('scenario-screen').style.display='none';
   document.getElementById('hdr-alert').classList.remove('off');
@@ -2854,8 +2907,8 @@ let TUTORIAL_ON = true;
 const TUTORIAL_STEPS = {
   power:{ title:'Power Allocation', step:'Step 1 — divide the reactor',
     body:`Every system draws on one reactor. In the <b>◈ Power Allocation</b> tab, split your total power between <b>Movement</b> (helm), <b>Shields</b> (defence) and <b>Weapons</b> (arm &amp; charge each mount). Each weapon shows a colour-coded <b>hit-chance tag</b> for the current range — hover it for the roll. Watch <b>REMAINING</b>: power left unspent is wasted. Then <b>COMMIT</b> and <b>▶ PROCEED</b>.` },
-  tacadv:{ title:'Tactical Advantage', step:'Step 2 — jockey for position',
-    body:`A single roll decides who seizes the initiative this turn. The loser is forced to move first — tipping their hand — so the winner reacts. No input needed; the bridge resolves it automatically.` },
+  tacadv:{ title:'Tactical Advantage', step:'Step 2 — who holds the initiative',
+    body:`Each captain announces how many <b>movement points</b> his ship has this turn. The ship with <b>more</b> holds the <b>tactical advantage</b>: it <b>moves last</b> in every movement phase, so it sees where the other ship ended up, while the loser has to commit first. A tie is settled by a die roll. No input needed — the bridge resolves it and shows you the result; press Continue when you have read it.` },
   sensors:{ title:'Sensors Phase', step:'Intermediate rules — read the enemy',
     body:`Attempt a <b>sensor lock</b> to unmask full enemy telemetry and run intel questions. If the target has <b>cloaked</b>, pick one of your six shield arcs and <b>SCAN</b> for their ion trail — choose the right arc to regain a firing solution. One scan attempt per phase.` },
   move:{ title:'Movement Phase', step:'Manoeuvre — spend helm power',
@@ -2978,6 +3031,11 @@ function endPhase() {
     setTimeout(()=>advanceFromMove(), 400);
   }
   else if(FIRE_PHASES.includes(p)) {
+    if(GS.pendingImpacts>0){   // v2.61-S172: a missile is still in flight -- its result must post before this phase ends
+      if(!GS._settling){ GS._settling=true; const _b=document.getElementById('btn-endphase'), _l=_b?_b.textContent:''; if(_b) _b.textContent='Resolving\u2026';
+        whenImpactsSettled(()=>{ GS._settling=false; if(_b) _b.textContent=_l; endPhase(); }); }
+      return;
+    }
     // Player clicked End Phase during fire phase — treat as no fire for unfired weapons
     // AI fires are revealed, then advance
     const efired=GS.enemyFireDeclared;
@@ -3028,6 +3086,11 @@ function declareFire(willFire) {
 }
 
 function revealFireDeclarations() {
+  if(GS.pendingImpacts>0){   // v2.61-S172: a missile is still in flight -- its result must post before this phase ends
+    if(!GS._settling){ GS._settling=true; const _b=document.getElementById('btn-endphase'), _l=_b?_b.textContent:''; if(_b) _b.textContent='Resolving\u2026';
+      whenImpactsSettled(()=>{ GS._settling=false; if(_b) _b.textContent=_l; revealFireDeclarations(); }); }
+    return;
+  }
   // Called when AI fires — player fires are now handled individually via fireWeapon().
   const efired = GS.enemyFireDeclared;
   const pfired = GS.playerFireDeclared;
@@ -3793,23 +3856,139 @@ function aiDoSensors(idx){
   renderTac();
 }
 
+// ============================================================================================================================================
+// INITIATIVE = THE TACTICAL ADVANTAGE (v2.62-S173). Rulebook, three versions:
+//   BASIC (p.12)               each captain announces his movement points; MORE wins; a tie is broken by a die roll (highest wins).
+//   INTERMEDIATE / ADVANCED    the same comparison, but a tie goes to the captain with the higher SKILL RATING (no die roll).
+//   COMMAND & CONTROL (RPG)    no comparison of movement points: each captain rolls one die and ADDS it to his Skill Rating in Starship Combat Strategy/Tactics;
+//                              the gamemaster does the same for the opposing captain; the higher total wins.
+// The winner moves LAST in every movement phase (the loser moves first and commits its position first). The book also has the winner roll sensors last
+// and declare fire last -- THIS BUILD ONLY USES IT FOR MOVEMENT ORDER (see HANDOVER), so that is all the screen claims.
+// The game has no captain Skill Ratings yet, so Intermediate ties are also settled by the Basic die roll for now.
+// The screen is built from generic "sides" (label, name, class, faction, movement points or skill) so hot-seat play can name the sides after the players, and the
+// skill-plus-die version (computeTacAdvSkill) can be shown by the same screen when the role-playing rules are wired in.
+// ============================================================================================================================================
+// There is NO auto-advance and no countdown (user, 2026-10-25: it closed before the result could be read): the screen stays until the player presses CONTINUE (or Space / Enter). Right for hot-seat play too.
+let TACADV_SPEED=1;        // animation speed multiplier (1 = normal; tests use a small number)
+let TA_ACTIVE=null;        // the screen currently showing, so a new one can replace it cleanly
+const TA_FACTION_COLOR={fed:'#6ab8ff',kli:'#ff6b5a',rom:'#4fdc8a'};
+// Pure decision (Basic): more movement points wins; a tie is settled by a die each, highest wins -- and an EQUAL roll is rolled again (before v2.62 an equal roll went to the player).
+function computeTacAdv(moves,rollDie){
+  if(moves[0]!==moves[1]) return {decidedBy:'moves',winner:moves[0]>moves[1]?0:1,rounds:[]};
+  const rounds=[]; let winner=-1;
+  for(let n=0;n<20&&winner<0;n++){ const a=rollDie(), b=rollDie(); rounds.push([a,b]); if(a!==b) winner=a>b?0:1; }
+  return {decidedBy:'dice',winner:winner<0?0:winner,rounds};
+}
+// Pure decision (Command & Control / role-playing rules): die + Skill Rating, higher total wins (an equal total is rolled again). Not used by the game yet.
+function computeTacAdvSkill(skills,rollDie){
+  const rounds=[]; let winner=-1, totals=[0,0];
+  for(let n=0;n<20&&winner<0;n++){ const a=rollDie(), b=rollDie(); rounds.push([a,b]); totals=[skills[0]+a,skills[1]+b]; if(totals[0]!==totals[1]) winner=totals[0]>totals[1]?0:1; }
+  return {decidedBy:'skill',winner:winner<0?0:winner,rounds,totals};
+}
+function hideInitiativeBadge(){ const b=document.getElementById('hdr-init'); if(b) b.style.display='none'; }
+function setInitiativeBadge(R,mineIdx){
+  const b=document.getElementById('hdr-init'); if(!b) return;
+  const w=R.sides[R.winner];
+  b.textContent='\u25c6 TAC ADV: '+w.label; b.title=w.name+' holds the tactical advantage this turn and moves last';
+  b.className='hdr-seg seg-d'+(R.winner===mineIdx?'':' theirs'); b.style.display='';
+}
+// R = { mode:'moves'|'skill', turn, decidedBy:'moves'|'dice'|'skill', rounds:[[a,b],..], winner:0|1, totals?, sides:[{label,name,cls,faction,moves|skill},..] }
+function showTacAdvVisual(R,onDone,onReveal){
+  if(TA_ACTIVE){ TA_ACTIVE.abort(); }
+  let ov=document.getElementById('tacadv-ov'); if(!ov){ ov=document.createElement('div'); ov.id='tacadv-ov'; document.body.appendChild(ov); }
+  const S=R.sides, W=R.winner, Lz=1-W, isSkill=R.mode==='skill';
+  const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const col=i=>TA_FACTION_COLOR[S[i].faction]||'#c8d8f0';
+  const val=i=>isSkill?S[i].skill:S[i].moves, maxV=Math.max(1,val(0),val(1));
+  const verb=l=>l==='YOU'?'move':'moves';
+  const timers=[], ints=[]; let finished=false, closed=false, revealed=false, readyAt=0;
+  const doReveal=()=>{ if(revealed) return; revealed=true; if(onReveal){ try{ onReveal(); }catch(e){ console.error('initiative reveal failed',e); } } };   // posts the log lines / badge / sidebar text -- only once the winner is on screen
+  const later=(ms,fn)=>{ timers.push(setTimeout(fn,Math.max(0,Math.round(ms*TACADV_SPEED)))); };
+  const rounds=R.rounds||[], dice=(R.decidedBy==='dice'||isSkill)&&rounds.length>0;
+  const dieSvg=id=>`<svg class="ta-die" id="${id}" viewBox="0 0 64 64" width="66" height="66"><polygon points="32,3 61,25 50,60 14,60 3,25"/><text x="32" y="43" text-anchor="middle" font-size="26" font-weight="bold" font-family="Courier New,monospace">\u2013</text></svg>`;
+  const sideHtml=i=>`<div class="ta-side" id="ta-s${i}"><div class="ta-tag" id="ta-t${i}">TACTICAL ADVANTAGE</div><div class="lbl">${esc(S[i].label)}</div><div class="nm" style="color:${col(i)}">${esc(S[i].name)}</div><div class="cls">${esc(S[i].cls||'')}</div><div class="big" id="ta-n${i}">0</div><div class="unit">${isSkill?'SKILL RATING':'MOVEMENT POINTS'}</div><div class="ta-bar"><i id="ta-b${i}" style="background:${col(i)}"></i></div></div>`;
+  const diceHtml=dice?`<div class="ta-dice" id="ta-dice"><div class="msg" id="ta-msg"></div><div class="ta-dicerow">${[0,1].map(i=>`<div class="ta-dcol"><div class="who">${esc(S[i].label)}</div>${dieSvg('ta-d'+i)}<div class="calc" id="ta-c${i}"></div></div>`).join('')}</div></div>`:'';
+  const sub=isSkill?`TURN ${R.turn} \u00b7 EACH CAPTAIN ROLLS ONE DIE AND ADDS HIS SKILL RATING \u00b7 HIGHER TOTAL WINS`:`TURN ${R.turn} \u00b7 MORE MOVEMENT POINTS WINS \u00b7 A TIE IS SETTLED BY A DIE ROLL`;
+  const why=R.decidedBy==='moves'?`MORE MOVEMENT: ${val(W)} TO ${val(Lz)}`
+          :R.decidedBy==='dice'?`TIED AT ${val(0)} \u2014 WON ON THE DIE: ${rounds[rounds.length-1][W]} TO ${rounds[rounds.length-1][Lz]}`
+          :`SKILL + DIE: ${R.totals[W]} TO ${R.totals[Lz]}`;
+  ov.innerHTML=`<div class="ta-card" onclick="event.stopPropagation()"><div class="ta-title">TACTICAL ADVANTAGE</div><div class="ta-sub">${sub}</div>
+    <div class="ta-row">${sideHtml(0)}<div class="ta-vs">VS</div>${sideHtml(1)}</div>${diceHtml}
+    <div class="ta-banner" id="ta-banner"><div class="h">\u25c6 ${esc(S[W].name)} HOLDS THE TACTICAL ADVANTAGE</div><div class="why">${esc(why)}</div>
+      <div class="c">${esc(S[W].label)} ${verb(S[W].label)} <b>LAST</b> in each movement phase \u2014 and sees where ${esc(S[Lz].label)} ended up.<br>${esc(S[Lz].label)} ${verb(S[Lz].label)} <b>FIRST</b> \u2014 committing a position before seeing the reply.</div></div>
+    <div class="ta-foot"><button class="ta-btn" id="ta-go">SKIP \u25b8</button></div></div>`;
+  const $=id=>document.getElementById(id);
+  const setDie=(i,v,cls)=>{ const d=$('ta-d'+i); if(!d) return; d.querySelector('text').textContent=v; d.classList.toggle('rolling',cls==='rolling'); d.classList.toggle('win',cls==='win'); };
+  const setNum=(i,v)=>{ const n=$('ta-n'+i); if(n) n.textContent=v; const b=$('ta-b'+i); if(b) b.style.width=Math.round(100*v/maxV)+'%'; };
+  const markWinner=()=>{ [0,1].forEach(i=>{ const e=$('ta-s'+i); e.classList.remove('tie'); e.classList.toggle('win',i===W); e.classList.toggle('lose',i!==W); $('ta-t'+i).textContent='TACTICAL ADVANTAGE'; }); };
+  const showRoundFinal=(r,last)=>{
+    setDie(0,rounds[r][0],(last&&W===0&&!isSkill)||(last&&isSkill&&W===0)?'win':''); setDie(1,rounds[r][1],(last&&W===1)?'win':'');
+    if(isSkill){ [0,1].forEach(i=>{ const c=$('ta-c'+i); if(c) c.textContent=`${S[i].skill} + ${rounds[r][i]} = ${S[i].skill+rounds[r][i]}`; }); }
+  };
+  const finalize=()=>{
+    if(finished) return; finished=true; ints.splice(0).forEach(clearInterval);
+    [0,1].forEach(i=>setNum(i,val(i)));
+    if(dice){ $('ta-dice').classList.add('on'); showRoundFinal(rounds.length-1,true); $('ta-msg').textContent=isSkill?'THE HIGHER TOTAL WINS':(rounds.length>1?'TIED AGAIN \u2014 ROLLED AGAIN':'HIGHEST DIE WINS'); }
+    markWinner(); $('ta-banner').classList.add('on'); $('ta-go').textContent='CONTINUE \u25b8'; doReveal();
+    readyAt=Date.now()+Math.round(450*TACADV_SPEED);   // a short guard so a quick double-click on the button cannot skip the animation AND dismiss the result unread
+  };
+  const finishNow=()=>{ timers.splice(0).forEach(clearTimeout); finalize(); };
+  const cleanup=()=>{ timers.splice(0).forEach(clearTimeout); ints.splice(0).forEach(clearInterval); document.removeEventListener('keydown',onKey,true); ov.onclick=null; if(TA_ACTIVE===handle) TA_ACTIVE=null; };
+  function close(){ if(closed) return; closed=true; cleanup(); ov.classList.remove('on'); if(onDone) onDone(); }
+  const onKey=e=>{ if(e.key===' '||e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); advance(); } };
+  const handle={abort(){ if(closed) return; closed=true; cleanup(); ov.classList.remove('on'); doReveal(); }};
+  TA_ACTIVE=handle;
+  function advance(){ if(!finished) finishNow(); else if(Date.now()>=readyAt) close(); }   // first press finishes the animation; the next one (after the guard) continues
+  ov.onclick=null; $('ta-go').onclick=e=>{ e.stopPropagation(); advance(); };
+  document.addEventListener('keydown',onKey,true);
+  ov.classList.add('on');
+  // ---- timeline: numbers and bars climb, then (a tie / skill) the dice are rolled in front of the player, then the winner is announced ----
+  later(40,()=>{ [0,1].forEach(i=>{ const b=$('ta-b'+i); if(b) b.style.width=Math.round(100*val(i)/maxV)+'%'; }); });
+  for(let k=1;k<=10;k++) later(k*85,()=>{ [0,1].forEach(i=>{ const n=$('ta-n'+i); if(n) n.textContent=Math.round(val(i)*k/10); }); });
+  let t=1100;
+  if(!dice){ later(t,finalize); }
+  else{
+    if(!isSkill) later(t,()=>{ [0,1].forEach(i=>{ const e=$('ta-s'+i); e.classList.add('tie'); $('ta-t'+i).textContent='TIED'; }); });
+    rounds.forEach((r,ri)=>{
+      const last=ri===rounds.length-1;
+      later(t,()=>{ $('ta-dice').classList.add('on'); $('ta-msg').textContent=ri?'TIED AGAIN \u2014 ROLL AGAIN':(isSkill?'EACH CAPTAIN ROLLS ONE DIE':'TIED \u2014 ROLL-OFF: HIGHEST DIE WINS'); [0,1].forEach(i=>{ setDie(i,'?','rolling'); const c=$('ta-c'+i); if(c) c.textContent=''; });
+        const iv=setInterval(()=>{ [0,1].forEach(i=>setDie(i,1+Math.floor(Math.random()*10),'rolling')); },70); ints.push(iv); timers.push(setTimeout(()=>{ clearInterval(iv); },Math.round(1050*TACADV_SPEED))); });
+      t+=1100;
+      later(t,()=>{ showRoundFinal(ri,last); $('ta-msg').textContent=last?(isSkill?'THE HIGHER TOTAL WINS':'HIGHEST DIE WINS'):'EQUAL \u2014 NO WINNER'; });
+      t+=last?700:900;
+    });
+    later(t,finalize);
+  }
+}
+
 function resolveTacAdv() {
   const pm=GS.player.movePts.reduce((a,b)=>a+b,0);
   const em=GS.enemy.movePts.reduce((a,b)=>a+b,0);
-  let winner;
-  if(pm!==em){ winner=pm>em?'player':'enemy'; }
-  else {
-    const pr=d10(),er=d10();
-    log(`Tac Adv tie — dice: You rolled <span class="die">${pr}</span>, Enemy rolled <span class="die">${er}</span>`,'roll');
-    winner=pr>=er?'player':'enemy';
-  }
-  GS.tacAdvWinner=winner;
+  const dec=computeTacAdv([pm,em],d10);            // v2.62-S173: the decision is a pure function now; an equal roll is rolled again
+  const winner=dec.winner===0?'player':'enemy';
+  GS.tacAdvWinner=winner;                          // the STATE is decided now (nothing else can happen while the screen is up)...
   const winnerName=winner==='player'?GS.player.name:'AI '+GS.enemy.name;
-  log(`Tactical Advantage: ${winnerName} wins (${pm} vs ${em} move pts)`,'phase');
-  log(winner==='player'?'You move last — enemy exposes their position first':'Enemy moves last — you must move first (exposing your position)','info');
-  document.getElementById('sb-tac-adv').textContent='Tac Adv: '+(winner==='player'?'YOURS':'ENEMY\'S');
-  snd('tactical');
-  setTimeout(()=>enterPhase(subTurnSeq()[0]),800);
+  const lab=GS.sideLabels||{player:'YOU',enemy:'ENEMY'};
+  const R={mode:'moves',turn:GS.turn,decidedBy:dec.decidedBy,rounds:dec.rounds,winner:dec.winner,
+    sides:[{label:lab.player,name:GS.player.name,cls:GS.player.cls,faction:GS.player.faction,moves:pm},
+           {label:lab.enemy, name:GS.enemy.name, cls:GS.enemy.cls, faction:GS.enemy.faction, moves:em}]};
+  GS.tacAdv=R;
+  hideInitiativeBadge(); document.getElementById('sb-tac-adv').textContent='Tac Adv: deciding\u2026';
+  // ...but what the player READS (the dice lines, the result, the header badge, the sidebar, the sound) is posted at the REVEAL, when the winner is on the screen,
+  // exactly like a missile's result is held until it lands. Skipping the animation, or the screen being replaced, posts it at once.
+  const reveal=()=>{
+    dec.rounds.forEach(([pr,er],n)=>{
+      log(`${n?'Tac Adv tie again \u2014 re-roll':'Tac Adv tie \u2014 dice'}: You rolled <span class="die">${pr}</span>, Enemy rolled <span class="die">${er}</span>`,'roll');
+    });
+    log(`Tactical Advantage: ${winnerName} wins (${pm} vs ${em} move pts)`,'phase');
+    log(winner==='player'?'You move last — enemy exposes their position first':'Enemy moves last — you must move first (exposing your position)','info');
+    document.getElementById('sb-tac-adv').textContent='Tac Adv: '+(winner==='player'?'YOURS':'ENEMY\'S');
+    const tev=document.getElementById('tac-e-mv'); if(tev) tev.textContent=em;      // both totals are announced at this phase, so the sidebar can show the real figure
+    snd('tactical'); setInitiativeBadge(R,0);
+  };
+  const next=()=>enterPhase(subTurnSeq()[0]);
+  try{ showTacAdvVisual(R,next,reveal); }
+  catch(e){ console.error('initiative screen failed',e); reveal(); setTimeout(next,800); }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3916,17 +4095,17 @@ function addGoldBeamFX(scHex,tcHex,power,maxPower,emitOff,tOff){
     FX.push({type:'goldpulse',life:1.0,dec:.09,sc:scHex,tc:tcHex,prog:0,delay:k*gap,gfrac,started:false,emitOff:emitOff||{dx:0,dy:0},tOff:tOff||null});
   }
 }
-function addTorpFX(scHex,tcHex,onArrive,col,emitOff,tOff,pathHexes){
+function addTorpFX(scHex,tcHex,onArrive,col,emitOff,tOff,pathHexes,pass){
   const hexes=Math.max(1,pathHexes||hexDist(scHex.col,scHex.row,tcHex.col,tcHex.row));
   FX.push({type:'torp',life:1.0,dec:.05,sc:scHex,tc:tcHex,prog:0,col:col||'#ffcc44',
-           hexes,spd:1/Math.max(1,hexes)*0.09,onArrive,arrived:false,emitOff:emitOff||null,tOff:tOff||null});  // ~1 hex per 11 ticks
+           hexes,spd:1/Math.max(1,hexes)*0.09,onArrive,arrived:false,emitOff:emitOff||null,tOff:tOff||null,pass:pass||null,seq:++FX_SEQ});  // ~1 hex per 11 ticks
 }
 // Romulan plasma torpedo: a large orange fireball that shrinks, dims, reddens and
 // grows more transparent as it crosses each hex — mirroring plasma damage falloff with range.
-function addPlasmaFX(scHex,tcHex,onArrive,emitOff,tOff,pathHexes){
+function addPlasmaFX(scHex,tcHex,onArrive,emitOff,tOff,pathHexes,pass){
   const hexes=Math.max(1,pathHexes||hexDist(scHex.col,scHex.row,tcHex.col,tcHex.row));
   FX.push({type:'plasma',life:1.0,dec:.010,sc:scHex,tc:tcHex,prog:0,hexes,
-           spd:1/Math.max(1,hexes)*0.035,onArrive,arrived:false,emitOff:emitOff||null,tOff:tOff||null});
+           spd:1/Math.max(1,hexes)*0.035,onArrive,arrived:false,emitOff:emitOff||null,tOff:tOff||null,pass:pass||null,seq:++FX_SEQ});
 }
 function addExplosionFX(hx,hy,sizeU,col,off){
   FX.push({type:'expl',life:1.0,dec:.025,hx,hy,sizeU,col,off:off||null});
@@ -3967,7 +4146,11 @@ function addScanFX(ship, arc, success, full){
 }
 // Detection reticle — a pulsing targeting lock drawn on a just-detected cloaked ship.
 function addDetectFX(col,row){ FX.push({type:'detect',life:1.0,dec:.016,cx:col,cy:row}); }
+// v2.61-S172: projectile arrivals / passes found during a tick are collected and run AFTER the loop, in LAUNCH order (`seq`). The loop walks the list backwards, so without this two missiles landing
+// on the same tick would post their results in reverse firing order.
+let FX_SEQ=0;
 function tickFX(){
+  const due=[];
   for(let i=FX.length-1;i>=0;i--){
     const f=FX[i];
     if(f.type==='goldpulse'){
@@ -3975,8 +4158,9 @@ function tickFX(){
       else { f.started=true; f.prog=Math.min(1,f.prog+0.14); if(f.prog>=1) f.life-=f.dec*4; }
     } else if(f.type==='plasma'||f.type==='torp'){
       f.prog=Math.min(1,f.prog+f.spd);
+      if(f.pass&&!f.passed&&f.prog>=f.pass.frac){ f.passed=true; due.push([f.seq||0,f.pass.fn]); }   // v2.61-S172: a MISS visibly passes the ship here -- its result is posted now
       if(f.prog>=1){
-        if(!f.arrived){ f.arrived=true; if(f.onArrive) f.onArrive(); }
+        if(!f.arrived){ f.arrived=true; if(f.onArrive) due.push([f.seq||0,f.onArrive]); }
         f.life-=f.dec;        // only fade once it has reached the target
       }
     } else {
@@ -3984,6 +4168,7 @@ function tickFX(){
     }
     if(f.life<=0) FX.splice(i,1);
   }
+  if(due.length){ due.sort((a,b)=>a[0]-b[0]); due.forEach(d=>d[1]()); }
 }
 function drawFX(g,ts,ox,oy){
   FX.forEach(f=>{
@@ -4336,6 +4521,14 @@ function missSpreadFactor(shooter,target,weapon){
   if(target.cloaked && shooter.detectedCloaked) f*=1.5;
   return f;
 }
+// v2.60-S171 (user play-test): "at one hex a miss went WAY WIDE, at ten hexes it looked fine" and "a missed beam went straight to the black hole". Two causes. (1) The miss
+// clearance is a SIDEWAYS DISTANCE, so at point-blank range the same distance is a huge ANGLE (0.9 HR at one hex is 30-60 degrees) and the beam then carried on a fixed 1.3-2.7
+// hexes. Now: the clearance BEYOND the hull outline is capped at MISS_MAX_GAP_PER_RANGE (18%) of the distance to the target (about 10 degrees), and the carry-on shrinks at short range.
+// (2) There is NO gravity-well mechanic for shots -- the side a miss passes on is a coin flip, so a beam heading for a black hole was chance. A coin flip that happens to look like
+// gravity is misleading, so a miss is now steered to the side that keeps it clear of any gravity well it would otherwise pass within MISS_STEER_HEXES of.
+const MISS_MAX_GAP_PER_RANGE=0.18, MISS_STEER_HEXES=3;
+function gravityWellCenters(){ const o=[]; for(const k in terrain){ if(terrain[k]==='G'){ const p=k.split(',').map(Number); o.push(hexCen(p[0],p[1])); } } return o; }
+function segPointDist(ax,ay,bx,by,px,py){ const ex=bx-ax, ey=by-ay, L2=ex*ex+ey*ey||1; const t=Math.max(0,Math.min(1,((px-ax)*ex+(py-ay)*ey)/L2)); return Math.hypot(ax+ex*t-px, ay+ey*t-py); }
 function computeWeaponAim(shooter,target,weapon,hit,severity){
   const sp=hexCen(shooter.col,shooter.row), tp=hexCen(target.col,target.row);
   const vx=tp.x-sp.x, vy=tp.y-sp.y;
@@ -4346,50 +4539,83 @@ function computeWeaponAim(shooter,target,weapon,hit,severity){
   const latS=isBeam ? (((idx%5)-2)*0.13) : (((idx%3)-1)*0.10);
   const emit=hullEdgePoint(shooter,dS,latS,0.04)||oldMountOffset(shooter,weapon);
   const E={x:sp.x+emit.dx,y:sp.y+emit.dy}, HEX=HR*Math.sqrt(3);
-  let tOff, impact={dx:0,dy:0};
+  let tOff, impact={dx:0,dy:0}, passFrac=1;
   if(hit){
     // lands on the target's hull edge on the side facing the shooter
     const dT=hullEdgePoint(target,(()=>{ const a=Math.atan2(-vy,-vx)-(target.facing||0)*Math.PI/3; return {x:Math.cos(a),y:Math.sin(a)}; })(),((idx%4)-1.5)*0.12,0.12);
     if(dT) impact=dT;
     tOff=impact;
   } else {
-    // MISS (v2.54-S165, retuned v2.57-S168): the shot passes the ship at a distance set by HOW BADLY the die missed. clearance = 0.03 + (maxClear - 0.03) * severity
-    // hex-radii (+-10%), where maxClear is 0.9 HR in clear space and grows with the outside forces in missSpreadFactor() up to a ceiling of 2.33 HR. (1 HR = the hex
-    // radius, 30 px; neighbouring hexes are 1.73 HR apart, so 0.9 HR is about half a hex.) A roll one pip over the number needed GRAZES the hull (0.03 HR clear of
-    // the real outline). The line is solved so that its closest approach to the REAL outline (read from the sprite) is exactly that clearance, so it can never touch
-    // the hull, and it carries on 1.3-2.7 hexes past the ship.
+    // MISS (v2.54-S165, retuned v2.57-S168, range-aware v2.60-S171): the shot passes the ship at a distance set by HOW BADLY the die missed. clearance beyond the hull outline =
+    // 0.03 + (maxClear - 0.03) * severity hex-radii (+-10%), where maxClear is 0.9 HR in clear space and grows with the outside forces in missSpreadFactor() up to 2.33 HR, and the
+    // result is capped at 18% of the distance to the target so a point-blank miss is not a wild swing. (1 HR = the hex radius, 30 px; neighbouring hexes are 1.73 HR apart.) A roll one
+    // pip over the number needed GRAZES the hull (0.03 HR clear of the real outline). The line is solved so that its closest approach to the REAL outline (read from the sprite) is
+    // exactly that clearance, so it can never touch the hull; it carries on 1.3-2.7 hexes past the ship (less at short range). Which side it passes on is a coin flip, except that
+    // it is steered away from a gravity well (see the note above): shots are not affected by gravity wells, so a miss must not look as if they were.
     const sev=(severity===undefined||severity===null)?Math.random():Math.max(0,Math.min(1,severity));
     const rh=hullRadiusWorld(target)||HR*0.9;
     const maxClear=Math.min(MISS_MAX_ABS_HR, MISS_MAX_NORMAL_HR*missSpreadFactor(shooter,target,weapon));
-    const gap=(0.03+(maxClear-0.03)*sev)*HR*(0.9+Math.random()*0.2);
     const ux0=tp.x-E.x, uy0=tp.y-E.y, d0=Math.hypot(ux0,uy0)||1, ux=ux0/d0, uy=uy0/d0;
-    const side=Math.random()<0.5?1:-1;
-    let Dd=rh+gap, th, ct, st, vx2, vy2;                     // Dd = perpendicular distance from the line of fire to the ship's centre
-    for(let it=0;it<4;it++){                                  // settle on a line that clears the REAL outline by exactly `gap`
-      Dd=Math.min(Dd, d0*0.9);
-      th=Math.asin(Dd/d0)*side; ct=Math.cos(th); st=Math.sin(th);
-      vx2=ux*ct-uy*st; vy2=ux*st+uy*ct;                       // line of fire, swung off the target by th
-      const Cx=E.x+vx2*d0*ct, Cy=E.y+vy2*d0*ct, nl=Math.hypot(Cx-tp.x,Cy-tp.y)||1;   // closest point on the line, and the direction from the ship to it
-      const ext=hullExtentAlong(target,(Cx-tp.x)/nl,(Cy-tp.y)/nl);
-      if(ext===null) break;                                   // no sprite: keep the bounding-circle estimate
-      Dd=ext+gap;
+    const gap=Math.min((0.03+(maxClear-0.03)*sev)*HR*(0.9+Math.random()*0.2), MISS_MAX_GAP_PER_RANGE*d0);
+    const extra=(1.3+Math.random()*1.4)*HEX*Math.min(1,0.35+0.2*(d0/HEX));          // carry-on past the closest point; shorter when the shooter is close
+    const solve=side=>{
+      let Dd=rh+gap, th, ct, st, vx2, vy2;                    // Dd = perpendicular distance from the line of fire to the ship's centre
+      for(let it=0;it<4;it++){                                 // settle on a line that clears the REAL outline by exactly `gap`
+        Dd=Math.min(Dd, d0*0.9);
+        th=Math.asin(Dd/d0)*side; ct=Math.cos(th); st=Math.sin(th);
+        vx2=ux*ct-uy*st; vy2=ux*st+uy*ct;                     // line of fire, swung off the target by th
+        const Cx=E.x+vx2*d0*ct, Cy=E.y+vy2*d0*ct, nl=Math.hypot(Cx-tp.x,Cy-tp.y)||1;   // closest point on the line, and the direction from the ship to it
+        const ext=hullExtentAlong(target,(Cx-tp.x)/nl,(Cy-tp.y)/nl);
+        if(ext===null) break;                                  // no sprite: keep the bounding-circle estimate
+        Dd=ext+gap;
+      }
+      Dd=Math.min(Dd, d0*0.9); th=Math.asin(Dd/d0)*side; ct=Math.cos(th); st=Math.sin(th); vx2=ux*ct-uy*st; vy2=ux*st+uy*ct;
+      const along=d0*ct+extra;
+      return {vx2,vy2,along,passAlong:d0*ct,px:E.x+vx2*along,py:E.y+vy2*along};   // passAlong = distance to the point of closest approach (where a miss visibly PASSES the ship)
+    };
+    const pA=solve(1), pB=solve(-1);
+    let pick=Math.random()<0.5?pA:pB;
+    const wells=gravityWellCenters();
+    if(wells.length){
+      const near=p=>Math.min(...wells.map(w=>segPointDist(E.x,E.y,p.px,p.py,w.x,w.y)));   // how close this path comes to the nearest gravity well
+      const nA=near(pA), nB=near(pB);
+      if(Math.min(nA,nB)<MISS_STEER_HEXES*HEX && Math.abs(nA-nB)>0.25*HEX) pick=nA>nB?pA:pB;
     }
-    Dd=Math.min(Dd, d0*0.9); th=Math.asin(Dd/d0)*side; ct=Math.cos(th); st=Math.sin(th); vx2=ux*ct-uy*st; vy2=ux*st+uy*ct;
-    const along=d0*ct+(1.3+Math.random()*1.4)*HEX;           // carry on past the point of closest approach
-    tOff={dx:E.x+vx2*along-tp.x, dy:E.y+vy2*along-tp.y};
+    tOff={dx:pick.px-tp.x, dy:pick.py-tp.y};
+    passFrac=Math.max(0.05,Math.min(0.95,pick.passAlong/pick.along));
   }
   const pathHexes=Math.hypot(tp.x+tOff.dx-E.x, tp.y+tOff.dy-E.y)/HEX;   // keeps the projectile speed at ~1 hex per 11 ticks whatever the path length
-  return {emit,tOff,impact,pathHexes};
+  return {emit,tOff,impact,pathHexes,passFrac};
 }
 
 // Trigger visual + sound for weapon fire ? stores HEX coords, canvas conversion in drawFX
-function triggerWeaponFX(shooter,target,weapon,hit,missSev,info){
+// v2.61-S172 DEFERRED RESULTS (user request): a missile or plasma bolt used to print its roll, damage and shield text the instant it was FIRED, while it was still flying.
+// Now the die is rolled at launch (so the animation knows hit or miss) but the whole result block is posted when the projectile visibly lands: on the hull or shield for a HIT,
+// as it passes the ship for a MISS. `onResolve` is the caller's "post the result" function; it runs exactly once. GS.pendingImpacts counts missiles in flight, and the places
+// where a fire phase can end wait for it to reach zero (whenImpactsSettled), so a phase can never move on while a result is still to come. If a projectile never lands (tab
+// hidden, effect lost) a watchdog posts the result anyway after IMPACT_WATCHDOG_MS; if the battle was replaced in the meantime the result is dropped.
+let IMPACT_WATCHDOG_MS=9000;
+function whenImpactsSettled(cb){
+  if(!(GS&&GS.pendingImpacts>0)){ cb(); return; }
+  const gsRef=GS, t0=Date.now();
+  const poll=()=>{ if(GS!==gsRef) return; if(!(GS.pendingImpacts>0)||Date.now()-t0>IMPACT_WATCHDOG_MS+3000) cb(); else setTimeout(poll,50); };
+  setTimeout(poll,50);
+}
+function triggerWeaponFX(shooter,target,weapon,hit,missSev,info,onResolve){
   const scHex={col:shooter.col,row:shooter.row};
   const tcHex={col:target.col,row:target.row};
   const aim=computeWeaponAim(shooter,target,weapon,hit,missSev);   // v2.53-S164: hull emitter, hull-edge impact, real misses; v2.54-S165: miss distance from the die roll
   // v2.58-S169: what a HIT looks like depends on what it struck. `info` is filled in by the fire code once the shield has been worked out ({face,pre,post,absorbed,pen}); it is read
   // here when the shot LANDS (a beam ~120 ms later, a missile when it arrives), which is always after that. Shield took (some of) it -> shimmer on that arc; damage got through
   // (or there was no shield) -> explosion on the hull edge; both can happen. No info at all -> behave as before (explosion).
+  const gsRef=GS; let _resolved=false;
+  const resolveOnce=()=>{
+    if(_resolved) return; _resolved=true;
+    if(!onResolve||GS!==gsRef) return;                       // nothing to post, or the battle was replaced while it flew
+    try{ onResolve(); }catch(e){ console.error('deferred result failed',e); }
+    finally{ GS.pendingImpacts=Math.max(0,(GS.pendingImpacts||0)-1); }
+  };
+  if(onResolve&&(weapon.type==='missile'||weapon.type==='plasma')){ GS.pendingImpacts=(GS.pendingImpacts||0)+1; setTimeout(resolveOnce,IMPACT_WATCHDOG_MS); }
   const impactFX=(boomSize,boomCol,boomSnd)=>{
     const I=info||{}, shielded=(I.absorbed||0)>0, through=(I.pen===undefined)||I.pen>0;
     if(shielded) addShieldArcFX(target,I.face,I.pre,I.post,I.absorbed,shooter);
@@ -4419,15 +4645,15 @@ function triggerWeaponFX(shooter,target,weapon,hit,missSev,info){
     const torpCol = isKlingonTube ? '#ff3322' : '#ffcc44';
     // impact fires when the torpedo visually reaches the target (arrival callback); a miss has no impact at all
     const impact = hit
-      ? ()=>impactFX(HR*1.2,'#ffcc44','explosion')
-      : ()=>{};
-    addTorpFX(scHex,tcHex,impact,torpCol,aim.emit,aim.tOff,aim.pathHexes);
+      ? ()=>{ resolveOnce(); impactFX(HR*1.2,'#ffcc44','explosion'); }     // post the result FIRST (it fills `info`), then show what the shot struck
+      : ()=>{ resolveOnce(); };
+    addTorpFX(scHex,tcHex,impact,torpCol,aim.emit,aim.tOff,aim.pathHexes,hit?null:{frac:aim.passFrac,fn:resolveOnce});
     snd('torpedo');
   } else if(weapon.type==='plasma'){
     const impact = hit
-      ? ()=>impactFX(HR*1.1,'#ff7a1e','explosion')
-      : ()=>{};
-    addPlasmaFX(scHex,tcHex,impact,aim.emit,aim.tOff,aim.pathHexes);
+      ? ()=>{ resolveOnce(); impactFX(HR*1.1,'#ff7a1e','explosion'); }
+      : ()=>{ resolveOnce(); };
+    addPlasmaFX(scHex,tcHex,impact,aim.emit,aim.tOff,aim.pathHexes,hit?null:{frac:aim.passFrac,fn:resolveOnce});
     snd('torpedo');
   }
 }
@@ -4616,7 +4842,7 @@ function terrainToHitPenalty(shooterCol, shooterRow, targetCol, targetRow, weapo
 }
 
 function resolveShipFiring(shooter, target, subPhase, onComplete) {
-  const finish=()=>{ if(onComplete) onComplete(); };
+  const finish=()=>{ whenImpactsSettled(()=>{ if(onComplete) onComplete(); }); };   // v2.61-S172: do not move on while a missile is still to land
   const weapons = shooter.weapons.filter(w=>w.armed&&w.alive&&!w.fired);
   if(weapons.length===0){log(`${shooter.name}: No armed weapons to fire`,'info');finish();return;}
   // Cloak firing gate (Intermediate = must have detected; Basic = cannot fire on cloaked at all).
@@ -4644,6 +4870,9 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
       } else {
         w.fired=true;
         shooter.ai?GS.turn_stats.enemyShotsFired++:GS.turn_stats.playerShotsFired++;
+        // v2.61-S172: a missile/plasma result is held back until the projectile lands (see triggerWeaponFX); everything printed BEFORE the result (warnings + the roll line) is buffered with it
+        const deferred=(w.type==='missile'||w.type==='plasma'); const _buf=[]; let _revealed=!deferred;
+        const emit=(m,c)=>{ if(_revealed) log(m,c); else _buf.push([m,c]); };
         // To-hit — a cloak penalty shrinks the effective success band (adds to the die roll),
         // and so does terrain (asteroid cover on the target, nebula on either side).
         const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
@@ -4653,16 +4882,16 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
         if(terrPen>0){
           const tT=terrain[`${target.col},${target.row}`]||'S';
           const sT=terrain[`${shooter.col},${shooter.row}`]||'S';
-          if(tT==='A'&&w.type==='beam') log(`  ⚠ Target in ASTEROID FIELD — +1 cover, beam weapons partially deflected`,'warn');
-          if(tT==='N') log(`  ⚠ Target is in a NEBULA — sensor lock degraded, +1 to required roll`,'warn');
-          if(sT==='N') log(`  ⚠ ${shooter.name} is in a NEBULA — sensors degraded, firing accuracy reduced`,'warn');
+          if(tT==='A'&&w.type==='beam') emit(`  ⚠ Target in ASTEROID FIELD — +1 cover, beam weapons partially deflected`,'warn');
+          if(tT==='N') emit(`  ⚠ Target is in a NEBULA — sensor lock degraded, +1 to required roll`,'warn');
+          if(sT==='N') emit(`  ⚠ ${shooter.name} is in a NEBULA — sensors degraded, firing accuracy reduced`,'warn');
         }
         const effMax=maxR-(fireGate.penalty||0)-terrPen;
         const roll=d10();
         const hit=roll>=minR&&roll<=effMax&&effMax>0;
         const totalPen=(fireGate.penalty||0)+terrPen;
         const needStr=totalPen>0?`1-${maxR} −${totalPen} = 1-${Math.max(0,effMax)}`:`1-${maxR}`;
-        log(`  ${w.name}: Chart <span class="chart">${w.chart}</span> Range ${rangeKey} → need <span class="die">${needStr}</span>, rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
+        emit(`  ${w.name}: Chart <span class="chart">${w.chart}</span> Range ${rangeKey} → need <span class="die">${needStr}</span>, rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
         // Trigger the beam/torpedo graphic regardless of hit/miss, matching the
         // player's own fireWeapon() -- a miss should still show a beam/tracer
         // (triggerWeaponFX's own internal hit/miss branch draws a shield-glint
@@ -4671,9 +4900,12 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
         // visually -- caught after the fire-staggering fix made a lone silent
         // miss much more noticeable than it was when everything resolved at once.
         const fxInfo={};   // v2.58-S169: filled in below once the shield has been worked out, read by the effect when the shot lands
-        triggerWeaponFX(shooter,target,w,hit,hit?0:missSeverity(roll,minR,effMax),fxInfo);   // v2.54-S165: how far it misses depends on the roll
+        const rsnd=deferred?(k=>{ if(k==='miss') snd(k); }):snd;   // a deferred shot's explosion / shield sounds come from the impact effect, not from here
+        const resolveOutcome=()=>{
+          _revealed=true; _buf.forEach(([m,c])=>log(m,c)); _buf.length=0;     // the roll line and warnings appear HERE, when the projectile lands
+          if(deferred&&(GS.over||target.superstructure<=0)){ log(`  ${w.name}: ${hit?'HIT':'MISS'} \u2014 but the fight is already decided; no further effect`,'info'); return; }
         if(!hit){
-          snd('miss');
+          rsnd('miss');
         } else {
           shooter.ai?GS.turn_stats.enemyShotsHit++:GS.turn_stats.playerShotsHit++;
           // FASA: a successful hit on a ship breaks any sensor lock that ship was holding.
@@ -4714,9 +4946,9 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
 
           fxInfo.face=hitFace; fxInfo.pre=preSh; fxInfo.post=target.shields[hitFace]; fxInfo.absorbed=absorbedAmt; fxInfo.pen=dmg;   // v2.58-S169
           if(dmg<=0){
-            log('  No damage penetrates','ok');snd('shieldhit');
+            log('  No damage penetrates','ok');rsnd('shieldhit');
           } else {
-            snd('explosion');
+            rsnd('explosion');
             // Damage location
             const locRoll=d10();
             const loc=DMG_LOCATION[locRoll];
@@ -4735,6 +4967,10 @@ function resolveShipFiring(shooter, target, subPhase, onComplete) {
             applyDamage(target,dmg,loc,hitFace,shooter);
           }
         }
+          updateSidebar(); renderDmgView(); renderTac();
+        };
+        triggerWeaponFX(shooter,target,w,hit,hit?0:missSeverity(roll,minR,effMax),fxInfo,deferred?resolveOutcome:undefined);   // v2.54-S165: how far it misses depends on the roll
+        if(!deferred) resolveOutcome();
       }
       updateSidebar();
       renderDmgView();
@@ -4774,7 +5010,7 @@ function applyDamage(ship,dmg,loc,hitFace,firer){
       const sd=Math.ceil(dmg/2);
       ship.superstructure=Math.max(0,ship.superstructure-sd);
       log(`${ship.name}: Cascade hit — superstructure −${sd} (${ship.superstructure} left)`,'dmg');
-      addDmgLog(`Superstructure cascade −${sd}`,'crit',ship);
+      addDmgLog(`Superstructure cascade \u2212${sd} (${ship.superstructure}/${ship.superstructureMax})`,'crit',ship);   // v2.60-S171: carries the amount and what is left
     }
   } else if(loc==='beam'||loc==='missile'){
     // v2.56-S167 (user chose "Option A"): rulebook pp.19-20 -- the destroyed weapon "must be one that could bear on the firer; target's owner picks if several can.
@@ -4787,7 +5023,7 @@ function applyDamage(ship,dmg,loc,hitFace,firer){
       pick.w.alive=false; addDmgLog(`${pick.w.name} DESTROYED`,'crit',ship); log(`${ship.name}: ${pick.w.name} DESTROYED`,'dmg');
     } else {
       const sd=Math.ceil(dmg/2); ship.superstructure=Math.max(0,ship.superstructure-sd);
-      addDmgLog('Weapon cascade \u2192 superstructure','warn',ship);
+      addDmgLog(`Weapon cascade \u2192 superstructure \u2212${sd} (${ship.superstructure}/${ship.superstructureMax})`,'warn',ship);   // v2.60-S171: carries the amount and what is left
       log(`${ship.name}: no weapon could bear on the firer \u2014 damage halved onto superstructure (\u2212${sd}, ${ship.superstructure} left)`,'dmg');
     }
   } else if(loc==='engine'){
@@ -9211,6 +9447,9 @@ function fireWeapon(wid, countedInBatch){
     log(`${w.name}: Target not in arc [${w.arcs.map(a=>['F','F-Stbd','A-Stbd','Aft','A-Port','F-Port'][a]).join('/')}] — rotate ship to bring target into arc`,'warn');
     return;
   }
+  // v2.61-S172: a missile/plasma result is held back until the projectile lands (see triggerWeaponFX); the warnings and the roll line printed BEFORE the result are buffered with it
+  const deferred=(w.type==='missile'||w.type==='plasma'); const _buf=[]; let _revealed=!deferred;
+  const emit=(m,c)=>{ if(_revealed) log(m,c); else _buf.push([m,c]); };
   // Check terrain modifiers -- these previously only logged a warning and never
   // actually changed the roll needed (found from a user report about asteroid cover
   // giving no real defensive benefit). Now uses the same shared helper and mechanism
@@ -9220,20 +9459,20 @@ function fireWeapon(wid, countedInBatch){
   const targetTerrain=terrain[`${target.col},${target.row}`]||'S';
   const terrPen=terrainToHitPenalty(shooter.col,shooter.row,target.col,target.row,w.type);
   if(shooterTerrain==='N'){
-    log(`⚠ You are in a NEBULA — sensors degraded, firing accuracy reduced`,'warn');
+    emit(`⚠ You are in a NEBULA — sensors degraded, firing accuracy reduced`,'warn');
   }
   if(targetTerrain==='N'){
-    log(`⚠ Target is in a NEBULA — sensor lock degraded, +1 to required roll`,'warn');
+    emit(`⚠ Target is in a NEBULA — sensor lock degraded, +1 to required roll`,'warn');
   }
   if(targetTerrain==='A'&&w.type==='beam'){
-    log(`⚠ Target in ASTEROID FIELD — +1 cover, beam weapons partially deflected`,'warn');
+    emit(`⚠ Target in ASTEROID FIELD — +1 cover, beam weapons partially deflected`,'warn');
   }
   // v2.56-S167 FIX: the cloak to-hit penalty (+3 if the target moved this turn, +5 if it stayed still -- see canFireOnTarget) was applied to the AI's shots in
   // resolveShipFiring() but NEVER to the player's, even though the weapon tooltip announced "CLOAK PENALTY +N". Found from a user combat log (Andor vs Whitewind):
   // torpedoes at a detected cloaked ship rolled against the plain chart (need 1-6 at range 5; should have been 1-3). Now identical to the AI path.
   const _cloakGate=(target&&target.cloaked)?canFireOnTarget(shooter,target):null;
   const cloakPen=(_cloakGate&&_cloakGate.allowed)?(_cloakGate.penalty||0):0;
-  if(cloakPen>0) log(`\u26a0 Firing at a CLOAKED contact \u2014 to-hit penalty +${cloakPen} (${target.movedThisTurn?'target moving':'target stationary'})`,'warn');
+  if(cloakPen>0) emit(`\u26a0 Firing at a CLOAKED contact \u2014 to-hit penalty +${cloakPen} (${target.movedThisTurn?'target moving':'target stationary'})`,'warn');
   // To-hit roll
   GS.turn_stats.playerShotsFired++;
   const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
@@ -9243,14 +9482,17 @@ function fireWeapon(wid, countedInBatch){
   const roll=d10();
   const hit=roll>=1&&roll<=effMax&&effMax>0;
   const needStr=(cloakPen+terrPen)>0?`1-${maxR} −${cloakPen+terrPen} = 1-${Math.max(0,effMax)}`:`1-${maxR}`;
-  log(`${w.name} at range ${range}: Chart <span class="chart">${w.chart}</span> need <span class="die">${needStr}</span> rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
+  emit(`${w.name} at range ${range}: Chart <span class="chart">${w.chart}</span> need <span class="die">${needStr}</span> rolled <span class="die">${roll}</span> — <b>${hit?'HIT!':'MISS'}</b>`,'roll');
   w.fired=true;
   // Only count this shot toward the volley total here if it wasn't already committed
   // up front by fireAllWeapons() -- see that function for why the batch total is
   // pre-committed rather than counted per-resolution.
   if(!countedInBatch) GS.player._volleyCount=(GS.player._volleyCount||0)+1;
   const fxInfo={};   // v2.58-S169: filled in below once the shield has been worked out, read by the effect when the shot lands
-  triggerWeaponFX(shooter,target,w,hit,hit?0:missSeverity(roll,1,effMax),fxInfo);   // v2.54-S165: how far it misses depends on the roll
+  const rsnd=deferred?(k=>{ if(k==='miss') snd(k); }):snd;   // a deferred shot's explosion / shield sounds come from the impact effect, not from here
+  const resolveOutcome=()=>{
+    _revealed=true; _buf.forEach(([m,c])=>log(m,c)); _buf.length=0;     // the roll line and warnings appear HERE, when the projectile lands
+    if(deferred&&(GS.over||target.superstructure<=0)){ log(`${w.name}: ${hit?'HIT':'MISS'} \u2014 but the fight is already decided; no further effect`,'info'); return; }
   if(hit){
     GS.turn_stats.playerShotsHit++;
     let dmg=0;
@@ -9279,7 +9521,7 @@ function fireWeapon(wid, countedInBatch){
     }
     fxInfo.face=hitFace; fxInfo.pre=preSh2; fxInfo.post=target.shields[hitFace]; fxInfo.absorbed=absorbedAmt2; fxInfo.pen=dmg;   // v2.58-S169
     if(dmg>0){
-      snd('explosion');
+      rsnd('explosion');
       const locRoll=d10();
       const loc=DMG_LOCATION[locRoll];
       log(`Location roll <span class="die">${locRoll}</span> → <b>${loc}</b>`,'roll');
@@ -9294,9 +9536,13 @@ function fireWeapon(wid, countedInBatch){
         };
       }
       applyDamage(target,dmg,loc,hitFace,shooter);
-    } else { snd('shieldhit'); }
+    } else { rsnd('shieldhit'); }
     checkVictory();
-  } else { snd('miss'); }
+  } else { rsnd('miss'); }
+    updateSidebar(); renderDmgView();
+  };
+  triggerWeaponFX(shooter,target,w,hit,hit?0:missSeverity(roll,1,effMax),fxInfo,deferred?resolveOutcome:undefined);   // v2.54-S165: how far it misses depends on the roll
+  if(!deferred) resolveOutcome();
   // Mark player as having declared fire this phase
   GS.playerFireDeclared=true;
   refreshWpnFireBtns();
@@ -9305,6 +9551,11 @@ function fireWeapon(wid, countedInBatch){
 }
 
 function declareNoFire(){
+  if(GS.pendingImpacts>0){   // v2.61-S172: a missile is still in flight -- its result must post before this phase ends
+    if(!GS._settling){ GS._settling=true; const _b=document.getElementById('btn-endphase'), _l=_b?_b.textContent:''; if(_b) _b.textContent='Resolving\u2026';
+      whenImpactsSettled(()=>{ GS._settling=false; if(_b) _b.textContent=_l; declareNoFire(); }); }
+    return;
+  }
   GS.playerFireDeclared=false;
   log('You: NO FIRE this phase','info');
   // Reveal AI fire and advance
@@ -9390,20 +9641,43 @@ function initUI(){
   updateSidebar();
 }
 
-function exportCombatLog(){
-  if(!GS||!GS.combatLog||!GS.combatLog.length){ alert('No combat log entries yet — start a battle first.'); return; }
+// v2.60-S171: one builder for the combat-log text, used by both EXPORT (a .txt download) and COPY (the clipboard), so they can never differ. Returns null when there is nothing yet.
+function combatLogText(){
+  if(!GS||!GS.combatLog||!GS.combatLog.length) return null;
   const strip=s=>{ const d=document.createElement('div'); d.innerHTML=s; return (d.textContent||d.innerText||'').trim(); };
   const build=document.getElementById('hdr-build')?document.getElementById('hdr-build').textContent:'';
   const pj=GS.player?`${GS.player.name} (${GS.player.cls})`:'?';
   const ej=GS.enemy?`${GS.enemy.name} (${GS.enemy.cls})`:'?';
-  const head=`STAR TREK: TACTICAL COMMAND — COMBAT LOG\n${build}\nExported ${new Date().toISOString()}\nPlayer: ${pj}\nEnemy:  ${ej}\n`+'='.repeat(52)+'\n\n';
+  const head=`STAR TREK: TACTICAL COMMAND \u2014 COMBAT LOG\n${build}\nExported ${new Date().toISOString()}\nPlayer: ${pj}\nEnemy:  ${ej}\n`+'='.repeat(52)+'\n\n';
   const body=GS.combatLog.map(e=>strip(e.msg)).filter(Boolean).join('\n');
-  const blob=new Blob([head+body+'\n'],{type:'text/plain'});
+  return head+body+'\n';
+}
+function exportCombatLog(){
+  const text=combatLogText();
+  if(text===null){ alert('No combat log entries yet \u2014 start a battle first.'); return; }
+  const blob=new Blob([text],{type:'text/plain'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url;
   a.download='combat_log_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.txt';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+// Copy text to the clipboard (modern API where it exists, otherwise a hidden textarea + execCommand, which also works from a local file); flashes the button to say what happened.
+function copyTextToClipboard(text,btn){
+  const flash=ok=>{ if(!btn) return; if(!btn.dataset.lbl) btn.dataset.lbl=btn.textContent; btn.textContent=ok?'COPIED':'FAILED'; setTimeout(()=>{ btn.textContent=btn.dataset.lbl; },1400); };
+  const fallback=()=>{ try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); flash(!!ok); }catch(e){ flash(false); } };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(()=>flash(true),fallback); } else fallback();
+}
+function copyCombatLog(btn){
+  const t=combatLogText();
+  if(t===null){ if(btn){ if(!btn.dataset.lbl) btn.dataset.lbl=btn.textContent; btn.textContent='NO LOG'; setTimeout(()=>{ btn.textContent=btn.dataset.lbl; },1400); } return; }   // nothing to copy: say so, and leave the clipboard alone
+  copyTextToClipboard(t,btn);
+}
+function copyDmgLog(side,btn){
+  if(!GS||!GS.dmgLog) return;
+  const lbl=document.getElementById(side==='enemy'?'dmg-log-enemy-lbl':'dmg-log-lbl');
+  const lines=GS.dmgLog.filter(e=>e.side===side).map(e=>`T${e.turn||1} \u00b7 ${e.msg}`);
+  copyTextToClipboard((lbl?lbl.textContent:'Damage log')+'\n'+(lines.length?lines.join('\n'):'(no entries yet)')+'\n',btn);
 }
 
 function log(msg,cls='info'){
@@ -9439,9 +9713,12 @@ function labelDmgLogs(){
 function addDmgLog(msg,cls,ship){
   if(!GS)return;
   const side=(ship&&GS.enemy&&ship===GS.enemy)?'enemy':'player';
-  GS.dmgLog.push({msg,cls,side});
+  const turn=GS.turn||1;
+  GS.dmgLog.push({msg,cls,side,turn});
   const el=document.getElementById(side==='enemy'?'dmg-log-enemy':'dmg-log');if(!el)return;
-  const d=document.createElement('div');d.className='dlog-e '+cls;d.textContent=msg;el.prepend(d);
+  // v2.60-S171: CHRONOLOGICAL (oldest at the top, newest at the bottom, scrolled to the newest) like the combat log -- these used to prepend, so reading down the panel ran BACKWARD in time
+  // and "-8 (12/20)" under "-3 (9/20)" looked like the hull going up. Each line also carries its turn number (T4 = the 4th Power Allocation, as in the combat log).
+  const d=document.createElement('div');d.className='dlog-e '+cls;d.textContent=`T${turn} \u00b7 ${msg}`;el.appendChild(d); el.scrollTop=el.scrollHeight;
 }
 
 // What each tier ACTUALLY does, as of v2.42-S153 -- keep this in step with the AI code (aiAllocatePower, aiDoMove,
