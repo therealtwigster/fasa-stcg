@@ -1,4 +1,4 @@
-> **Build v2.46-S157** · Every ship now has a matchup rating — 2026-10-07
+> **Build v2.59-S170** · Gravity wells keep three full hexes clear — 2026-10-25
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,89 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.59-S170)
+- **Gravity wells (black holes) now keep three full empty hexes between themselves and every planet and moon** (it was two). They can still sit right beside a nebula.
+
+## Recent fixes (v2.58-S169)
+- **The Damage Control tab now has two clearly labelled logs:** "Damage taken" for your ship and "Damage dealt" for the enemy. Before, both ships' damage was mixed together in one
+  unlabelled list. The logs also start empty at the beginning of each battle.
+- **The shield shimmer is back, and now it shows which shield face was hit.** When a shot hits and a shield takes the damage, the one shield arc that was struck shimmers, with a flare where
+  the shot arrived and a small label (face name and how much it absorbed). Cyan means the face is holding, amber that it is below half, red that the hit used it up. If damage also gets through you
+  see the hull explosion; if there is no shield you see only the explosion; a full miss still just flies past.
+
+## Recent fixes (v2.57-S168)
+- **Misses are tighter.** In clear space even the worst miss now passes about half a hex from the ship (it used to go as wide as about 1.35 hexes). A shot only goes wider when something in
+  the environment is degrading it: a ship inside a nebula, a target in an asteroid field (beams), or a detected cloaked target. Only the worst conditions reach the old maximum.
+
+## Recent fixes (v2.56-S167)
+- **Shooting at a cloaked ship now carries the cloak penalty for you too.** The game already applied it to the AI's shots at you, and the weapon tooltip announced it, but your own
+  dice ignored it. A detected cloaked ship that moved this turn now needs a much better roll (and a stationary one even more). Cloaked ships are noticeably harder to hit.
+- **Admiral and Captain cloaking ships no longer waste power on the turn they cloak:** the power that would have gone to weapons now goes into shields.
+- **A hit that destroys a weapon now follows the rulebook.** The weapon lost must be one that could actually aim at the shooter, and the game picks the least valuable such weapon
+  (so you keep your best guns). If no weapon of that type could bear it hits the other type, and if nothing could bear, the hit does half damage to the hull instead.
+  Before, it always destroyed the first weapon listed, even an aft tube hit from the front.
+
+## Recent fixes (v2.55-S166)
+- **The Damage Control tab now shows each ship's own top-down art.** Before, 46 of the 66 ships got a generic drawn silhouette even though the game had their real top-down picture
+  (every Chandley, the Federation II, the Gagarin, the L-24 and more). They now use that picture, cropped to the hull and centred in the shield ring. Ships with dedicated
+  damage art keep it.
+- **A moon can no longer sit next to a planet** (there is always at least one empty hex between them).
+- **Gravity wells (black holes) now stay at least three hexes from every planet and moon.** They can still sit right beside a nebula. Before this fix, a well could even land on top
+  of a planet or moon.
+
+## Recent fixes (v2.54-S165)
+- **How far a shot misses now depends on the die roll.** A roll just over the number needed grazes the target; the worst rolls go very wide. This works for beams and
+  missiles alike, and it only changes how the shot looks, not whether it hits.
+- **Fixed the Damage Control tab:** the top-down ship was not centred inside its ring. Tall ships (Constitution, Excelsior, Federation I, T-5, D-4) sat low and the wide Bird of Prey
+  ships sat high. They are now centred. The hand-tuned D-7 placement is unchanged.
+
+## Recent fixes (v2.53-S164)
+- **Weapon visuals, stage 1.** Beams and torpedoes now leave from the firing ship's own hull (on the side facing the target) instead of from a point out in the hex.
+  A hit lands on the target's hull edge, on the side facing the shooter. A miss now flies past beside the ship and carries on beyond it, with no impact flash,
+  so you can finally tell a hit from a miss by eye. These are graphics only: hit chances, damage and the combat log are unchanged.
+- Still to come (waiting for the go-ahead): holding back a missile's hit/miss text and damage until it actually arrives.
+
+## Recent fixes (v2.52-S163)
+- **Fixed a bug that made the hardest AI opponents too easy.** At Captain, Admiral and Legend the enemy was entering battle with an empty (or even negative) forward
+  shield on most ships, so your first hit on its front always went straight through. Enemy shields are now spread evenly across all six faces at every tier, so the
+  top three difficulty levels are noticeably tougher than before. Found from two of your combat logs.
+- **Fixed a second, smaller AI bug:** enemy ships that had just cloaked could spend more power than they had.
+
+## Recent fixes (v2.51-S162)
+- **The Federation II dreadnought was only carrying half its weapons.** It now has both complete beam sets as designed — six FH-11 plus six FH-9 (Mk I) or six FH-14 (Mk II) — and its
+  two torpedo tubes: 14 weapons per mark instead of 8. Its second beam set now covers forward, side and aft arcs. Expect the Federation II to hit much harder than before.
+- The Federation I was re-checked against its source tables and was already correct on every mark.
+- The power-allocation panel needed no changes: it already lists every weapon on its own row with its own maximum power.
+
+## Recent fixes (v2.50-S161)
+- **New playable ship: the Federation I dreadnought** (the TOS-style Franz Joseph design) — all six marks, with its own sprite, viewscreen portrait and
+  damage-control view. Ten beams in two banks plus two torpedo tubes on every mark; the hull stays at 50 but the shields, engines and weapons improve from Mk I to Mk VI.
+  It shares the name and registry "USS Federation, NCC-2100" with the Federation II; the class label tells them apart.
+- **The Federation II dreadnought is now in the Recognition Database too**, and so is the Federation I. Both show their live sprites and Playable badges, and
+  "Select for battle" works for every mark of both.
+- The Federation I's side-facing weapons cover both side arcs of their side (a reading we can adjust after play-testing).
+
+## Recent fixes (v2.49-S160)
+- **The Klingon T-5 Throne Seeker and L-24 Ever-Victorious no longer share artwork.** The T-5 now has its own art (the FASA 1985 original,
+  colorized): a top-down map sprite, a viewscreen portrait and a damage-control view. The L-24 keeps its existing art until its own is supplied.
+  No stats changed. The T-5 viewscreen portrait is softer than most because the source is a small halftone scan.
+
+## Recent fixes (v2.48-S159)
+- **New playable ship: the Klingon D-4 "Predator"** (Class VII cruiser, the D-7's predecessor) — both Marks A and E, from the FASA
+  Klingon manual. Five KD disruptor banks (forward-port, forward-starboard and one aft), no missiles. Mk A: 16 hull, 30 power;
+  Mk E: 17 hull, 34 power, heavier KD-3 beams and bigger shields. Real top-down sprite, viewscreen portrait and damage-control view.
+- **It's in the Recognition Database too:** the D-4 page now shows the live sprite and Playable badge, and "Select for battle" works
+  for either mark. The old Mk E entry had no beam arcs on file; it now matches Mk A.
+- The artist's legend mentions two photon torpedo launchers; the manual gives the D-4 none, so the game follows the book.
+
+## Recent fixes (v2.47-S158)
+- **New playable ship: USS Gagarin (Gagarin Mk I, NCC-80100, Class V Research Vessel)** — straight from FASA rulebook p.65.
+  A small, fragile science ship: one FH-1 phaser covering port, forward and starboard, 22 power, 9 hull, 4 impulse power.
+  Comes with real ship art — a top-down tactical sprite and a bow-on viewscreen portrait — relettered from the artist's
+  "U.S.S. Dumont" to "U.S.S. Gagarin" / NCC-80100. Matchup rating D 53.8 / WDF 0.6 from the page.
+- **A rulebook typo was untangled.** The printed page shows "1f" in the firing-arcs field and "p/f/s" in the firing-CHART
+  field. The arc is really "1 p/f/s" and the chart is F (confirmed against fasaststcs.com and the game's own FH-1 table).
 
 ## Recent fixes (v2.46-S157)
 - **The USS Federation dreadnought (both marks) now has its matchup rating**, taken from the published Federation II stat block, which
@@ -806,6 +889,10 @@ one HTML file.
 - `Nova_art.zip` — the Nova's profile, aft and bottom views, saved for later use.
 - `Northampton_art.zip` — the Northampton's profile view, saved for later use.
 - `Remora_art.zip` — the Remora's profile view, saved for later use.
+- `F1_art.zip` — Federation I cutouts (top, profile, front), the 256px game sprite, viewscreen and damage-view art, original sheet.
+- `T5_art.zip` — Klingon T-5 cutouts (dorsal, port, bow), the 256px game sprite, viewscreen and damage-view art, original sheet, and the cutout script.
+- `D4_art.zip` — Klingon D-4 cutouts (top, front, profile), the 256px game sprite, upscaled viewscreen and damage-view art, original sheet, and the cutout script.
+- `Gagarin_art.zip` — all Gagarin views (top, bottom, profile, front, aft) relettered, the 256px game sprite, the original sheet, and the relettering helper script.
 - `Larson_art.zip` — the Larson's bottom, profile and aft views, saved for later use (the top and
   front views are already in the game).
 - `Andor_art.zip` — all five views of the USS Andor (top, bottom, front, aft, profile) as transparent
