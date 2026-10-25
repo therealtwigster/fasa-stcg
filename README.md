@@ -1,4 +1,4 @@
-> **Build v2.59-S170** · Gravity wells keep three full hexes clear — 2026-10-25
+> **Build v2.63-S174** · Initiative screen waits for you — 2026-10-25
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,32 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.63-S174)
+- **The initiative screen no longer closes by itself and the progress bar is gone.** It stays until you press CONTINUE (or Space / Enter). Clicking the dark background does not dismiss it.
+
+## Recent fixes (v2.62-S173)
+- **Initiative is now shown, not just logged.** At the start of each turn's movement a Tactical Advantage screen shows both ships' movement points counting up and says who holds the advantage
+  and what it means (that ship moves last, the other moves first). If the two sides are tied on movement points, you watch the dice roll-off. A badge in the header keeps "TAC ADV" in view for the
+  rest of the turn. The screen stays up until you press the CONTINUE button (or Space / Enter), so you can read it at your own pace.
+- **A tied roll-off that comes up equal is now rolled again.** Before, an equal roll went to the player, who therefore won 55% of ties instead of 50%.
+- The tutorial help text for this phase now describes the real rule (more movement points wins; a die only breaks ties).
+- Built so that two-player "hot seat" play (sides named after the players) and the role-playing rules (skill rating plus a die) can use the same screen later.
+
+## Recent fixes (v2.61-S172)
+- **Missile and plasma results now appear when the projectile actually lands.** You still fire and the die is still rolled at that moment, but the combat log shows nothing until the missile has visibly
+  hit the shield or hull (or visibly flown past the ship on a miss). Then the whole result appears at once (the roll, damage, which shield face, how much it absorbed, where it hit, hull remaining)
+  together with the shield shimmer or explosion. This applies to your shots and the enemy's. Beams are unchanged because they are effectively instant.
+- **A fire phase will not end while a missile is still in flight.** If you press End Phase early, the button reads "Resolving..." until every missile has landed and its result is posted.
+- Missiles that land at the same moment now post in the order they were fired. If a missile lands after the target is already destroyed, the log says the fight was already decided.
+
+## Recent fixes (v2.60-S171)
+- **Close-range misses no longer swing wildly wide.** At point-blank range the missed beam used to be thrown 50-60 degrees off line; the extra clearance is now limited by how far away the target
+  is, and the beam does not carry on as far when you are close. Shots from three or more hexes away look as before.
+- **Misses are never steered by a gravity well** (shots do not feel them). To stop a coin-flip miss looking like gravity, a missed shot now passes on the side that keeps it clear of any nearby well.
+- **The Damage Control logs now read oldest to newest, like the combat log,** each line stamped with its turn, and the cascade entries show their amount and the hull left, so the running total adds up.
+  (Before, the newest line was at the top, so reading down went backward in time.)
+- **You can now select and copy text from the combat log and the damage logs,** and there are COPY buttons on each (the combat log's COPY gives exactly what EXPORT writes to the file).
 
 ## Recent fixes (v2.59-S170)
 - **Gravity wells (black holes) now keep three full empty hexes between themselves and every planet and moon** (it was two). They can still sit right beside a nebula.
