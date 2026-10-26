@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.63-S174</title>
+<title>Star Trek: Tactical Command — v2.67-S178</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -44,12 +44,18 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#
 .ta-dcol{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;}
 .ta-dcol .who{font-size:9px;letter-spacing:3px;color:#6a7c98;}
 .ta-dcol .calc{font-size:10px;letter-spacing:1.5px;color:#8fa8cc;min-height:13px;}
-.ta-die polygon{fill:#0a1830;stroke:#3a6ab0;stroke-width:3;stroke-linejoin:round;}
-.ta-die text{fill:#dfe9ff;}
+/* the die is drawn as a real TEN-SIDED DIE seen at an angle (a pentagonal trapezohedron: a point at the top, a point at the bottom, a zig-zag band between, ten KITE faces). Each kite is only ONE face. Geometry and projection from /d10 (see HANDOVER). */
+.ta-die{--df:#2f66c0;--de:#cfe0ff;--dt:#f2f7ff;}
+.ta-die .f{fill:var(--df);stroke:var(--de);stroke-width:1.1;stroke-linejoin:round;}
+.ta-die text{fill:var(--dt);}
+/* crystal (see-through) dice: gradient faces, a bright edge, a specular sliver, and a WHITE number with a dark outline so it stays readable on a translucent face */
+.ta-die .cf{stroke:var(--de);stroke-width:1.15;stroke-linejoin:round;}
+.ta-die .hl{fill:#fff;fill-opacity:.38;stroke:none;}
+.ta-die.crystal text{fill:#fff;paint-order:stroke;stroke:rgba(0,10,30,.7);stroke-width:2.6px;stroke-linejoin:round;}
 .ta-die.rolling{animation:taWobble .13s linear infinite;}
 @keyframes taWobble{0%{transform:rotate(-9deg) scale(1.04)}50%{transform:rotate(9deg) scale(.97)}100%{transform:rotate(-9deg) scale(1.04)}}
-.ta-die.win polygon{stroke:#e0b040;fill:#241c06;}
-.ta-die.win text{fill:#ffe08a;}
+.ta-die.win{--de:var(--dw,#ffffff);filter:drop-shadow(0 0 7px var(--dg,#8fbfff));transform:scale(1.1);}   /* the winning die: brighter edge, a glow in its faction colour, a little larger -- NOT gold: gold would clash with the faction colours */
+.ta-die.lose{opacity:.72;filter:grayscale(.2);}   /* subdued next to the glowing winner, but its number must stay easy to read (>= 4.5:1) */
 .ta-banner{margin-top:16px;text-align:center;opacity:0;transform:translateY(6px);transition:opacity .45s,transform .45s;}
 .ta-banner.on{opacity:1;transform:none;}
 .ta-banner .h{font-size:17px;letter-spacing:4px;color:#ffd470;font-weight:bold;}
@@ -510,6 +516,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
   --rom:#33bb66; --romm:#1f7a44; --rombg:#031a0d;
   --gor:#ccb244; --gorm:#8a7622; --gorbg:#141005;
   --ori:#aa55cc; --orim:#6f2a80; --oribg:#0f051a;
+  --ind:#9bb0d0; --indm:#4f6385; --indbg:#080c16;
   --ac:var(--fed); --acm:var(--fedm); --acbg:var(--fedbg);
 }
 #shipdb-overlay *{box-sizing:border-box;}
@@ -520,6 +527,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
 #shipdb-overlay .f-rom{--ac:var(--rom);--acm:var(--romm);--acbg:var(--rombg);}
 #shipdb-overlay .f-gor{--ac:var(--gor);--acm:var(--gorm);--acbg:var(--gorbg);}
 #shipdb-overlay .f-ori{--ac:var(--ori);--acm:var(--orim);--acbg:var(--oribg);}
+#shipdb-overlay .f-ind{--ac:var(--ind);--acm:var(--indm);--acbg:var(--indbg);}
 #shipdb-overlay .shell{max-width:1180px;margin:0 auto;padding:20px 16px 40px;}
 #shipdb-overlay .topbar{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:11px;}
 #shipdb-overlay .tb-mark{font-size:17px;letter-spacing:5px;color:var(--amber);text-transform:uppercase;}
@@ -755,7 +763,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
         <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.63-S174</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.67-S178</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -2828,6 +2836,10 @@ function launchGame() {
   log('BUILD v2.61-S172 -- Missile and plasma results now post when the projectile LANDS. The die is still rolled when you fire, but the roll line, damage, shield absorption, damage location and hull remaining appear only once the shot has visibly hit the shield or hull, or visibly passed the ship on a miss; the shield shimmer or explosion appears at the same moment. A fire phase will not end while a missile is still in flight. Beams are unchanged (they are effectively instant).');
   log('BUILD v2.62-S173 -- Initiative (the Tactical Advantage) is now shown instead of just logged. Each turn a screen shows both ships\' movement points counting up, rolls the dice in front of you if they are tied, and announces who holds the advantage and what it means (that ship moves last); a badge in the header keeps it in view for the rest of the turn. Click, press Space/Enter, or wait a few seconds to continue. An equal roll on a tie is now rolled again (it used to go to the player).');
   log('BUILD v2.63-S174 -- The initiative (Tactical Advantage) screen no longer closes by itself and the progress bar is gone: it stays up until you press CONTINUE (or Space / Enter), so you can read the result at your own pace. Clicking the dark background no longer dismisses it either.');
+  log('BUILD v2.64-S175 -- The dice on the initiative screen are now drawn as ten-sided dice (a kite-shaped face). They were drawn as a pentagon, which is the face of a twelve-sided die.');
+  log('BUILD v2.65-S176 -- The initiative dice are now drawn as a real ten-sided die (a pointed top and bottom with ten kite-shaped faces, seen at an angle) with the rolled number on the front face. The earlier version showed a single kite, which is only one face of the die.');
+  log('BUILD v2.66-S177 -- Each side\'s die on the initiative screen is now in its faction colour: Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple (Gorn and Orion ships previously had no colour of their own on this screen). The winning die is brighter, glows and is a little larger; the losing die is dimmed.');
+  log('BUILD v2.67-S178 -- The independent merchants now have their colour: Obsidian, a dark see-through crystal die (option 6 of the six saved crystal styles). It is set up on the initiative screen and in the game\'s other faction colour tables, ready for when independent ships are added. The other five crystal styles (Clear Quartz, Smoky Quartz, Moonstone, Aquamarine, Rose Quartz) are kept in the game data for later dice personalisation.');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -3871,7 +3883,35 @@ function aiDoSensors(idx){
 // There is NO auto-advance and no countdown (user, 2026-10-25: it closed before the result could be read): the screen stays until the player presses CONTINUE (or Space / Enter). Right for hot-seat play too.
 let TACADV_SPEED=1;        // animation speed multiplier (1 = normal; tests use a small number)
 let TA_ACTIVE=null;        // the screen currently showing, so a new one can replace it cleanly
-const TA_FACTION_COLOR={fed:'#6ab8ff',kli:'#ff6b5a',rom:'#4fdc8a'};
+// FACTION COLOURS for this screen (v2.66-S177), one place. accent = the ship name, the bar and the die's edge; face = the die body, dark enough for a white number
+// (white number on face: 4.6:1 or better on the real rendered dice, winner or loser). Five hues chosen to be clearly different from each other (closest pair 45 apart in CIE76 colour difference; faces 33):
+//   Federation blue | Klingon crimson | Romulan green | Gorn burnt orange | Orion purple | (neutral) Independent merchants: Obsidian dark glass, a crystal die.
+// NOTE the rest of the game has TWO other, mutually different sets (start screen/ship database: Klingon orange-red, Gorn olive-gold, Orion purple; scan sweep/viewscreen: Klingon
+// crimson, Gorn burnt orange, Orion GOLD) -- see HANDOVER; this screen uses its own so that no faction is gold, which is the colour of the winner highlight.
+const TA_FACTION={fed:{accent:'#4499ff',face:'#2764b8'},kli:{accent:'#e23a52',face:'#a01c30'},rom:{accent:'#33bb66',face:'#176a3c'},gor:{accent:'#c97a3a',face:'#8b4a1a'},ori:{accent:'#aa55cc',face:'#74309a'},
+  ind:{accent:'#9bb0d0',face:'#1f2a42',crystal:'obsidian'}};   // INDEPENDENT MERCHANTS: option 6, OBSIDIAN (dark glass), chosen by the user 2026-10-25; drawn as a crystal die
+const TA_FACTION_COLOR=Object.fromEntries(Object.entries(TA_FACTION).map(([k,v])=>[k,v.accent]));
+// The ten-sided die as seen on this screen: five visible faces in painter's order, each [solid-die fill-opacity, polygon points], from the projection of the true geometry (HANDOVER 0.123).
+const TA_D10_FACES=[[0.95,'32.0,3.0 6.11,25.02 4.9,37.59 14.05,36.95'],[0.56,'32.0,3.0 46.8,37.81 57.89,38.98 59.1,26.41'],[0.38,'30.05,45.5 14.05,36.95 4.9,37.59 32.0,61.0'],[0.38,'57.89,38.98 46.8,37.81 30.05,45.5 32.0,61.0'],[0.89,'32.0,3.0 14.05,36.95 30.05,45.5 46.8,37.81']];
+const TA_D10_TEXT={x:30.75,y:39.4};   // where the number goes (the front face's inscribed-circle centre, lowered for the baseline)
+// SAVED CRYSTAL DICE STYLES (v2.67-S178). The six translucent "materials" proposed for a neutral faction; the user liked ALL of them and asked for them to be kept, choosing OBSIDIAN
+// for the independent merchants. The other five are saved here unused, ready for per-player / per-faction dice personalisation later (a faction or a player would just name a style).
+// stops = the face gradient [offset, colour, opacity]; op = each face's opacity in TA_D10_FACES order; edge/glow = outline and winner glow. Pictured in neutral_faction_options.png.
+const TA_CRYSTAL_STYLES={
+  quartz:{name:"Clear Quartz",tag:"see-through ice",edge:'#f4faff',glow:'#d6ebff',stops:[[0,'#ffffff',0.92],[1,'#a9c4de',0.5]],op:[0.42,0.22,0.11,0.11,0.26],desc:"Almost fully transparent, near-white: the background shows straight through. Literally \"clear\" -- no allegiance, nothing hidden."},
+  smoky:{name:"Smoky Quartz",tag:"translucent grey-brown",edge:'#d8c3ad',glow:'#b49c84',stops:[[0,'#e0cdb8',0.9],[1,'#3f342b',0.95]],op:[0.62,0.38,0.2,0.2,0.45],desc:"Warm taupe glass, like a trader's lamp. Calm, dusty, clearly not a military colour."},
+  opal:{name:"Moonstone (opal)",tag:"milky, iridescent",edge:'#f2f5ff',glow:'#e0d4ff',stops:[[0,'#9fe3ff',0.95],[0.3,'#f7b8ec',0.95],[0.62,'#b6f5d8',0.92],[1,'#a99bff',0.95]],op:[0.78,0.52,0.32,0.32,0.64],desc:"Milky and nearly opaque, with a pink / cyan / mint / lilac sheen that shifts across the faces. The most distinctive option."},
+  aqua:{name:"Aquamarine",tag:"pale sea-glass teal",edge:'#aef6ec',glow:'#5fe0d6',stops:[[0,'#d5fff9',0.95],[1,'#1f9c9a',0.9]],op:[0.58,0.34,0.18,0.18,0.4],desc:"Cool translucent teal. The most colourful option; sits between Federation blue and Romulan green."},
+  rose:{name:"Rose Quartz",tag:"soft translucent pink",edge:'#ffd3e2',glow:'#ff9fbd',stops:[[0,'#ffe6ee',0.95],[1,'#b5496f',0.85]],op:[0.58,0.34,0.18,0.18,0.4],desc:"Gentle pink glass. Friendly and non-threatening; pale enough to stay apart from Klingon crimson."},
+  obsidian:{name:"Obsidian (dark glass)",tag:"black volcanic glass",edge:'#9bb0d0',glow:'#6f86ad',stops:[[0,'#5a6a86',0.92],[0.42,'#1a2238',0.96],[0.56,'#27455a',0.95],[0.72,'#2b2347',0.96],[1,'#080b14',0.98]],op:[0.82,0.62,0.48,0.48,0.72],desc:"Dark, glossy and see-through only at the edges, with a faint teal-and-violet sheen. The one dark option: calm and anonymous."}
+};
+function taCrystalDie(id,C){
+  const gid='ta-cg-'+id;
+  const stops=C.stops.map(([o,c,a])=>`<stop offset="${o}" stop-color="${c}" stop-opacity="${a}"/>`).join('');
+  const polys=TA_D10_FACES.map(([,pts],k)=>`<polygon class="cf" style="fill:url(#${gid});fill-opacity:${C.op[k]}" points="${pts}"/>`).join('');
+  return `<svg class="ta-die crystal" id="${id}" style="--de:${C.edge};--dg:${C.glow};--dw:${taMixWhite(C.edge,0.6)}" viewBox="0 0 64 64" width="78" height="78"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">${stops}</linearGradient></defs>${polys}<polygon class="hl" points="31.2,7 32.6,9.5 21.4,30.5 18.6,31.5"/><text x="${TA_D10_TEXT.x}" y="${TA_D10_TEXT.y}" text-anchor="middle" font-size="22" font-weight="bold" font-family="Courier New,monospace">\u2013</text></svg>`;
+}
+const taMixWhite=(hex,t)=>{ const n=parseInt(hex.slice(1),16); return '#'+[(n>>16)&255,(n>>8)&255,n&255].map(v=>Math.round(v+(255-v)*t).toString(16).padStart(2,'0')).join(''); };
 // Pure decision (Basic): more movement points wins; a tie is settled by a die each, highest wins -- and an EQUAL roll is rolled again (before v2.62 an equal roll went to the player).
 function computeTacAdv(moves,rollDie){
   if(moves[0]!==moves[1]) return {decidedBy:'moves',winner:moves[0]>moves[1]?0:1,rounds:[]};
@@ -3905,9 +3945,14 @@ function showTacAdvVisual(R,onDone,onReveal){
   const doReveal=()=>{ if(revealed) return; revealed=true; if(onReveal){ try{ onReveal(); }catch(e){ console.error('initiative reveal failed',e); } } };   // posts the log lines / badge / sidebar text -- only once the winner is on screen
   const later=(ms,fn)=>{ timers.push(setTimeout(fn,Math.max(0,Math.round(ms*TACADV_SPEED)))); };
   const rounds=R.rounds||[], dice=(R.decidedBy==='dice'||isSkill)&&rounds.length>0;
-  const dieSvg=id=>`<svg class="ta-die" id="${id}" viewBox="0 0 64 64" width="66" height="66"><polygon points="32,3 61,25 50,60 14,60 3,25"/><text x="32" y="43" text-anchor="middle" font-size="26" font-weight="bold" font-family="Courier New,monospace">\u2013</text></svg>`;
+  const dieSvg=(id,i)=>{
+    const P=TA_FACTION[S[i].faction];
+    if(P&&P.crystal) return taCrystalDie(id,TA_CRYSTAL_STYLES[P.crystal]);        // a crystal (see-through) die: the independent merchants
+    const sty=P?` style="--df:${P.face};--de:${P.accent};--dg:${P.accent};--dw:${taMixWhite(P.accent,0.6)}"`:'';
+    return `<svg class="ta-die" id="${id}"${sty} viewBox="0 0 64 64" width="78" height="78">${TA_D10_FACES.map(([op,pts])=>`<polygon class="f" style="fill-opacity:${op}" points="${pts}"/>`).join('')}<text x="${TA_D10_TEXT.x}" y="${TA_D10_TEXT.y}" text-anchor="middle" font-size="22" font-weight="bold" font-family="Courier New,monospace">\u2013</text></svg>`;
+  };
   const sideHtml=i=>`<div class="ta-side" id="ta-s${i}"><div class="ta-tag" id="ta-t${i}">TACTICAL ADVANTAGE</div><div class="lbl">${esc(S[i].label)}</div><div class="nm" style="color:${col(i)}">${esc(S[i].name)}</div><div class="cls">${esc(S[i].cls||'')}</div><div class="big" id="ta-n${i}">0</div><div class="unit">${isSkill?'SKILL RATING':'MOVEMENT POINTS'}</div><div class="ta-bar"><i id="ta-b${i}" style="background:${col(i)}"></i></div></div>`;
-  const diceHtml=dice?`<div class="ta-dice" id="ta-dice"><div class="msg" id="ta-msg"></div><div class="ta-dicerow">${[0,1].map(i=>`<div class="ta-dcol"><div class="who">${esc(S[i].label)}</div>${dieSvg('ta-d'+i)}<div class="calc" id="ta-c${i}"></div></div>`).join('')}</div></div>`:'';
+  const diceHtml=dice?`<div class="ta-dice" id="ta-dice"><div class="msg" id="ta-msg"></div><div class="ta-dicerow">${[0,1].map(i=>`<div class="ta-dcol"><div class="who">${esc(S[i].label)}</div>${dieSvg('ta-d'+i,i)}<div class="calc" id="ta-c${i}"></div></div>`).join('')}</div></div>`:'';
   const sub=isSkill?`TURN ${R.turn} \u00b7 EACH CAPTAIN ROLLS ONE DIE AND ADDS HIS SKILL RATING \u00b7 HIGHER TOTAL WINS`:`TURN ${R.turn} \u00b7 MORE MOVEMENT POINTS WINS \u00b7 A TIE IS SETTLED BY A DIE ROLL`;
   const why=R.decidedBy==='moves'?`MORE MOVEMENT: ${val(W)} TO ${val(Lz)}`
           :R.decidedBy==='dice'?`TIED AT ${val(0)} \u2014 WON ON THE DIE: ${rounds[rounds.length-1][W]} TO ${rounds[rounds.length-1][Lz]}`
@@ -3918,11 +3963,11 @@ function showTacAdvVisual(R,onDone,onReveal){
       <div class="c">${esc(S[W].label)} ${verb(S[W].label)} <b>LAST</b> in each movement phase \u2014 and sees where ${esc(S[Lz].label)} ended up.<br>${esc(S[Lz].label)} ${verb(S[Lz].label)} <b>FIRST</b> \u2014 committing a position before seeing the reply.</div></div>
     <div class="ta-foot"><button class="ta-btn" id="ta-go">SKIP \u25b8</button></div></div>`;
   const $=id=>document.getElementById(id);
-  const setDie=(i,v,cls)=>{ const d=$('ta-d'+i); if(!d) return; d.querySelector('text').textContent=v; d.classList.toggle('rolling',cls==='rolling'); d.classList.toggle('win',cls==='win'); };
+  const setDie=(i,v,cls)=>{ const d=$('ta-d'+i); if(!d) return; const tx=d.querySelector('text'); tx.textContent=v; tx.setAttribute('font-size',String(v).length>1?16:22); tx.setAttribute('y',String(v).length>1?39.3:39.4); d.classList.toggle('rolling',cls==='rolling'); d.classList.toggle('win',cls==='win'); d.classList.toggle('lose',cls==='lose'); };
   const setNum=(i,v)=>{ const n=$('ta-n'+i); if(n) n.textContent=v; const b=$('ta-b'+i); if(b) b.style.width=Math.round(100*v/maxV)+'%'; };
   const markWinner=()=>{ [0,1].forEach(i=>{ const e=$('ta-s'+i); e.classList.remove('tie'); e.classList.toggle('win',i===W); e.classList.toggle('lose',i!==W); $('ta-t'+i).textContent='TACTICAL ADVANTAGE'; }); };
   const showRoundFinal=(r,last)=>{
-    setDie(0,rounds[r][0],(last&&W===0&&!isSkill)||(last&&isSkill&&W===0)?'win':''); setDie(1,rounds[r][1],(last&&W===1)?'win':'');
+    const pick=i=>last?(W===i?'win':'lose'):''; setDie(0,rounds[r][0],pick(0)); setDie(1,rounds[r][1],pick(1));
     if(isSkill){ [0,1].forEach(i=>{ const c=$('ta-c'+i); if(c) c.textContent=`${S[i].skill} + ${rounds[r][i]} = ${S[i].skill+rounds[r][i]}`; }); }
   };
   const finalize=()=>{
@@ -4135,6 +4180,7 @@ function factionScanColor(ship){
   if(f==='rom') return '#5fe6ad';   // Romulan — mint green
   if(f==='gor') return '#c97a3a';   // Gorn — burnt orange/rust (matches viewscreen FACTION_STYLE.gor)
   if(f==='ori') return '#d4af37';   // Orion — gold (matches viewscreen FACTION_STYLE.ori)
+  if(f==='ind') return '#9bb0d0';   // Independent merchants — obsidian grey-blue (matches the initiative-screen die)
   return '#3ab8e0';                 // neutral cyan fallback
 }
 // Sensor scan sweep — emanates from the scanning ship, tinted to its faction.
@@ -10055,8 +10101,8 @@ const SPRITES = {
   rom_Stormbird: SHIP_SPRITES.RomulanStormbird,
   rom_WingedDefender: SHIP_SPRITES.V30WingedDefender,
 };
-const FAC_NAME={fed:'Federation',kli:'Klingon',rom:'Romulan',gor:'Gorn',ori:'Orion'};
-const FAC_CLS={fed:'f-fed',kli:'f-kli',rom:'f-rom',gor:'f-gor',ori:'f-ori'};
+const FAC_NAME={fed:'Federation',kli:'Klingon',rom:'Romulan',gor:'Gorn',ori:'Orion',ind:'Independent'};
+const FAC_CLS={fed:'f-fed',kli:'f-kli',rom:'f-rom',gor:'f-gor',ori:'f-ori',ind:'f-ind'};
 const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'];
 const clsNum=c=>ROMAN.indexOf(c)+1;
 const ARC_ORDER=[0,1,2,3,4,5];
@@ -10366,9 +10412,9 @@ const FACTION_STYLE = {
     scanning:'STALKING\u2026', footNoLock:'Prey unseen. Hold your strike.',
     footLock:'Prey pinned. Move in for the kill.' }
 };
-FACTION_STYLE.ind = FACTION_STYLE.fed;
+FACTION_STYLE.ind = Object.assign({}, FACTION_STYLE.fed, { accent:'#9bb0d0', dim:'#5a6a86' });   // independents: obsidian colours; the WORDING is still the Federation's -- a placeholder until they get their own
 
-const VS_FACTION_COLOR = { fed:'#7ad1ff', kli:'#e23a52', rom:'#5fe6ad', ori:'#d4af37', gor:'#c97a3a' };
+const VS_FACTION_COLOR = { fed:'#7ad1ff', kli:'#e23a52', rom:'#5fe6ad', ori:'#d4af37', gor:'#c97a3a', ind:'#9bb0d0' };
 
 function vsFitSize(im, maxW, maxH){
   if(!im || !im.width) return {w:0,h:0};
