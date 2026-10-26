@@ -1,4 +1,4 @@
-> **Build v2.63-S174** · Initiative screen waits for you — 2026-10-25
+> **Build v2.67-S178** · Independent merchants (Obsidian) + saved crystal dice styles — 2026-10-25
 
 # Star Trek: Tactical Command
 
@@ -55,6 +55,19 @@ one HTML file.
   screen narrates the killing blow along with turn and shots-fired statistics.
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.67-S178)
+- **The independent merchants now have their colour: Obsidian**, a dark see-through crystal die with steel-blue edges, shown on the initiative screen and registered wherever the game keeps faction colours, so it is ready for when independent ships are added.
+- **Five more see-through dice styles are saved for later** (Clear Quartz, Smoky Quartz, Moonstone, Aquamarine, Rose Quartz) in the game data and in a separate file, for future dice personalisation.
+
+## Recent fixes (v2.66-S177)
+- **Each side's die on the initiative screen is now in its faction colour:** Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple. The ship name and bar use the same colour. (Gorn and Orion ships previously had no colour of their own on this screen.) The winning die is brighter, glows and is slightly larger; the losing die is subdued but easy to read.
+
+## Recent fixes (v2.65-S176)
+- **The dice on the initiative screen are now a real ten-sided die**: a pointed top and bottom with a zig-zag band between and ten kite-shaped faces, seen at an angle, with the rolled number on the front face. (The previous version drew just one kite, which is only a single face of the die.)
+
+## Recent fixes (v2.64-S175)
+- **The dice on the initiative screen are now drawn as ten-sided dice** (a kite-shaped face). They had been drawn as a pentagon, which is the face of a twelve-sided die.
 
 ## Recent fixes (v2.63-S174)
 - **The initiative screen no longer closes by itself and the progress bar is gone.** It stays until you press CONTINUE (or Space / Enter). Clicking the dark background does not dismiss it.
