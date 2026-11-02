@@ -1,4 +1,4 @@
-> **Build v2.67-S178** · Independent merchants (Obsidian) + saved crystal dice styles — 2026-10-25
+> **Build v2.74-S185** · Audio: the weapon-arming sound now covers phasers too — 2026-11-02
 
 # Star Trek: Tactical Command
 
@@ -53,8 +53,34 @@ one HTML file.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
   screen narrates the killing blow along with turn and shots-fired statistics.
+- **Sound** (Web Audio, nothing to download): a looping rumble on the setup screen before you press Engage, a procedural bed on the tactical map (per faction, with sensor pings), a power-allocation pad, a looping engineering hum on the Damage Control tab under sounds that grow with hull damage, TOS console chirps for Federation captains when they commit power and when they proceed to combat, a recorded load / charge sound when a Federation weapon (phasers and torpedoes alike) is selected, recorded torpedo launch and phaser sounds for Federation, an explosion for every ship destroyed, and for Federation the TOS bridge ambience (start-up once on Engage, then a swoosh-free bed that loops on Tactical and Power and gives way to the hum on Damage Control, with the door swoosh played now and then).
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.74-S185)
+- **Selecting a phaser in Power Allocation now plays the load / charge sound too** (it used to play only for torpedoes). It is the Federation player's audible feedback that a weapon selection registered; deselecting stays silent, and the other factions are unchanged. If you arm many weapons very quickly the sounds are limited to four at a time (the oldest fades out), so a fast click-through can never distort.
+
+## Recent fixes (v2.73-S184)
+- **A small "Click here to enter the Simulator" window opens the game.** It matches the game's look and is the page's first click, which is what lets the browser play the start-screen sound straight away (browsers allow no sound before a click or key press). It closes when you click it (or press Enter or Space), or by itself in a browser that allows sound without a click.
+- **The bridge door "shwoosh" is now rare.** The bridge ambience loop was moved to a stretch of the recording with no door sound, and the swoosh itself plays now and then (every 25 to 55 seconds) instead of about eight times a minute. The loop is 13.5 seconds long. The isolated swoosh is also available as its own sound file.
+- **Federation phaser banks have a recorded sound** (your phaser clip, trimmed to the tone itself). Lasers, the enemy's weapons and the other factions are unchanged.
+- **Every ship that blows up now has a recorded explosion** (either side, any faction). Before, a ship destruction was silent. Volume levels were set so a full five-weapon volley plus an explosion does not clip.
+
+## Recent fixes (v2.72-S183)
+- **Sound now starts at the earliest moment the browser allows.** It used to wait for a completed click; now the first mouse press, touch or key press of any kind starts it (and it starts by itself at load in a browser that permits sound). Browsers will not let a page make any sound before that first press or key, so a freshly opened page is silent until then; that is a browser rule the game cannot change.
+- **Federation torpedoes have their own recorded sounds.** Selecting a torpedo in Power Allocation plays a load / charge sound, and firing one in combat plays a launch sound (it replaces the synthesised torpedo sound for the player's own Federation torpedoes). Phasers, disarming, the enemy's torpedoes and every other faction are unchanged. The two sounds were split from one recording, trimmed with fades, and stored as about 62 KB of audio.
+
+## Recent fixes (v2.71-S182)
+- **The setup screen now has a sound.** Where you choose faction, ships and settings, a low engine rumble (the stationary-ship recording) fades in on your first click or key press (browsers do not allow sound before one) and fades out when you press Engage. Nothing played on that screen before. The recording is only 1.9 seconds long, so it plays as a ping-pong loop (forward, then backward, then forward again), turning at waveform peaks so there is no click or gap; the turn-around points were chosen to avoid a small high-frequency crackle in the recording, which the first attempt had landed on. It is stored as about 31 KB of audio and works at any sound-card rate. Every other sound in the game is unchanged.
+
+## Recent fixes (v2.70-S181)
+- **Federation captains now get the TOS bridge ambience.** Pressing Engage plays the start-up swell once, which settles into the bridge bed; the bed then loops under the Tactical and Power Allocation tabs. The Damage Control tab swaps it for its own hum, and the bridge fades back in when you leave, picking up where it left off (the start-up never replays). The old synthesised Federation bridge sound is no longer used for Federation; every other faction keeps its previous ambience exactly. The supplied 4-minute recording is stored as one 31-second clip of about 183 KB (instead of 8.2 MB), with a 22-second loop whose join was found by search and blended, and was checked in a real browser across two loop wraps: no click, no slip.
+
+## Recent fixes (v2.69-S180)
+- **Federation captains now get the TOS console chirps.** A short six-note keypress run plays when you commit your power allocation, and a longer eleven-note run when you press Proceed to Combat. Revise is silent, and so is a commit that is refused for being over budget. The other four factions stay silent for now; the sounds are kept in a per-faction table so theirs can be added later. The two sounds are trimmed and stored as about 38 KB of audio, in a format with no start-up delay so the chirp lands on the click.
+
+## Recent fixes (v2.68-S179)
+- **The Damage Control tab now hums.** A looping engineering-deck drone sits under the existing damage-reactive sounds (structural groan, crew chatter, sparks, red-alert klaxon), the same on every faction. The supplied 3-minute recording turned out to be one 2.3-second loop repeated 79 times, so the game carries just that loop: about 56 KB instead of 5.8 MB. The loop is cut to an exact length and its seam is crossfaded, and was checked in a real browser at five sound-card rates: the join is smaller than the sound's own movement, so there is no click or gap. One setting (`DMG_HUM_GAIN`) controls its volume.
 
 ## Recent fixes (v2.67-S178)
 - **The independent merchants now have their colour: Obsidian**, a dark see-through crystal die with steel-blue edges, shown on the initiative screen and registered wherever the game keeps faction colours, so it is ready for when independent ships are added.
