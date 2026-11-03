@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.74-S185</title>
+<title>Star Trek: Tactical Command — v2.76-S187</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -382,11 +382,21 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
 #dmg-wrap{flex:1;position:relative;overflow:hidden;background:#010508;}
 #dmg-cv{display:block;}
 #dmg-sb{width:272px;background:#030810;border-left:2px solid #770f00;display:flex;flex-direction:column;overflow:hidden;}
-.sys-row{display:flex;align-items:center;gap:7px;padding:6px 12px;border-bottom:1px solid #080e18;}
-.sys-nm{font-size:9px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;width:114px;}
+.sys-row{display:flex;align-items:center;gap:7px;border-bottom:1px solid #080e18;}
+.sys-nm{font-size:9px;color:#7888aa;letter-spacing:1px;text-transform:uppercase;width:104px;}
 .sys-tr{flex:1;height:5px;background:#090f1a;border:1px solid #0c1522;}
 .sys-fi{height:100%;transition:width .5s;}
-.sys-pc{font-size:8px;width:36px;text-align:right;letter-spacing:1px;}
+.sys-pc{font-size:8px;width:62px;text-align:right;letter-spacing:.5px;}
+.sys-row{cursor:help;padding:4px 12px;}
+/* v2.76-S187: Damage Control sidebar groups + the richer tooltip body */
+.sys-grp{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:2px 6px;padding:7px 12px 2px;font-size:9px;letter-spacing:1px;color:#ff9900;text-transform:uppercase;border-top:1px solid #0c1420;}
+.sys-grp:first-child{border-top:none;}
+.sys-grp .cnt{letter-spacing:.5px;font-size:8px;}
+.sys-grp .stn{font-size:7px;letter-spacing:.5px;color:#5f7799;margin-left:auto;}
+#ship-tooltip.dc{max-width:300px;}
+#ship-tooltip .body{color:#a9bddb;font-size:10px;line-height:1.4;margin-top:5px;white-space:normal;}
+#ship-tooltip .rule{color:#e8b86a;font-size:9.5px;line-height:1.4;margin-top:4px;white-space:normal;}
+#ship-tooltip .stn{color:#6f8fc4;font-size:9px;letter-spacing:.6px;line-height:1.4;margin-top:6px;border-top:1px solid #16263f;padding-top:5px;white-space:normal;}
 .dlog-wrap{flex:1;overflow-y:auto;}
 /* v2.60-S171: the whole page is user-select:none (so the game UI never selects by accident); the LOGS must be selectable so their text can be copied */
 #combat-log,#combat-log *,#dmg-log,#dmg-log *,#dmg-log-enemy,#dmg-log-enemy *,#eg-panel .eg-narrative,#eg-panel .eg-sub,#eg-panel .eg-stats,#eg-panel .eg-debrief{user-select:text;-webkit-user-select:text;cursor:text;}
@@ -786,7 +796,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
         <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.74-S185</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.76-S187</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -1064,7 +1074,7 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
 <div id="sbar">
   <div class="sb-sys"><div class="sb-lbl">Hull</div><div class="sb-bar"><div class="sb-fil" id="sbf-hull"></div></div><div class="sb-val" id="sbv-hull"></div></div>
   <div class="sb-sys"><div class="sb-lbl">Fwd Shield</div><div class="sb-bar"><div class="sb-fil" id="sbf-shld"></div></div><div class="sb-val" id="sbv-shld"></div></div>
-  <div class="sb-sys"><div class="sb-lbl">Warp Core</div><div class="sb-bar"><div class="sb-fil" id="sbf-warp"></div></div><div class="sb-val" id="sbv-warp"></div></div>
+  <div class="sb-sys"><div class="sb-lbl">Power</div><div class="sb-bar"><div class="sb-fil" id="sbf-warp"></div></div><div class="sb-val" id="sbv-warp"></div></div>
   <div class="sb-sys"><div class="sb-lbl">Weapons</div><div class="sb-bar"><div class="sb-fil" id="sbf-wpn"></div></div><div class="sb-val" id="sbv-wpn"></div></div>
   <div class="sb-sys"><div class="sb-lbl">Sensors</div><div class="sb-bar"><div class="sb-fil" id="sbf-sens"></div></div><div class="sb-val" id="sbv-sens"></div></div>
   <div id="sb-id">USS ENTERPRISE · NCC-1701</div>
@@ -2865,7 +2875,7 @@ function launchGame() {
   log('BUILD v2.64-S175 -- The dice on the initiative screen are now drawn as ten-sided dice (a kite-shaped face). They were drawn as a pentagon, which is the face of a twelve-sided die.');
   log('BUILD v2.65-S176 -- The initiative dice are now drawn as a real ten-sided die (a pointed top and bottom with ten kite-shaped faces, seen at an angle) with the rolled number on the front face. The earlier version showed a single kite, which is only one face of the die.');
   log('BUILD v2.66-S177 -- Each side\'s die on the initiative screen is now in its faction colour: Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple (Gorn and Orion ships previously had no colour of their own on this screen). The winning die is brighter, glows and is a little larger; the losing die is dimmed.');
-  log('BUILD v2.74-S185 -- Federation captains now hear the load/charge sound when ANY weapon is selected in Power Allocation (phasers as well as torpedoes), as audible feedback that the selection registered. Deselecting stays silent; the other factions are unchanged.');
+  log('BUILD v2.76-S187 -- Damage Control redesign: every ship now fits inside the shield ring; the Power and Sensors gauges are labelled with units, a condition word and a 100/50/0% scale; hover any gauge, shield face, the superstructure track, the ship or a System Status row for what it is and what damage does; the System Status list is grouped by system and station. Fixed: three of the six shield generators were drawn on the wrong arc, and damaged ships showed a brown box around the art.');
     const ps = mkShip(pk, 4, 9, 1);   // player left side, facing east
   const es = mkShip(ek, 19, 9, 4);  // enemy right side, facing west
   es.ai = true;
@@ -7741,6 +7751,7 @@ const EXPLOSION_FRAMES = [
   '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'
 ];
 const explosionImages = [];  // preloaded HTMLImageElement[], same silent-fail pattern as shipImages
+let destructionActive = 0;   // v2.75-S186: number of destruction animations currently drawing the map (see frame() in initTac)
 
 const shipImages = {};   // key → HTMLImageElement (or null if load failed)
 
@@ -7857,6 +7868,10 @@ function playDestructionSequence(ship, onComplete){
 
   const t0 = performance.now();
   let frameIdx = 0, lastFrameTime = t0;
+  destructionActive++;
+  let _live = true;
+  const endDestruction = () => { if (_live) { _live = false; destructionActive = Math.max(0, destructionActive-1); } };
+  setTimeout(endDestruction, EXPAND_MS + 2500);   // safety: the map must never be left unrendered, whatever happens to the animation loop
   function tick(now){
     const t = now - t0;
     const progress = Math.min(t/EXPAND_MS, 1);
@@ -7905,7 +7920,7 @@ function playDestructionSequence(ship, onComplete){
       g.restore();
     }
     if (progress < 1) requestAnimationFrame(tick);
-    else onComplete();
+    else { endDestruction(); onComplete(); }
   }
   requestAnimationFrame(tick);
 }
@@ -9009,7 +9024,11 @@ function initTac(){
   });
   function frame(ts2){
     const dt=Math.min((ts2-tacLT)/16.67,3);tacLT=ts2;tacT+=.016*dt;
-    renderTac();
+    // v2.75-S186: while a ship-destruction animation is running it redraws the scene AND paints the flash / shockwave ring / fireball on top, in its own
+    // loop. If this loop also repainted the map in the same frame AFTER it, the explosion was erased before it was ever shown. That is exactly what happened
+    // whenever the killing blow was a torpedo (its result is delivered from inside this loop's own renderTac(), so the destruction loop registered first and
+    // ran first); phaser kills resolve elsewhere and were unaffected. So this loop simply stands aside until the animation is finished.
+    if(!destructionActive) renderTac();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -9028,28 +9047,45 @@ function drawPS(g){for(const p of PS){g.save();g.globalAlpha=Math.max(0,p.life);
 function renderDmgView(){
   if(!GS) return;
   const s=GS.player;
-  // Update system rows
+  // v2.76-S187: the System Status list is grouped by system, each group names its condition and the bridge station that will repair it once crew repair exists
+  // (FASA's Systems Repair Status Tracks: sensors, shield generators, engineering). Every row has the same hover tooltip as the canvas. "Warp Core" is now "Power",
+  // the word the rest of the game already uses (Power Allocation tab, the tooltips, the log).
   const rows=document.getElementById('sys-rows');
   if(!rows) return;
   rows.innerHTML='';
   const hull=Math.round(s.superstructure/s.superstructureMax*100);
-  const rows_data=[
-    ['Superstructure', hull, hull>60?'#336633':hull>30?'#886600':'#992200'],
-    ...SHIELD_NAMES.map((nm,i)=>{
-      const alive=s.shieldGenAlive[i];
-      const maxS=s.maxShieldPerFace;
-      const pct=alive?Math.round(s.shields[i]/maxS*100):0;
-      return ['Shield '+nm, pct, alive?(pct>50?'#1a44aa':'#885500'):'#441100',alive?null:'DEAD'];
-    }),
-    ['Warp Core', Math.round(s.currentPower/s.totalPower*100), '#886600'],
-    ['Sensors', Math.round(s.sensors), s.sensors>60?'#336633':'#886600'],
-    ...s.weapons.map(w=>[w.name, w.alive?100:0, w.alive?'#1a3888':'#441100', w.alive?'OK':'DEAD']),
-  ];
-  rows_data.forEach(([nm,pct,col,label])=>{
-    const div=document.createElement('div');div.className='sys-row';
-    div.innerHTML=`<div class="sys-nm">${nm}</div><div class="sys-tr"><div class="sys-fi" style="width:${pct}%;background:${col}"></div></div><div class="sys-pc" style="color:${col}">${label||pct+'%'}</div>`;
+  const pwr=Math.round(s.currentPower/s.totalPower*100);
+  const sns=Math.round(s.sensors);
+  const gensUp=s.shieldGenAlive.filter(a=>a).length;
+  const wUp=s.weapons.filter(w=>w.alive).length;
+  const barCol=p=>p>60?'#336633':p>30?'#886600':'#992200';
+  const grp=(title,status,statusCol,stn)=>{
+    const d=document.createElement('div'); d.className='sys-grp';
+    d.innerHTML=`<span>${title}${status?` <span class="cnt" style="color:${statusCol||'#cfe0ff'}">${status}</span>`:''}</span><span class="stn">${stn}</span>`;
+    rows.appendChild(d);
+  };
+  const row=(nm,pct,col,label,kind,lblCol)=>{
+    const div=document.createElement('div'); div.className='sys-row';
+    div.innerHTML=`<div class="sys-nm">${nm}</div><div class="sys-tr"><div class="sys-fi" style="width:${pct}%;background:${col}"></div></div><div class="sys-pc" style="color:${lblCol||col}">${label}</div>`;
+    div.addEventListener('mousemove',e=>dmgTipShow(e,kind));
+    div.addEventListener('mouseleave',hideShipTip);
     rows.appendChild(div);
+  };
+  const hc=dmgCondition(hull), pc=dmgCondition(pwr), sc=dmgCondition(sns);
+  grp('Hull',hc.w,hc.c,'Damage Control');
+  row('Superstructure',hull,barCol(hull),`${s.superstructure}/${s.superstructureMax}`,'ss');
+  grp('Shield generators',`${gensUp}/6 online`,gensUp===6?'#32be3c':gensUp>=3?'#dc9614':'#e0502c','Engineering');
+  SHIELD_NAMES.forEach((nm,i)=>{
+    const alive=s.shieldGenAlive[i], maxS=s.maxShieldPerFace;
+    const pct=alive?Math.round(s.shields[i]/maxS*100):0;
+    row(nm,pct,alive?(pct>50?'#1a44aa':'#885500'):'#441100',alive?`${s.shields[i]}/${maxS}`:'DESTROYED','sh'+i,alive?null:'#c0392b');
   });
+  grp('Power',pc.w,pc.c,'Engineering');
+  row('Engine output',pwr,barCol(pwr),`${s.currentPower}/${s.totalPower}`,'pwr');
+  grp('Sensors',sc.w,sc.c,'Science');
+  row('Sensor array',sns,barCol(sns),sns+'%','sns');
+  grp('Weapons',`${wUp}/${s.weapons.length} operational`,wUp===s.weapons.length?'#32be3c':wUp>0?'#dc9614':'#e0502c','Weapons');
+  s.weapons.forEach((w,i)=>row(w.name,w.alive?100:0,w.alive?'#1a3888':'#441100',w.alive?'OK':'DESTROYED','w'+i,w.alive?null:'#c0392b'));
 }
 
 // ── DAMAGE VIEW — particle helpers ────────────────────────────────────
@@ -9111,6 +9147,207 @@ function dmgPlaceImage(drawW,drawH,envH,box,ov,U){
   return {tx:0, ty:0, x:-drawW*(box.x0+box.x1)/2, y:-drawH*(box.y0+box.y1)/2};
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v2.76-S187 -- DAMAGE CONTROL PRESENTATION (shared helpers)
+// Goals: nothing overlaps the shield ring, every gauge says what it is, and every element explains itself on hover, laid out the way FASA's Damage Control Display
+// is (Superstructure Damage Track, Systems Repair Status Tracks) so that the planned bridge-crew repair layer (wishlist A4/A5) can sit directly on it.
+// ═══════════════════════════════════════════════════════════════════════════
+// Shield faces in the GAME's own order (SHIELD_NAMES: 0 Fwd, 1 F-Stbd, 2 A-Stbd, 3 Aft, 4 A-Port, 5 F-Port) with where each is drawn on the ring (bow up, starboard right).
+// FIX: until v2.76-S187 the ring used the order FWD, F-P, F-S, AFT, A-P, A-S, so a destroyed F-Stbd, A-Stbd or F-Port generator was drawn on the wrong arc (and charge
+// colours likewise). That mapping dated from v1.79-S90.
+const DMG_FACES=[
+  {nm:'FWD',   long:'Forward',           b:[-115.85,-64.15]},
+  {nm:'F-STBD',long:'Forward-Starboard', b:[-64.15,-1.6]},
+  {nm:'A-STBD',long:'Aft-Starboard',     b:[-1.6,62.55]},
+  {nm:'AFT',   long:'Aft',               b:[62.55,117.45]},
+  {nm:'A-PORT',long:'Aft-Port',          b:[117.45,181.6]},
+  {nm:'F-PORT',long:'Forward-Port',      b:[-178.4,-115.85]},
+];
+const DMG_RING_ANG=[-115.85,-64.15,-1.6,62.55,117.45,181.6];   // the six ring corners, in degrees on the rx/ry ellipse
+const DMG_RX=13*1.423, DMG_RY=13*1.846;                          // ring radii in units of U (SR = 13)
+const DMG_RING_MARGIN=1.1;                                       // clear gap (units) kept between the ship art and the ring
+const DMG_CONTENT_H=50.0, DMG_CONTENT_MID=1.1, DMG_HALF_W=33.5;   // measured extent of everything drawn: FWD label top to legend bottom, and bar to bar
+const DMG_SS={w:0.9,h:0.5,gap:0.15,perRow:14,bottom:20.5};       // superstructure track: box size, boxes per row, and where the last row sits (units)
+let dmgHot=[];                                                   // hover regions, rebuilt every frame (canvas pixels)
+function dmgGeom(W,H){ const U=Math.min(W*.97/(2*DMG_HALF_W), H*.9/DMG_CONTENT_H); return {U:U, cx:W/2, cy:H/2-DMG_CONTENT_MID*U}; }
+function dmgSsRows(n){ return Math.max(1,Math.ceil((n||1)/DMG_SS.perRow)); }
+function dmgSsTop(n){ const step=DMG_SS.h+DMG_SS.gap; return DMG_SS.bottom-dmgSsRows(n)*step+DMG_SS.gap; }   // top of the first box row (units)
+function dmgKeepY(n){ return dmgSsTop(n)-2.5; }                                                          // lowest point the ship art may reach (clear of the track caption)
+const DMG_RING_EDGES=(()=>{   // the shield hexagon's edges in unit space: outward normal and offset (inside = n.p <= d)
+  const V=DMG_RING_ANG.map(a=>({x:Math.cos(a*Math.PI/180)*DMG_RX, y:Math.sin(a*Math.PI/180)*DMG_RY}));
+  return V.map((p,i)=>{ const q=V[(i+1)%6]; let nx=q.y-p.y, ny=-(q.x-p.x); const L=Math.hypot(nx,ny)||1; nx/=L; ny/=L; if(nx*p.x+ny*p.y<0){nx=-nx;ny=-ny;} return {nx:nx,ny:ny,d:nx*p.x+ny*p.y}; });
+})();
+// How far the ship art must shrink (k <= 1, about the ring centre) so that EVERY non-transparent pixel sits inside the ring by DMG_RING_MARGIN and above the
+// superstructure caption. Measured from the art's own alpha, once per art+track-size, in unit space (everything scales with U, so k does not depend on window size).
+const _dmgFitCache={};
+function dmgFitK(ck,img,src,drawW,drawH,place,angleRad,U,ssMax){
+  if(_dmgFitCache[ck]!==undefined) return _dmgFitCache[ck];
+  let k=1;
+  try{
+    const cw=Math.max(16,Math.min(160,Math.round(drawW))), ch=Math.max(16,Math.round(drawH*cw/drawW));
+    const c=document.createElement('canvas'); c.width=cw; c.height=ch; const gg=c.getContext('2d');
+    if(src) gg.drawImage(img,src.sx,src.sy,src.sw,src.sh,0,0,cw,ch); else gg.drawImage(img,0,0,cw,ch);
+    const px=gg.getImageData(0,0,cw,ch).data, keepY=dmgKeepY(ssMax), ca=Math.cos(angleRad||0), sa=Math.sin(angleRad||0);
+    for(let j=0;j<ch;j++) for(let i=0;i<cw;i++){
+      if(px[(j*cw+i)*4+3]<48) continue;
+      const qx=place.x+(i+.5)/cw*drawW, qy=place.y+(j+.5)/ch*drawH;
+      const X=(place.tx+qx*ca-qy*sa)/U, Y=(place.ty+qx*sa+qy*ca)/U;
+      for(const e of DMG_RING_EDGES){ const dot=e.nx*X+e.ny*Y; if(dot>1e-9){ const s=(e.d-DMG_RING_MARGIN)/dot; if(s<k) k=s; } }
+      if(Y>0){ const s=keepY/Y; if(s<k) k=s; }
+    }
+    k=Math.max(0.35,Math.min(1,k));
+  }catch(e){ k=1; }
+  return _dmgFitCache[ck]=k;
+}
+// One shared vocabulary for "how is this system doing": same thresholds as the bar colours (green above 60%, amber above 30%, red at or below 30%).
+function dmgCondition(p){
+  p=Math.max(0,Math.min(100,p));
+  if(p<=0)  return {w:'OFFLINE', c:'#c0392b'};
+  if(p<=30) return {w:'CRITICAL',c:'#e0502c'};
+  if(p<=60) return {w:'IMPAIRED',c:'#dc9614'};
+  if(p<90)  return {w:'REDUCED', c:'#5fbf4a'};
+  return {w:'NOMINAL',c:'#32be3c'};
+}
+// Hover text. Every statement below is what the rules actually do (checked against applyDamage, checkVictory and the sensor code), plus the bridge station that will own the
+// repair once crew repair exists. The station tags are a proposal built on FASA's four control-panel displays (Engineering, Helm, Weapons, Damage Control); Science is
+// added for the sensors track. Until A5 exists, damage is permanent for the battle, and the tooltip says so.
+function dmgStn(stn){ return `<div class="stn">REPAIR STATION (planned): <b>${stn}</b><br>Crew repair is not in the game yet, so damage is permanent for this battle.</div>`; }
+function dmgTipHtml(kind){
+  if(!GS||!GS.player) return '';
+  const s=GS.player;
+  if(kind==='pwr'){
+    const pct=Math.round(s.currentPower/(s.totalPower||1)*100), c=dmgCondition(pct);
+    return `<h5>POWER · ENGINE OUTPUT</h5><span class="big">${s.currentPower} / ${s.totalPower} units</span><div class="sub" style="color:${c.c}">${pct}% of full output remains · ${c.w}</div>`
+      +`<div class="body">The pool of power you divide every turn between Movement, Shields and Weapons. Each Engine hit permanently removes power from it.</div>`
+      +`<div class="rule">At 0 the ship suffers a total power failure and the battle is lost. Each box on the gauge is 10%.</div>`+dmgStn('Engineering');
+  }
+  if(kind==='sns'){
+    const pct=Math.round(s.sensors), c=dmgCondition(pct);
+    return `<h5>SENSORS · ARRAY CONDITION</h5><span class="big">${pct}%</span><div class="sub" style="color:${c.c}">${c.w}</div>`
+      +`<div class="body">How well your sensor array works. A Sensors hit costs three times its damage in percent.</div>`
+      +`<div class="rule">At 0% you cannot lock on or scan. Below 100% the enemy contact on the tactical map is shown with static in proportion to the loss. Each box is 10%.</div>`+dmgStn('Science');
+  }
+  if(kind==='ss'){
+    const pct=Math.round(s.superstructure/s.superstructureMax*100), c=dmgCondition(pct);
+    return `<h5>SUPERSTRUCTURE · HULL INTEGRITY</h5><span class="big">${s.superstructure} / ${s.superstructureMax} boxes</span><div class="sub" style="color:${c.c}">${pct}% remains · ${c.w}</div>`
+      +`<div class="body">The hull's strength. Every hit that reaches the hull crosses off boxes (FASA's Superstructure Damage Track).</div>`
+      +`<div class="rule">At 0 the ship is destroyed. Below 35% a hull-breach warning shows and the screen pulses red.</div>`+dmgStn('Damage Control');
+  }
+  if(kind&&/^sh[0-5]$/.test(kind)){
+    const i=+kind.slice(2), F=DMG_FACES[i], alive=s.shieldGenAlive[i], v=s.shields[i]||0, mx=s.maxShieldPerFace||1;
+    if(!alive) return `<h5>${F.long.toUpperCase()} SHIELD · ${F.nm}</h5><span class="big" style="color:#ff6a52">✕ GENERATOR DESTROYED</span>`
+      +`<div class="body">This facing has no shield at all and cannot be charged.</div>`
+      +`<div class="rule">Every hit on this facing goes straight through to the ship. A destroyed generator stays destroyed for the rest of the battle.</div>`+dmgStn('Engineering');
+    return `<h5>${F.long.toUpperCase()} SHIELD · ${F.nm}</h5><span class="big">${v} / ${mx} points</span><div class="sub">${v<=0?'generator working, but no charge right now':'charged'}</div>`
+      +`<div class="body">Absorbs damage from hits on this facing; whatever it cannot absorb carries through to the ship. The power you assign to Shields each turn charges it.</div>`
+      +`<div class="rule">Arc colour: green = charged (brighter and thicker = more points), white = generator ready but uncharged.</div>`+dmgStn('Engineering');
+  }
+  if(kind==='wpn'||kind==='ship'){
+    const up=s.weapons.filter(w=>w.alive).length, dead=s.weapons.filter(w=>!w.alive).map(w=>w.name);
+    return `<h5>${s.name.toUpperCase()} · WEAPONS</h5><span class="big">${up} / ${s.weapons.length} operational</span>`
+      +`<div class="body">${dead.length?'Destroyed: '+dead.join(', ')+'.':'Every weapon is working.'}</div>`
+      +`<div class="rule">A destroyed weapon cannot fire. Hover a weapon in the System Status list for its details.</div>`+dmgStn('Weapons');
+  }
+  if(kind&&/^w\d+$/.test(kind)){
+    const w=s.weapons[+kind.slice(1)]; if(!w) return '';
+    return `<h5>${(w.type==='missile'?'TORPEDO TUBE':w.type==='plasma'?'PLASMA TUBE':'BEAM BANK')}</h5><span class="big">${w.name}</span>`
+      +`<div class="sub" style="color:${w.alive?'#32be3c':'#ff6a52'}">${w.alive?'operational':'✕ DESTROYED'}</div>`
+      +`<div class="rule">${w.alive?'Arm it in Power Allocation to fire it.':'A destroyed weapon cannot be armed or fired.'}</div>`+dmgStn('Weapons');
+  }
+  return '';
+}
+function dmgTipShow(ev,kind){
+  const tip=document.getElementById('ship-tooltip'); if(!tip) return;
+  const html=dmgTipHtml(kind); if(!html){ hideShipTip(); return; }
+  tip.className='dc'; tip.innerHTML=html; tip.style.display='block';
+  tip.style.left=Math.max(4,Math.min(ev.clientX+14, innerWidth-tip.offsetWidth-8))+'px';
+  tip.style.top=Math.max(4,Math.min(ev.clientY+14, innerHeight-tip.offsetHeight-8))+'px';
+}
+// Which hover region is under the pointer (canvas pixels): label and gauge boxes first, then the near-line zone around each shield arc, then the ship inside the ring.
+function dmgHit(x,y){
+  for(const h of dmgHot){ if(h.rect&&x>=h.rect[0]&&x<=h.rect[2]&&y>=h.rect[1]&&y<=h.rect[3]) return h.kind; }
+  for(const h of dmgHot){
+    if(!h.seg) continue;
+    const [x0,y0,x1,y1]=h.seg, dx=x1-x0, dy=y1-y0, L2=dx*dx+dy*dy||1;
+    let u=((x-x0)*dx+(y-y0)*dy)/L2; u=Math.max(0,Math.min(1,u));
+    if(Math.hypot(x-(x0+u*dx), y-(y0+u*dy))<=h.tol) return h.kind;
+  }
+  for(const h of dmgHot){
+    if(!h.poly) continue;
+    let inside=false;
+    for(let i=0,j=h.poly.length-1;i<h.poly.length;j=i++){
+      const a=h.poly[i], b=h.poly[j];
+      if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])) inside=!inside;
+    }
+    if(inside) return h.kind;
+  }
+  return null;
+}
+function dmgInstallHover(cv){
+  cv.addEventListener('mousemove',ev=>{
+    const r=cv.getBoundingClientRect(); if(!r.width) return;
+    const k=dmgHit((ev.clientX-r.left)*cv.width/r.width,(ev.clientY-r.top)*cv.height/r.height);
+    if(k){ cv.style.cursor='help'; dmgTipShow(ev,k); } else { cv.style.cursor='default'; hideShipTip(); }
+  });
+  cv.addEventListener('mouseleave',()=>{ cv.style.cursor='default'; hideShipTip(); });
+}
+
+// The ship itself (dedicated art, else the tactical sprite, else the old procedural silhouette), drawn about the ring centre (the caller has translated there) and
+// shrunk by dmgFitK so it stays inside the ring. P is any ship-like {faction, spriteKey, superstructureMax}; noFit is for tests (draws at the old size). Returns k.
+function dmgDrawShipArt(g,U,hullPct,P,dmgT,noFit){
+  const shipW=32, shipH=36;
+  const isFed=!P||P.faction==='fed', isRom=!!P&&P.faction==='rom';
+  const damaged=hullPct<0.7;
+  let dmgImg=P?getDmgImg(P.spriteKey):null, dmgSrc=null;
+  if(!dmgImg && P){
+    // v2.55-S166: a ship with no dedicated damage-control art uses its real top-down tactical sprite (46 of 66 ships), cropped to its own outline.
+    const sk=P.spriteKey, sp=(sk&&SHIP_SPRITES[sk])?shipImages[sk]:null;
+    if(sp&&sp.width){
+      const bx=dmgContentBox(sk,sp,'spr:',512);
+      if(bx){ const pad=0.01, x0=Math.max(0,bx.x0-pad), x1=Math.min(1,bx.x1+pad), y0=Math.max(0,bx.y0-pad), y1=Math.min(1,bx.y1+pad);   // 1% margin so thin tips are not clipped
+        dmgImg=sp; dmgSrc={sx:x0*sp.width, sy:y0*sp.height, sw:(x1-x0)*sp.width, sh:(y1-y0)*sp.height}; }
+    }
+  }
+  let fitK=1;
+  if(dmgImg){
+    // Per-ship override (the user's own tuned output from damage_control_designer.html), applied verbatim.
+    const DMG_IMG_OVERRIDE = { D7RSM: {scale:0.77, cxShift:0.00, cyShift:-2.00, angleDeg:0} };
+    const ov = DMG_IMG_OVERRIDE[P&&P.spriteKey];
+    const imgScale = ov ? ov.scale : 1.0;
+    const envW=shipW*U*imgScale, envH=(shipH+4)*U*imgScale;
+    const imgAspect=dmgSrc?dmgSrc.sw/dmgSrc.sh:dmgImg.width/dmgImg.height, envAspect=envW/envH;
+    let drawW,drawH;
+    if(imgAspect>envAspect){drawW=envW;drawH=envW/imgAspect;}
+    else{drawH=envH;drawW=envH*imgAspect;}
+    const place=dmgPlaceImage(drawW,drawH,envH,ov?null:(dmgSrc?{x0:0,x1:1,y0:0,y1:1}:dmgContentBox(P.spriteKey)),ov,U);
+    const angleRad=(ov&&ov.angleDeg?ov.angleDeg:0)*Math.PI/180;
+    // v2.76-S187: shrink about the ring centre until no pixel of the art touches the ring or the superstructure track.
+    fitK=noFit?1:dmgFitK(P.spriteKey+'|'+dmgSsRows(P.superstructureMax),dmgImg,dmgSrc,drawW,drawH,place,angleRad,U,P.superstructureMax);
+    g.save();
+    g.scale(fitK,fitK);
+    g.translate(place.tx, place.ty);
+    if(angleRad) g.rotate(angleRad);
+    if(damaged){
+      // v2.76-S187 FIX: the damage tint used to be drawn with 'source-atop' straight onto the main canvas, where everything under the image is already opaque, so it tinted the
+      // WHOLE image rectangle (a visible brown box around every damaged ship). Tint a private copy of the art instead (source-atop then only touches the ship's own pixels)
+      // and draw that copy.
+      const cw=Math.max(1,Math.ceil(drawW)), ch=Math.max(1,Math.ceil(drawH));
+      if(!dmgDrawShipArt._cv) dmgDrawShipArt._cv=document.createElement('canvas');
+      const oc=dmgDrawShipArt._cv; if(oc.width!==cw||oc.height!==ch){ oc.width=cw; oc.height=ch; }
+      const og=oc.getContext('2d'); og.setTransform(1,0,0,1,0,0); og.globalCompositeOperation='source-over'; og.clearRect(0,0,cw,ch);
+      og.imageSmoothingEnabled=true; og.imageSmoothingQuality='high';
+      if(dmgSrc) og.drawImage(dmgImg,dmgSrc.sx,dmgSrc.sy,dmgSrc.sw,dmgSrc.sh,0,0,cw,ch); else og.drawImage(dmgImg,0,0,cw,ch);
+      og.globalCompositeOperation='source-atop'; og.fillStyle='rgba(200,90,20,.32)'; og.fillRect(0,0,cw,ch); og.globalCompositeOperation='source-over';
+      g.drawImage(oc,place.x,place.y,drawW,drawH);
+    } else if(dmgSrc) g.drawImage(dmgImg,dmgSrc.sx,dmgSrc.sy,dmgSrc.sw,dmgSrc.sh,place.x,place.y,drawW,drawH);
+    else g.drawImage(dmgImg,place.x,place.y,drawW,drawH);
+    g.restore();
+  } else if(isFed) drawFedShip(g, U/0.028, dmgT, damaged);
+  else if(isRom) drawRomShip(g, U/0.028, dmgT, damaged);
+  else       drawKliShip(g, U/0.028, dmgT, damaged);
+  return fitK;
+}
+
 function dmgDrawShip(g,W,H,dmgT,hullPct,dmgSystems){
   if(W<10||H<10) return;
   // Found the actual root cause of the "boom and command pod missing" reports across
@@ -9128,238 +9365,132 @@ function dmgDrawShip(g,W,H,dmgT,hullPct,dmgSystems){
   // clipping theory that pixel measurement now shows was never the real issue.
   g.imageSmoothingEnabled = true;
   g.imageSmoothingQuality = 'high';
-  // FASA-style damage control — large annotated silhouette
-  //
-  // shipW=32 for width-fitting stays as before (the FWD/A-P/A-S label spread roughly matches
-  // the original 32-unit assumption). The HEIGHT side of this was a real bug, not just a
-  // tight fit: the FWD and AFT face labels (drawn further below, at sY-SR*1.28 and
-  // 22*U+SR*.35) actually span about 47 units top-to-bottom once measured directly from
-  // their own coordinates -- not the 36 units this scale factor used to assume. Since
-  // #dmg-wrap has overflow:hidden, that ~30% understatement meant the AFT label (and,
-  // on some panel proportions, the bottom of the ship image itself) was silently drawn
-  // past the visible bottom edge and clipped -- reported directly by the user as "aft is
-  // not there." contentH/contentMid below are the measured true span and its own vertical
-  // midpoint, used to both scale and center correctly instead of guessing.
-  const shipW=32, shipH=36, contentH=47.5, contentMid=2.955;
-  const U=Math.min(W*.78/shipW, H*.85/contentH)*1.0125;
-  const cx=W/2, cy=H/2-contentMid*U;
+  // FASA-style damage control: the ship inside the shield ring, a labelled gauge either side, the superstructure track under it, a legend along the bottom.
+  // All of it is laid out in units of U (see dmgGeom); the ring is the hexagon from DMG_RING_ANG and the art is fitted inside it (dmgDrawShipArt).
+  const {U,cx,cy}=dmgGeom(W,H);
   g.save();g.translate(cx,cy);
-  // Draw the ship in FASA ink style, OR a real per-ship image if one exists (see DMG_VIEW_ART
-  // above). The shield-face labels, superstructure box track, and status text below all
-  // position themselves from the shared SR/sY/nacX constants regardless of which was drawn --
-  // they were tuned to the procedural silhouette's proportions, so a swapped-in real image
-  // reads correctly as long as its own saucer/nacelles sit roughly where those constants
-  // assume (true for any conventional saucer-forward, twin-nacelle design).
-  const isFed=!GS||GS.player.faction==='fed';
-  const isRom=GS&&GS.player.faction==='rom';
-  const damaged=hullPct<0.7;
-  let dmgImg=GS?getDmgImg(GS.player.spriteKey):null, dmgSrc=null;
-  if(!dmgImg && GS){
-    // v2.55-S166 FIX: a ship with no dedicated damage-control art used to get a generic PROCEDURAL silhouette even though the game already has its real top-down
-    // sprite (46 of 66 ships, e.g. every Chandley). Use that sprite instead, cropped to its own outline (the sprite canvas has a transparent margin) and fitted
-    // and centred exactly like the dedicated art. Dedicated damage art, where it exists, still wins.
-    const sk=GS.player.spriteKey, sp=(sk&&SHIP_SPRITES[sk])?shipImages[sk]:null;
-    if(sp&&sp.width){
-      const bx=dmgContentBox(sk,sp,'spr:',512);
-      if(bx){ const pad=0.01, x0=Math.max(0,bx.x0-pad), x1=Math.min(1,bx.x1+pad), y0=Math.max(0,bx.y0-pad), y1=Math.min(1,bx.y1+pad);   // 1% margin so thin tips are not clipped
-        dmgImg=sp; dmgSrc={sx:x0*sp.width, sy:y0*sp.height, sw:(x1-x0)*sp.width, sh:(y1-y0)*sp.height}; }
-    }
-  }
-  if(dmgImg){
-    // Per-ship override for real art whose actual proportions don't match the procedural
-    // silhouette's assumed shipW/shipH. Now supports horizontal offset and rotation too
-    // (cxShift, angleDeg), matching the full capability of damage_control_designer.html --
-    // the tool this override's values are tuned in. Values below are the user's own tuned
-    // output from that tool, applied verbatim rather than re-approximated by hand.
-    const DMG_IMG_OVERRIDE = { D7RSM: {scale:0.77, cxShift:0.00, cyShift:-2.00, angleDeg:0} };
-    const ov = DMG_IMG_OVERRIDE[GS && GS.player.spriteKey];
-    const imgScale = ov ? ov.scale : 1.0;
-    const envW=shipW*U*imgScale, envH=(shipH+4)*U*imgScale; // +4 units of height slack --
-    // the procedural ships run a little taller than shipH once nacelles/aft details are
-    // included, and a real photo benefits from the same margin rather than being forced
-    // tighter than its procedural peers.
-    const imgAspect=dmgSrc?dmgSrc.sw/dmgSrc.sh:dmgImg.width/dmgImg.height, envAspect=envW/envH;
-    let drawW,drawH;
-    if(imgAspect>envAspect){drawW=envW;drawH=envW/imgAspect;}
-    else{drawH=envH;drawW=envH*imgAspect;}
-    const place=dmgPlaceImage(drawW,drawH,envH,ov?null:(dmgSrc?{x0:0,x1:1,y0:0,y1:1}:dmgContentBox(GS.player.spriteKey)),ov,U);   // v2.54-S165: centre the art on the ring (a cropped sprite fills its rect)
-    const angleRad=(ov&&ov.angleDeg?ov.angleDeg:0)*Math.PI/180;
+  dmgDrawShipArt(g,U,hullPct,GS?GS.player:null,dmgT,false);
+
+  // ── SHIELD RING, FACE LABELS, GAUGES, SUPERSTRUCTURE TRACK, LEGEND (v2.76-S187) ──────────────────────────────────
+  // Arc colours follow the tactical map: red = generator destroyed, green = charged (brighter and thicker = more points), white = generator ready but uncharged.
+  // The faces are drawn from DMG_FACES (the game's own order). Each face label sits OUTSIDE the ring, on its outward normal, and shows live points; nothing is drawn
+  // over a label any more (the old X mark that sat on top of the face name is gone; the arc keeps its own X).
+  const P=GS?GS.player:null;
+  const rx=DMG_RX*U, ry=DMG_RY*U;
+  dmgHot.length=0;
+  const shDead=dmgSystems.shields, shNow=dmgSystems.shieldStrength||[], maxFace=dmgSystems.maxShieldPerFace||1;
+  const lblPx=Math.max(8,U*1.0);
+  DMG_FACES.forEach((F,i)=>{
+    const a0=F.b[0]*Math.PI/180, a1=F.b[1]*Math.PI/180;
+    const p0={x:Math.cos(a0)*rx,y:Math.sin(a0)*ry}, p1={x:Math.cos(a1)*rx,y:Math.sin(a1)*ry};
+    const dead=!!(shDead&&shDead[i]), cur=shNow[i]||0, charged=!dead&&cur>0;
     g.save();
-    g.translate(place.tx, place.ty);
-    if(angleRad) g.rotate(angleRad);
-    if(dmgSrc) g.drawImage(dmgImg,dmgSrc.sx,dmgSrc.sy,dmgSrc.sw,dmgSrc.sh,place.x,place.y,drawW,drawH);
-    else g.drawImage(dmgImg,place.x,place.y,drawW,drawH);
-    if(damaged){
-      // Tint only the ship's own drawn pixels (source-atop respects the image's alpha shape)
-      // so a hurt ship reads as damaged even without separate damaged-state art.
-      g.globalCompositeOperation='source-atop';
-      g.fillStyle='rgba(200,90,20,.32)';
-      g.fillRect(place.x,place.y,drawW,drawH);
+    if(dead){ g.strokeStyle='rgba(255,69,54,.95)'; g.lineWidth=Math.max(1.5,U*.273); }
+    else if(charged){ const pp=Math.min(1,cur/maxFace); g.strokeStyle=`rgba(57,230,122,${(.5+.5*pp).toFixed(2)})`; g.lineWidth=Math.max(1.5,U*.273*(0.6+0.9*pp)); }
+    else { g.strokeStyle='rgba(232,240,255,.7)'; g.lineWidth=Math.max(1,U*.13); }
+    g.lineCap='round'; g.beginPath(); g.moveTo(p0.x,p0.y); g.lineTo(p1.x,p1.y); g.stroke();
+    if(dead){
+      const mx=(p0.x+p1.x)/2, my=(p0.y+p1.y)/2, d=Math.max(1.5,U*.55);
+      g.lineWidth=Math.max(1,U*.17);
+      g.beginPath(); g.moveTo(mx-d,my-d);g.lineTo(mx+d,my+d);g.moveTo(mx+d,my-d);g.lineTo(mx-d,my+d); g.stroke();
     }
     g.restore();
-  } else if(isFed) drawFedShip(g, U/0.028, dmgT, damaged);
-  else if(isRom) drawRomShip(g, U/0.028, dmgT, damaged);
-  else       drawKliShip(g, U/0.028, dmgT, damaged);
-
-  // ── SHIELD ARCS (drawn ring, matching the tactical map's per-facing hex-edge style) ──
-  // Previously this view only showed a colored text label + X for a dead shield generator --
-  // real information, but not the actual drawn arc the user sees on the tactical map for the
-  // same ship. This projects that same convention (dead=red, charged=green scaled by
-  // strength, alive-but-uncharged=white) onto an ellipse sized to the ship's own silhouette
-  // instead of a hex's uniform 6 sides. Angles below are the exact angle each face LABEL
-  // already sits at (computed directly from faceLabels' own x,y below, not a forced uniform
-  // hexagon) so the arc for face i always lines up with label i's actual position rather than
-  // an idealized hex that this elongated ship shape doesn't quite match.
-  //
-  // Segment SPANS (a0/a1 below) are NOT a fixed +-30 deg from each label angle -- the six
-  // face labels are not evenly 60 deg apart on this elongated silhouette (ranging from about
-  // 52 deg to 73 deg apart), so a fixed +-30 deg span made adjacent segments overlap where
-  // labels sit closer than 60 deg apart (reported directly: "Forward arc crosses over the
-  // forward-port and forward-starboard shield arc lines") and left visible gaps where they
-  // sit farther apart. Fixed by computing each segment's actual boundary as the ANGULAR
-  // MIDPOINT to its neighbor on each side, so the six segments tile the full circle exactly
-  // once with no overlap and no gap, while each arc is still centered on its own label.
-  const SR=13*U, sY=-4*U, nacX=14*U;
-  // rx/ry (the shield-arc ellipse radii) are declared here, outside the shields-data check
-  // below, specifically because the POWER/SENSORS side bars further down also need them for
-  // positioning -- declaring them inside the `if` block as `const` (as an earlier version of
-  // this fix did) scoped them to that block only, so referencing rx/ry outside it threw a
-  // ReferenceError on every single frame, crashing dmgDrawShip() before it could finish
-  // drawing anything -- this is what caused the panel to go completely blank.
-  const rx=SR*1.423, ry=SR*1.846;
-  if(dmgSystems.shields){
-    const faceAngDeg=[-90,-141.7,-38.3,90,144.9,35.1]; // FWD, F-P, F-S, AFT, A-P, A-S
-    // Precomputed midpoint boundaries (see comment above) -- index-matched to faceAngDeg.
-    const faceArcBounds=[[-115.85,-64.15],[-178.4,-115.85],[-64.15,-1.6],[62.55,117.45],[117.45,181.6],[-1.6,62.55]];
-    const strength=dmgSystems.shieldStrength, maxFace=dmgSystems.maxShieldPerFace||1;
-    faceAngDeg.forEach((deg,i)=>{
-      const [b0,b1]=faceArcBounds[i];
-      const a0=b0*Math.PI/180, a1=b1*Math.PI/180;
-      const p0={x:Math.cos(a0)*rx, y:Math.sin(a0)*ry}, p1={x:Math.cos(a1)*rx, y:Math.sin(a1)*ry};
-      const dead=dmgSystems.shields[i];
-      const charged=strength&&strength[i]>0;
-      if(dead){ g.strokeStyle='rgba(255,69,54,.95)'; g.lineWidth=Math.max(1.5,U*.273); }
-      else if(charged){ const p=Math.min(1,strength[i]/maxFace); g.strokeStyle=`rgba(57,230,122,${(.5+.5*p).toFixed(2)})`; g.lineWidth=Math.max(1.5,U*.273*(0.6+0.9*p)); }
-      else { g.strokeStyle='rgba(232,240,255,.7)'; g.lineWidth=Math.max(1,U*.13); }
-      g.lineCap='round';
-      g.beginPath(); g.moveTo(p0.x,p0.y); g.lineTo(p1.x,p1.y); g.stroke();
-      if(dead){
-        const mx=(p0.x+p1.x)/2, my=(p0.y+p1.y)/2, d=Math.max(1.5,U*.55);
-        g.lineWidth=Math.max(1,U*.17);
-        g.beginPath(); g.moveTo(mx-d,my-d);g.lineTo(mx+d,my+d);g.moveTo(mx+d,my-d);g.lineTo(mx-d,my+d); g.stroke();
-      }
-    });
-  }
-
-  // ── SHIELD FACE LABELS (FASA ship sheet style) ────────────────────
-  const faceLabels=[
-    {name:'FWD', x:0,          y:sY-SR*1.28},
-    {name:'F-P', x:-SR*1.25,   y:sY-SR*.68},
-    {name:'F-S', x: SR*1.25,   y:sY-SR*.68},
-    {name:'AFT', x:0,           y:22*U+SR*.35},
-    {name:'A-P', x:-nacX-4.5*U, y:13*U},
-    {name:'A-S', x: nacX+4.5*U, y:13*U},
-  ];
-  g.font=`bold ${Math.max(7,U*1.15)}px Courier New`;
-  g.textAlign='center';g.textBaseline='middle';
-  faceLabels.forEach((fl,i)=>{
-    const sdead=dmgSystems.shields&&dmgSystems.shields[i];
-    g.fillStyle=sdead?'rgba(255,50,20,.95)':(hullPct>0.6?'rgba(200,215,180,.8)':'rgba(210,185,130,.8)');
-    g.fillText(fl.name,fl.x,fl.y);
-    if(sdead){
-      // X mark — dead shield generator
-      g.strokeStyle='rgba(255,30,10,.9)';g.lineWidth=Math.max(1,U*.38);
-      const bs=U*1.15;
-      g.beginPath();g.moveTo(fl.x-bs,fl.y-bs*.6);g.lineTo(fl.x+bs,fl.y+bs*.6);g.stroke();
-      g.beginPath();g.moveTo(fl.x+bs,fl.y-bs*.6);g.lineTo(fl.x-bs,fl.y+bs*.6);g.stroke();
-    }
+    const mx=(p0.x+p1.x)/2, my=(p0.y+p1.y)/2;
+    let nx=p1.y-p0.y, ny=-(p1.x-p0.x); const nl=Math.hypot(nx,ny)||1; nx/=nl; ny/=nl; if(nx*mx+ny*my<0){nx=-nx;ny=-ny;}
+    const ax=mx+nx*U*1.2, ay=my+ny*U*1.2, centred=Math.abs(nx)<0.3;
+    g.font=`bold ${lblPx}px Courier New`;
+    let txt=dead?`${F.nm}  DESTROYED`:`${F.nm}  ${cur}/${maxFace}`;
+    // in a narrow window the text must not run into the gauge beside it: fall back to the compact form (the arc and the tooltip carry the detail)
+    if(!centred && g.measureText(txt).width > (25.1*U-Math.abs(ax))-4) txt=dead?`${F.nm}  ✕`:`${F.nm}  ${cur}`;
+    g.textAlign=centred?'center':(nx<0?'right':'left');
+    g.textBaseline=centred?(ny<0?'bottom':'top'):'middle';
+    g.fillStyle=dead?'#ff6a52':(charged?'#7ee39a':'#c7d2e6');
+    g.fillText(txt,ax,ay);
+    const tw=g.measureText(txt).width;
+    const lx0=centred?ax-tw/2:(nx<0?ax-tw:ax), ly0=centred?(ny<0?ay-lblPx:ay):ay-lblPx/2;
+    dmgHot.push({kind:'sh'+i, rect:[cx+lx0-3,cy+ly0-2,cx+lx0+tw+3,cy+ly0+lblPx+2], seg:[cx+p0.x,cy+p0.y,cx+p1.x,cy+p1.y], tol:Math.max(6,U*1.1)});
   });
+  // the ship's own area inside the ring: hover for the weapons summary
+  dmgHot.push({kind:'ship', poly:DMG_RING_ANG.map(a=>[cx+Math.cos(a*Math.PI/180)*rx, cy+Math.sin(a*Math.PI/180)*ry])});
 
-  // ── SUPERSTRUCTURE BOX TRACK (FASA engineering display) ──────────
-  const boxTotal=GS?GS.player.superstructureMax:24;
+  // ── SUPERSTRUCTURE DAMAGE TRACK: FASA draws it as rows of boxes, so it wraps to fit INSIDE the ring (it used to be one row, up to 54 units wide, across the ring's lower corners)
+  const boxTotal=P?P.superstructureMax:24;
   const boxFilled=Math.round(hullPct*boxTotal);
-  const bW=Math.max(4,U*.92),bH=Math.max(4,U*.477);
-  const bGap=Math.max(1,U*.16);
-  const bStartX=-(boxTotal/2)*(bW+bGap);
-  const bY2=sY+SR*1.85;
-
-  // ── POWER / SENSORS STATUS BARS (rulebook-authentic addition) ──────────────────────
-  // The FASA Damage Control Display's "Systems Repair Status Tracks" include a dedicated
-  // sensors track alongside the superstructure track (rulebook, PDF p.11-12) -- this view
-  // had no sensors readout at all before now (the SYSTEM STATUS TEXT block below references
-  // dmgSystems.sensors, but that field was never populated, so it could never actually
-  // appear -- see the dmgSystems construction above for the fix). Power isn't a distinct
-  // rulebook track on THIS display (it belongs to the separate Engineering Display in the
-  // original game), but since this view already showed power indirectly as conditional
-  // "ENGINES: X%" text, promoting it to a persistent readout alongside sensors -- rather
-  // than leaving it as text that only appears once damage exceeds 12% -- reads as a more
-  // complete status readout without contradicting the source material.
-  //
-  // Positioned in the LEFT/RIGHT side margins, outside the shield-arc ring, rather than
-  // stacked together above the superstructure track -- an earlier version crowded three
-  // elements into the same narrow vertical band near the bottom of the ship, and reported
-  // directly: "There's plenty of space on the sides of the screen... not everything needs
-  // to be all tightly consolidated."
-  //
-  // Drawn as a column of small segmented boxes -- NOT a continuous filled bar (an earlier
-  // version used one, and it read as "just a big block of vertical green" with no texture
-  // or resemblance to anything else in this display). Confirmed against the rulebook: both
-  // the Engineering Display's Power Tracks and the Damage Control Display's Systems Repair
-  // Status Tracks are described as rows of boxes that get crossed off as damage accrues --
-  // the same visual language already used for the superstructure track just above, not a
-  // modern progress-bar fill. This version reuses that box-track look directly.
-  const sbBoxes=10, sbBoxW=Math.max(5,SR*.62), sbBoxH=Math.max(3,SR*.36), sbBoxGap=Math.max(1,U*.14);
-  const sbColW=sbBoxW, sbColH=sbBoxes*(sbBoxH+sbBoxGap)-sbBoxGap;
-  const sbGap=SR*.4;
-  const sbLeftX=Math.max(-W/2+2, -rx-sbGap-sbColW), sbRightX=Math.min(W/2-2-sbColW, rx+sbGap);
-  const sbY=-sbColH/2;
-  g.font=`${Math.max(6,U*.7)}px Courier New`;
-  [{label:'PWR',pct:dmgSystems.engine,x:sbLeftX},{label:'SNS',pct:dmgSystems.sensors,x:sbRightX}].forEach(({label,pct,x})=>{
-    const p=Math.max(0,Math.min(100,pct))/100;
-    const boxesFilled=Math.round(p*sbBoxes);
-    g.textAlign='center';g.textBaseline='middle';
-    g.fillStyle='rgba(190,200,165,.75)';
-    g.fillText(label,x+sbColW/2,sbY-U*1.3);
-    // Boxes stack top-to-bottom; filled (remaining capacity) boxes start from the TOP,
-    // matching the rulebook convention of crossing off from one end as damage accrues.
-    for(let bi=0;bi<sbBoxes;bi++){
-      const by=sbY+bi*(sbBoxH+sbBoxGap);
-      const alive=bi<boxesFilled;
-      const col = p>0.6?'rgba(50,190,60,':(p>0.3?'rgba(220,150,20,':'rgba(220,40,20,');
-      g.fillStyle=alive?(col+'.55)'):'rgba(90,30,20,.25)';
-      g.strokeStyle=alive?(col+'.8)'):'rgba(150,60,40,.45)';
-      g.lineWidth=Math.max(.5,U*.13);
-      g.fillRect(x,by,sbBoxW,sbBoxH);g.strokeRect(x,by,sbBoxW,sbBoxH);
-    }
-    g.fillStyle='rgba(220,230,210,.9)';
-    g.fillText(`${Math.round(pct)}%`,x+sbColW/2,sbY+sbColH+U*1.4);
-  });
-
-  g.font=`${Math.max(6,U*.82)}px Courier New`;g.textAlign='center';g.textBaseline='middle';
-  g.fillStyle='rgba(190,200,165,.65)';
-  g.fillText('SUPERSTRUCTURE',0,bY2-U*1.5);
+  const sRows=dmgSsRows(boxTotal), perRow=Math.ceil(boxTotal/sRows);
+  const sbW=DMG_SS.w*U, sbH=DMG_SS.h*U, sbG=DMG_SS.gap*U;
+  const rowW=perRow*(sbW+sbG)-sbG, trackTop=dmgSsTop(boxTotal)*U;
+  const hullCond=dmgCondition(hullPct*100);
   for(let bi=0;bi<boxTotal;bi++){
-    const bx=bStartX+bi*(bW+bGap), by=bY2;
+    const r=Math.floor(bi/perRow), c=bi%perRow;
+    const bx=-rowW/2+c*(sbW+sbG), by=trackTop+r*(sbH+sbG);
     const alive=bi<boxFilled;
     g.fillStyle=alive?(hullPct>.5?'rgba(50,190,60,.5)':'rgba(220,130,20,.5)'):'rgba(180,25,10,.3)';
     g.strokeStyle=alive?(hullPct>.5?'rgba(100,220,110,.7)':'rgba(240,160,40,.7)'):'rgba(220,50,30,.55)';
-    g.lineWidth=Math.max(.5,U*.22);
-    g.fillRect(bx,by,bW,bH);g.strokeRect(bx,by,bW,bH);
+    g.lineWidth=Math.max(.5,U*.15);
+    g.fillRect(bx,by,sbW,sbH);g.strokeRect(bx,by,sbW,sbH);
   }
+  g.font=`${Math.max(7,U*.82)}px Courier New`; g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle=hullPct<0.35?'#ff6a52':'rgba(200,210,175,.85)';
+  const ssTxt=`SUPERSTRUCTURE  ${P?P.superstructure:boxTotal}/${boxTotal}  ${Math.round(hullPct*100)}%`+(hullPct<0.35?'  ⚠ BREACH':'');
+  g.fillText(ssTxt,0,trackTop-1.1*U);
+  { const w=g.measureText(ssTxt).width;
+    dmgHot.push({kind:'ss', rect:[cx-Math.max(w/2,rowW/2)-4,cy+trackTop-1.9*U,cx+Math.max(w/2,rowW/2)+4,cy+trackTop+sRows*(sbH+sbG)+2]}); }
 
-  // ── SYSTEM STATUS TEXT ────────────────────────────────────────────
-  const dmgPct=1-hullPct;
-  if(dmgPct>.12){
-    g.font=`bold ${Math.max(8,U*1.1)}px Courier New`;
-    g.textAlign='left';g.textBaseline='middle';
-    const statusItems=[];
-    if(dmgSystems.engine<80) statusItems.push(`ENGINES: ${dmgSystems.engine}%`);
-    if(dmgSystems.sensors<80) statusItems.push(`SENSORS: ${dmgSystems.sensors}%`);
-    if(dmgSystems.shields&&dmgSystems.shields.some(d=>d)) statusItems.push('SHIELD GEN: OFFLINE');
-    if(hullPct<0.35) statusItems.push('*** HULL BREACH ***');
-    statusItems.forEach((txt,i)=>{
-      g.fillStyle=txt.includes('***')?'rgba(255,40,10,.95)':'rgba(255,110,30,.85)';
-      g.fillText(txt,-W*.38, sY+SR*1.35+i*U*1.9);
+  // ── GAUGES: each says what it is (title and subtitle), shows units and a condition word, and carries a 100 / 50 / 0% scale. They fill from the BOTTOM like any gauge.
+  const pwrCur=P?P.currentPower:0, pwrTot=P?P.totalPower:1;
+  const bars=[
+    {kind:'pwr', title:'POWER',   sub:'ENGINE OUTPUT',   pct:dmgSystems.engine,  line:`${pwrCur} / ${pwrTot} units`, side:-1},
+    {kind:'sns', title:'SENSORS', sub:'ARRAY CONDITION', pct:dmgSystems.sensors, line:dmgSystems.sensors>0?'lock/scan: ON':'lock/scan: OFF', side:1},
+  ];
+  const nB=10, gbW=5.6*U, gbH=2.8*U, gbG=.25*U, colH=nB*(gbH+gbG)-gbG, by0=-colH/2;
+  bars.forEach(B=>{
+    const bx=B.side<0?-31.7*U:26.1*U, midX=bx+gbW/2;
+    const pct=Math.max(0,Math.min(100,B.pct)), pf=pct/100, filled=Math.round(pf*nB), cond=dmgCondition(pct);
+    const col=pf>0.6?'rgba(50,190,60,':(pf>0.3?'rgba(220,150,20,':'rgba(220,40,20,');
+    g.textAlign='center'; g.textBaseline='middle';
+    g.font=`bold ${Math.max(9,U*1.2)}px Courier New`; g.fillStyle='#ffcf6b'; g.fillText(B.title,midX,by0-4.5*U);
+    g.font=`${Math.max(7,U*.78)}px Courier New`;     g.fillStyle='#8aa0c0'; g.fillText(B.sub,midX,by0-2.9*U);
+    for(let bi=0;bi<nB;bi++){
+      const by=by0+bi*(gbH+gbG), alive=(nB-1-bi)<filled;
+      g.fillStyle=alive?(col+'.55)'):'rgba(90,30,20,.25)';
+      g.strokeStyle=alive?(col+'.8)'):'rgba(150,60,40,.45)';
+      g.lineWidth=Math.max(.5,U*.13);
+      g.fillRect(bx,by,gbW,gbH); g.strokeRect(bx,by,gbW,gbH);
+    }
+    g.font=`${Math.max(6,U*.62)}px Courier New`; g.fillStyle='rgba(140,160,190,.85)'; g.textAlign=B.side<0?'right':'left';
+    const tx=B.side<0?bx-.5*U:bx+gbW+.5*U;
+    g.fillText('100%',tx,by0+gbH/2); g.fillText('50%',tx,by0+colH/2); g.fillText('0%',tx,by0+colH-gbH/2);
+    g.textAlign='center';
+    g.font=`bold ${Math.max(10,U*1.6)}px Courier New`;  g.fillStyle=cond.c;     g.fillText(Math.round(pct)+'%',midX,by0+colH+2.7*U);
+    g.font=`${Math.max(7,U*.8)}px Courier New`;         g.fillStyle='#cfe0ff';  g.fillText(B.line,midX,by0+colH+4.7*U);
+    g.font=`bold ${Math.max(7,U*.82)}px Courier New`;   g.fillStyle=cond.c;     g.fillText(cond.w,midX,by0+colH+6.2*U);
+    dmgHot.push({kind:B.kind, rect:[cx+bx-(B.side<0?3.4:1.0)*U, cy+by0-5.6*U, cx+bx+gbW+(B.side>0?3.4:1.0)*U, cy+by0+colH+7.2*U]});   // wider on the outer side, where the 100/50/0% scale sits
+  });
+
+  // ── LEGEND: what the ring colours mean (hover anything for the full explanation) ──
+  { const lgPx=Math.max(8,U*.8), items=[
+      {t:'SHIELD RING', head:true},
+      {t:'charged (brighter = more)', sw:'rgba(57,230,122,.95)'},
+      {t:'generator ready, no charge', sw:'rgba(232,240,255,.8)'},
+      {t:'generator destroyed', sw:'rgba(255,69,54,.95)', x:true},
+    ];
+    const short=[ 'SHIELD RING','charged','no charge','destroyed' ];
+    g.font=`${lgPx}px Courier New`;
+    const swW=2.0*U, gap=1.6*U;
+    let tw=items.reduce((a,it)=>a+g.measureText(it.t).width+(it.sw?swW+.5*U:0),0)+gap*(items.length-1);
+    const useShort=tw>W-16;
+    if(useShort){ items.forEach((it,i)=>it.t=short[i]); tw=items.reduce((a,it)=>a+g.measureText(it.t).width+(it.sw?swW+.5*U:0),0)+gap*(items.length-1); }
+    let lx=-tw/2; const ly=25.1*U;
+    g.textAlign='left'; g.textBaseline='middle';
+    items.forEach(it=>{
+      if(it.sw){
+        g.strokeStyle=it.sw; g.lineWidth=Math.max(1.5,U*.27); g.lineCap='round';
+        g.beginPath(); g.moveTo(lx,ly); g.lineTo(lx+swW,ly); g.stroke();
+        if(it.x){ const d=U*.4,mx=lx+swW/2; g.lineWidth=Math.max(1,U*.15); g.beginPath(); g.moveTo(mx-d,ly-d);g.lineTo(mx+d,ly+d);g.moveTo(mx+d,ly-d);g.lineTo(mx-d,ly+d); g.stroke(); }
+        lx+=swW+.5*U;
+      }
+      g.fillStyle=it.head?'#ffcf6b':'rgba(190,205,230,.85)'; g.font=`${it.head?'bold ':''}${lgPx}px Courier New`;
+      g.fillText(it.t,lx,ly); lx+=g.measureText(it.t).width+gap;
     });
   }
   g.restore();
@@ -9375,6 +9506,7 @@ function initDmg(){
     if(nw>0&&nh>0){cv.width=nw;cv.height=nh;}
   }
   rsz();window.addEventListener('resize',rsz);
+  dmgInstallHover(cv);   // v2.76-S187: tooltips on the gauges, shield faces, superstructure track and ship
 
   // Damage particle spawn points in unit-space (relative to ship centre)
   // Populated based on damage state each frame
@@ -9386,7 +9518,7 @@ function initDmg(){
   // now-repositioned ship image.
   function spawnDmgParticles(cx,cy,W,H,dmgPct,dmgSystems){
     if(dmgPct<.2) return;
-    const U=Math.min(W*.78/32, H*.85/47.5)*1.0125;
+    const U=dmgGeom(W,H).U;
     const rate=dmgPct;
     const SR=13*U;
     const sY=-4*U;
@@ -9430,8 +9562,7 @@ function initDmg(){
     // (31/35, 0.984375) were different from dmgDrawShip's (32/36, 1.0125); close enough to
     // not look obviously wrong, but a real discrepancy, now fixed to be the literal same
     // formula rather than two hand-tuned approximations of it.
-    const U=Math.min(W*.78/32, H*.85/47.5)*1.0125;
-    const cx=W/2, cy=H/2-2.955*U;
+    const {U,cx,cy}=dmgGeom(W,H);   // v2.76-S187: the one shared layout (see dmgGeom)
     g.clearRect(0,0,W,H);g.fillStyle='#010408';g.fillRect(0,0,W,H);
     // Background stars
     for(let i=0;i<180;i++){
@@ -9592,7 +9723,7 @@ function showShipTip(ev){
   tip.style.left=Math.min(ev.clientX+14, innerWidth-tip.offsetWidth-8)+'px';
   tip.style.top=Math.min(ev.clientY+14, innerHeight-tip.offsetHeight-8)+'px';
 }
-function hideShipTip(){ const t=document.getElementById('ship-tooltip'); if(t) t.style.display='none'; }
+function hideShipTip(){ const t=document.getElementById('ship-tooltip'); if(t){ t.style.display='none'; t.className=''; } }
 
 function updateSidebar(){
   if(!GS) return;
