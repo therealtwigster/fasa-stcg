@@ -1,4 +1,4 @@
-> **Build v2.74-S185** · Audio: the weapon-arming sound now covers phasers too — 2026-11-02
+> **Build v2.76-S187** · Damage Control redesign: labelled gauges, ship inside the shield ring, hover tooltips — 2026-11-03
 
 # Star Trek: Tactical Command
 
@@ -56,6 +56,16 @@ one HTML file.
 - **Sound** (Web Audio, nothing to download): a looping rumble on the setup screen before you press Engage, a procedural bed on the tactical map (per faction, with sensor pings), a power-allocation pad, a looping engineering hum on the Damage Control tab under sounds that grow with hull damage, TOS console chirps for Federation captains when they commit power and when they proceed to combat, a recorded load / charge sound when a Federation weapon (phasers and torpedoes alike) is selected, recorded torpedo launch and phaser sounds for Federation, an explosion for every ship destroyed, and for Federation the TOS bridge ambience (start-up once on Engage, then a swoosh-free bed that loops on Tactical and Power and gives way to the hum on Damage Control, with the door swoosh played now and then).
 - **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.76-S187)
+- **Damage Control tab redesigned.** The ship now sits fully inside the shield ring (it used to cross it on most ships), the superstructure track wraps inside the ring, and both gauges say what they are: **POWER** (engine output left, in units, such as 24 / 52) and **SENSORS** (array condition), each with a 100 / 50 / 0% scale and a condition word (NOMINAL, REDUCED, IMPAIRED, CRITICAL, OFFLINE). Shield faces show their live points and a legend explains the ring colours.
+- **Hover anything for an explanation.** The gauges, each shield face, the superstructure track, the ship and every row of the System Status list explain what the system is and what damage does to it. The System Status list is grouped by system and shows the bridge station that will repair it once crew repair is added (planned).
+- **Fixed: shield damage was drawn on the wrong faces.** A destroyed F-Stbd, A-Stbd or F-Port generator showed on the wrong arc. All six faces are now right.
+- **Fixed: damaged ships no longer have a brown box around them.**
+- "Warp Core" is now called **Power** here and in the bottom status bar, to match the rest of the game.
+
+## Recent fixes (v2.75-S186)
+- **The explosion visuals are back for torpedo kills.** When the killing blow was a torpedo, the detonation flash, the expanding shockwave ring and the fireball never appeared (you heard the explosion but saw nothing). The map was repainting over the explosion in the same frame. Phaser kills always worked. Now every kind of kill, yours or the enemy's, shows the full explosion. This was a long-standing bug, not caused by the explosion sound.
 
 ## Recent fixes (v2.74-S185)
 - **Selecting a phaser in Power Allocation now plays the load / charge sound too** (it used to play only for torpedoes). It is the Federation player's audible feedback that a weapon selection registered; deselecting stays silent, and the other factions are unchanged. If you arm many weapons very quickly the sounds are limited to four at a time (the oldest fades out), so a fast click-through can never distort.
