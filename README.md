@@ -1,4 +1,4 @@
-> **Build v2.76-S187** · Damage Control redesign: labelled gauges, ship inside the shield ring, hover tooltips — 2026-11-03
+> **Build v2.89-S200** · The plasma weapons fire with the new "flame roar and spit" sound — 2026-11-06
 
 # Star Trek: Tactical Command
 
@@ -14,13 +14,12 @@ one HTML file.
 ## What's in this build
 
 - **5 playable factions**: Federation, Klingon Empire, Romulan Star Empire, Gorn Alliance,
-  Orion Colonies — 44 ship hulls total, each statted directly from the FASA recognition
+  Orion Colonies — 63 playable ship hulls (Federation 28, Klingon 18, Romulan 12, Gorn 3, Orion 2), each statted directly from the FASA recognition
   manuals (power, shields, weapons, firing arcs). Newest addition: the **USS Baker** (Mk II and
   Mk IV), a real FASA Class IX Destroyer.
 - **Tactical viewscreen**: the enemy contact panel shows a live bow-on portrait of the ship
   you're facing instead of just text. No sensor lock yet? The portrait is genuinely blurred,
-  overlaid with sensor static, and the status readout blinks like a warning light. 22 hulls now
-  have real artwork (Reliant, D-10, Chandley, both D-7 marks, the Romulan Winged Defender,
+  overlaid with sensor static, and the status readout blinks like a warning light. the front-view table now holds 40 portraits (the hull list that follows was written at an earlier build and is not complete) (Reliant, D-10, Chandley, both D-7 marks, the Romulan Winged Defender,
   Bird of Prey, and Stormbird, Loknar, Excelsior, both Klingon Throne Seeker/Ever-Victorious
   hulls, three more Klingon Bird of Prey classes, the Klingon Sting Tongue, Constitution,
   Enterprise, Federation, Baker, both Orion ships — Wanderer and Lightning — and the new Klingon
@@ -53,9 +52,66 @@ one HTML file.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
   screen narrates the killing blow along with turn and shots-fired statistics.
-- **Sound** (Web Audio, nothing to download): a looping rumble on the setup screen before you press Engage, a procedural bed on the tactical map (per faction, with sensor pings), a power-allocation pad, a looping engineering hum on the Damage Control tab under sounds that grow with hull damage, TOS console chirps for Federation captains when they commit power and when they proceed to combat, a recorded load / charge sound when a Federation weapon (phasers and torpedoes alike) is selected, recorded torpedo launch and phaser sounds for Federation, an explosion for every ship destroyed, and for Federation the TOS bridge ambience (start-up once on Engage, then a swoosh-free bed that loops on Tactical and Power and gives way to the hum on Damage Control, with the door swoosh played now and then).
-- **Ship Recognition Database**: browse all 78 catalogued hulls from the recognition manuals,
+- **Sound** (Web Audio, nothing to download): the owner's own recordings and designed sounds play for the Federation's phasers, lasers and torpedoes (launch and arming), the Gorn beams and torpedoes, the Romulan torpedoes, the older Klingon D-7 disruptors, the plasma weapons (a loading sound when you arm one and the "flame roar and spit" firing sound), every ship that explodes, the Federation console chirps (commit, proceed) and bridge door, and three ambience recordings (the setup-screen rumble, the Federation TOS bridge, and the Damage Control engineering hum). **Everything else is still computer-generated and is being replaced one by one (the owner's goal, wishlist C10):** the beams of the Romulans, the newer Klingons and the Orions, the Klingon and Orion torpedoes, the hit, shield and miss sounds, the movement and turn blips, the victory and defeat tones, the Klingon, Romulan and Gorn/Orion tactical ambience, the Power tab hum and pad, and the alert and chatter layers on the Damage Control tab. Commit, proceed and weapon-arming sounds exist for the Federation (and plasma weapons) only; the other factions hear nothing at those moments yet.
+- **Weapon looks**: torpedoes are glowing, turning, many-rayed stars designed by the owner in the Klingon weapons bay: a small red one for the Klingon Motion Picture ships, two Federation looks (original series and Motion Picture), and green, orange and blue ones for the Romulan, Gorn and Orion torpedoes; the older Klingon D-7s fire green disruptor bolts. Plasma bolts and beams keep their old look.
+- **Power Allocation shows what you have armed**: above the weapon rows, "ARMED NOW: 3 weapons" lists each armed weapon with its points (yellow label, green count, bold names). You can click a weapon's name, not only its small circle, to arm it, and the commit writes the armed weapons into the logs.
+- **Ship Recognition Database**: browse all 103 catalogued hulls from the recognition manuals (Federation 35, Klingon 23, Romulan 40, Gorn 3, Orion 2),
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent fixes (v2.89-S200)
+- **Plasma weapons now fire with the owner's "flame roar and spit" sound** (a crackling, roaring bolt, designed in the Torpedo Lab), on either side: the Romulan plasma bolt tubes and the plasma tubes of the Klingon D-7 G and R. It is a little quieter than the old computer-generated sound it replaces; the plasma torpedoes of the Romulans and the Gorn, all beams and the loading sound are as before.
+
+## Recent fixes (v2.88-S199)
+- **New sounds, designed by the owner in the Torpedo Lab:** a **Gorn torpedo** sound (every Gorn torpedo), a **Romulan torpedo** sound (every Romulan torpedo), and a **loading sound for plasma weapons** (played when you arm a plasma weapon, Romulan or Klingon). The three were checked to be genuinely different from each other before they went in. Plasma weapons' firing sound, all beams and the other factions' torpedoes sound as before.
+
+## Recent fixes (v2.86-S197)
+- **The torpedoes of the Romulans, the Gorn and the Orions have their own looks now**, from the owner's recipes: a turning, many-rayed star (green for the Romulans, orange for the Gorn, blue for the Orions). The plasma weapons (the plasma bolt tubes) are a different category and are unchanged, and so are all the sounds.
+
+## Recent fixes (v2.85-S196)
+- **The plasma weapons are back to the sound they had before.** The plasma bank recording had been put into the game by mistake (it was meant for the sound tools only); it is out again, and the game behaves exactly as it did before that change. The recording stays in the Beam Lab and the Torpedo Lab.
+- **All three tools (Beam Lab, Torpedo Lab, Klingon weapons bay) have a "Download this tool" button** that saves the whole page as one file that opens in any browser with no internet.
+
+## Recent fixes (v2.84-S195, taken out again in v2.85-S196)
+- **(Taken out again.) Plasma weapons played the owner's plasma bank recording** instead of the computer-generated sound: the Romulan plasma torpedoes and bolt tubes, the Gorn plasma launchers and the plasma tubes of the Klingon D-7 G and R (34 weapons in all, on either side). It was set to the loudness of the Federation torpedo launch, and the biggest volleys (eight tubes) were measured not to clip.
+- **Not changed:** every beam, the Klingon and Orion photon tubes, and how plasma looks.
+
+## Recent fixes (v2.83-S194)
+- **The "Armed now" line is bigger and easier to read.** "ARMED NOW:" is yellow, the number of weapons is green, and every weapon is in bold.
+- **The Klingon Motion Picture torpedo has a new look,** a small dim red sparkle instead of the big bright starburst, from the owner's second recipe.
+
+## Recent fixes (v2.82-S193)
+- **The Power tab now shows what you have armed.** Above the weapon rows a line reads, for example, "ARMED NOW: 3 weapons: FH-11 Bank 4 (1 pt), FP-4 Tube 1 (1 pt), FP-4 Tube 2 (1 pt)", or "nothing" in orange, and it changes with every click. You can click a weapon's **name** to arm it, not only the small circle. When you commit, the combat log and the allocation log say which weapons you armed.
+- **Why:** a log showed one torpedo fired when two were expected; the second tube had simply not been armed, and nothing on screen said so.
+
+## Recent fixes (v2.81-S192)
+- **Enemy Federation ships now fire with the recorded phaser and torpedo sounds.** Before, only the player's Federation ship did, and an enemy Constitution's phasers and torpedoes played the computer-generated sounds. Now every Federation phaser, laser and torpedo uses the recordings, whoever fires it. Nothing else changed: the other factions keep their own sounds.
+- **Noted, not changed:** the Klingon Motion Picture torpedo is a bit too bright; a better look will come from a new recipe.
+
+## Recent fixes (v2.80-S191)
+- **Torpedoes have their own looks now.** A glowing core with thin spokes that turn and twinkle, after the Klingon torpedoes in the Motion Picture. There are three looks, all designed in the Klingon weapons bay: a big red one for the Klingon Motion Picture-era ships, and a small dim one each for the Federation's Motion Picture-era and original-series ships. They fly fast and the result of the shot appears when they land, as before.
+- **Not changed:** the Klingon original-series torpedoes (the D-7 M, D-2 and D-10 D), every Romulan, Gorn and Orion missile, plasma, beams and all the sounds. More looks can be added the same way.
+
+## Visual tool: Klingon weapons bay (a separate page, not part of the game)
+- One page, two eras. **TOS** shows the original-series D-7 and its green disruptor bolts (set to the speed and size chosen for the game). **TMP** shows a Motion Picture-era Klingon cruiser firing a photon torpedo: a glowing pale-yellow core with thin straight rays, as in the film. You can change how long the rays are, how big and bright the glow is, how fast the rays turn, the overall brightness and how fast the torpedo flies, plus the number of rays, how uneven they are, their thickness, the core size, the twinkle and the colour. The rays are always shared out around the whole core (with an optional "through the core" mode where each ray continues out the other side), and they keep turning at the rotation you set. There is a salvo of three, a cloud or space backdrop, a tactical and a viewscreen view, a Reset, copy, save and load for every setting, and a **Download this tool** button that saves the whole page as one file you can keep and open anywhere.
+- The six torpedo looks in the game came from this tool (v2.80 to v2.87): the Klingon Motion Picture look, the two Federation looks, and the Romulan, Gorn and Orion looks. Any faction's missiles can get a look the same way: design it here and send the settings.
+
+## Sound tools (separate pages, not part of the game)
+- **Beam Lab** (for beam weapons) now has a **Reset to starting point** button, and a small ↺ on every section that resets just that section. The starting point is whichever preset or recipe you loaded last, and Undo brings your changes back.
+- **Torpedo Lab** is new: the same idea for torpedoes and plasma bolts, with much more bass (a pitch-dropping sub-bass layer, your explosion recording, a rumble layer, a bass boost), sounds that can last up to 10 seconds (it can loop a section of a recording so a short sound can hum, and add echoes and a reverb up to 8 seconds), and more other-worldly tools (an FM layer, ring modulation, a flanger, throb, crunch). It also has Reset, A/B compare, Mutate, Undo, a waveform and spectrogram, and exports a WAV plus a recipe.
+- **Both sound tools** now include your plasma bank recording as a source (the whole recording, the charge-up swell, or the surge and ring), and every tool page (Beam Lab, Torpedo Lab, Klingon weapons bay) has a **Download this tool** button that saves the whole page as one file you can keep and open anywhere.
+- **Torpedo Lab** also has a **Fire pops** control (sparse, irregular crackle pops with their own length and level, and a noise-bed level to turn the hiss down) for fire and plasma sounds, and three plasma-firing presets (A, B, C). Preset B, "flame roar and spit", is the firing sound of the plasma weapons in the game.
+- **The plan:** replace every remaining computer-generated sound in the game with one designed in these tools; the full list, the method and a proposed order are in the wishlist (item C10).
+
+## Recent fixes (v2.79-S190)
+- **Every Gorn beam weapon now has its own sound.** It was designed by the owner in the new **Beam Lab** (a page for building sounds from the recorded TOS phaser, the game's computer-generated voice and a crackle layer) and replaces the plain computer-generated beam tone. It plays for Gorn ships on either side. The beams look the same, and the plasma launchers and the other factions are unchanged.
+- **The Beam Lab** is a separate page (not part of the game). It shows what the game's beam sound is today, lets you mix the recorded phaser with synthesised layers and effects, shows a waveform and spectrogram, and exports the sound as a WAV (inside a .zip when used online) together with a recipe file that records every setting.
+
+## Recent fixes (v2.78-S189)
+- **The oldest Constitution (Mk I) and the Federation I now fire with the recorded TOS phaser sound.** Their beams are lasers (FL banks), which had been left on the old computer-generated sound when the phaser recording was added; only phaser (FH) banks used the recording. Lasers now use it too. Torpedoes and cannons, enemy ships and the other factions are unchanged.
+
+## Recent fixes (v2.77-S188)
+- **The older D-7s (marks A, C and G) fire green disruptor bolts instead of a solid beam.** Each bolt is a glowing head with a trail of small beads, and it leaves from one of the ship's two nacelle pods (alternating bank by bank), so a volley looks like two parallel streams. It uses the recorded TOS disruptor sound with the echo tail trimmed. This applies whether the older D-7 is yours or the enemy's. The M, R and S marks, the D-7 G's plasma tube, and every other ship are unchanged.
+- **A bolt takes time to fly, and the result of the shot appears when it lands** (hit or miss, damage, shield flash), the way a torpedo's does. A volley is a stream of bolts landing one after another, and the phase waits for the last one.
 
 ## Recent fixes (v2.76-S187)
 - **Damage Control tab redesigned.** The ship now sits fully inside the shield ring (it used to cross it on most ships), the superstructure track wraps inside the ring, and both gauges say what they are: **POWER** (engine output left, in units, such as 24 / 52) and **SENSORS** (array condition), each with a 100 / 50 / 0% scale and a condition word (NOMINAL, REDUCED, IMPAIRED, CRITICAL, OFFLINE). Shield faces show their live points and a legend explains the ring colours.
