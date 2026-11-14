@@ -1,4 +1,12 @@
-> **Build v2.89-S200** · The plasma weapons fire with the new "flame roar and spit" sound — 2026-11-06
+> **Build v2.98-S209** · Big Bad Wolf: its own bridge sound, a three-part story ending, a centred "Scenarios" heading — 2026-11-13
+>
+> Previous: **Build v2.97-S208** · The Big Bad Wolf opening scene, Asteroid Fields switch, bigger scenario text, Lotus Flower and Monarch in the Recognition Database (not playable) — 2026-11-13
+>
+> Previous: **Build v2.96-S207** · Big Bad Wolf starfield now truly empty; Nebula/Gravity Well switches fixed — 2026-11-13
+>
+> Previous: **Build v2.95-S206** · First scenario: The Big Bad Wolf, with a Scenario drop-down on the setup screen — 2026-11-13
+>
+> Previous: **Build v2.94-S205** · Clearer evade windows and a clearer firing screen for Evasive Maneuvers — 2026-11-10
 
 # Star Trek: Tactical Command
 
@@ -52,11 +60,45 @@ one HTML file.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
   screen narrates the killing blow along with turn and shots-fired statistics.
-- **Sound** (Web Audio, nothing to download): the owner's own recordings and designed sounds play for the Federation's phasers, lasers and torpedoes (launch and arming), the Gorn beams and torpedoes, the Romulan torpedoes, the older Klingon D-7 disruptors, the plasma weapons (a loading sound when you arm one and the "flame roar and spit" firing sound), every ship that explodes, the Federation console chirps (commit, proceed) and bridge door, and three ambience recordings (the setup-screen rumble, the Federation TOS bridge, and the Damage Control engineering hum). **Everything else is still computer-generated and is being replaced one by one (the owner's goal, wishlist C10):** the beams of the Romulans, the newer Klingons and the Orions, the Klingon and Orion torpedoes, the hit, shield and miss sounds, the movement and turn blips, the victory and defeat tones, the Klingon, Romulan and Gorn/Orion tactical ambience, the Power tab hum and pad, and the alert and chatter layers on the Damage Control tab. Commit, proceed and weapon-arming sounds exist for the Federation (and plasma weapons) only; the other factions hear nothing at those moments yet.
+- **Sound** (Web Audio, nothing to download): the owner's own recordings and designed sounds play for the Federation's phasers, lasers and torpedoes (launch and arming), the Gorn beams and torpedoes, the Romulan torpedoes, the older Klingon D-7 disruptors, the plasma weapons (a loading sound when you arm one and the "flame roar and spit" firing sound), every ship that explodes, the Federation console chirps (commit, proceed) and bridge door, and six ambience recordings: the setup-screen rumble, four bridge beds (the Federation original-series bridge, the Federation Motion Picture Enterprise bridge, the Klingon bridge and the Romulan bridge; each captain hears their own) and the Damage Control engineering hum. **Everything else is still computer-generated and is being replaced one by one (the owner's goal, wishlist C10):** the beams of the Romulans, the newer Klingons and the Orions, the Klingon and Orion torpedoes, the hit, shield and miss sounds, the movement and turn blips, the victory and defeat tones, the Gorn and Orion tactical ambience, the Power tab hum and pad, and the alert and chatter layers on the Damage Control tab. Commit, proceed and weapon-arming sounds exist for the Federation (and plasma weapons) only; the other factions hear nothing at those moments yet.
 - **Weapon looks**: torpedoes are glowing, turning, many-rayed stars designed by the owner in the Klingon weapons bay: a small red one for the Klingon Motion Picture ships, two Federation looks (original series and Motion Picture), and green, orange and blue ones for the Romulan, Gorn and Orion torpedoes; the older Klingon D-7s fire green disruptor bolts. Plasma bolts and beams keep their old look.
 - **Power Allocation shows what you have armed**: above the weapon rows, "ARMED NOW: 3 weapons" lists each armed weapon with its points (yellow label, green count, bold names). You can click a weapon's name, not only its small circle, to arm it, and the commit writes the armed weapons into the logs.
+- **Where the rules are going**: the game has two rulesets today, Basic Course and Intermediate (a stand-in for the book's Advanced Course: sensors, locks, cloak detection). The plan is to build the whole rulebook in stages: the full Advanced Course (which will replace Intermediate), then the Graduate Course as a separate setting, then the Command & Control course (bridge officers and skill rolls). Nothing changes in the game until those stages are built; the details are in the wishlist.
 - **Ship Recognition Database**: browse all 103 catalogued hulls from the recognition manuals (Federation 35, Klingon 23, Romulan 40, Gorn 3, Orion 2),
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent changes (v2.98-S209)
+- **Bridge sound in The Big Bad Wolf.** The scenario uses the new TOS bridge recording (a steady loop that fades in as the opening scene ends). Free Battle keeps the original bridge recording with its start-up sound. Weapon-arming and Damage Control sounds are unchanged.
+- **The Big Bad Wolf ending is now a story** with a beginning, a middle and an end, written from what happened in your battle (hits, losses, hulls, shots, the killing blow), for every way the fight can end.
+- **"Scenarios" heading** on the setup screen is centred and larger.
+
+## Recent changes (v2.97-S208)
+- **Opening scene.** Commanding the Hood in The Big Bad Wolf now opens with a short cinematic: the convoy (Lotus Flower and two Monarchs) warps out, the Hood turns to face the threat, and a red contact blips in with the red-alert klaxon. Skip with the button or Esc. Sound is on by default.
+- **Asteroid Fields switch** for Free Battle (on by default).
+- **Scenario text is 50% bigger.**
+- **Lotus Flower and Monarch** are in the Ship Recognition Database (Ind filter) with their rulebook stats, marked not playable (for now). Their art is in the game for scenarios.
+
+## Recent fixes (v2.96-S207)
+- **Empty starfield.** The Big Bad Wolf no longer shows asteroids or gravity wells. Also fixed an old bug: the Nebulae and Gravity Wells switches on the setup screen were ignored on the first battle after loading the page.
+
+## Recent fixes (v2.95-S206)
+- **Scenarios.** The setup screen has a Scenario drop-down. Free Battle (default) plays as always. **The Big Bad Wolf** (Basic Course, rulebook p.20) pits the USS Hood against a Klingon D-7M on an empty starfield, starting at the centres of the short edges, head to head. You choose which captain to be. Destroy the enemy or drive it from the field: step off the map edge (with ↑ / ↓, after a confirmation) and you lose; a crippled AI captain will run too. The scenario locks the ships and rules; AI difficulty stays yours.
+
+## Recent fixes (v2.94-S205)
+- **The Evasive Maneuvers window is easier to read.** The rules are now a short bulleted list, with the two costs first, in bold and a little bigger: you take 1 point of hull stress, and you cannot fire this phase. "Half damage" and "full damage" stand out in bold. Identical missiles share one row ("2 × KP-4 torpedo, you may evade ONE"). After you choose, the window title stays "Evasive Maneuvers" (no more question mark), the die now really tumbles and settles on its number, and a banner tells you which shield is hit, the kind and amount of damage, and what it does to the shield ("Shield 12 → 0 · 12 absorbed · 6 gets through").
+- **The firing screen is clearer when Evasive Maneuvers is on.** One big button says what it will do: "FIRE 2 SELECTED", "HOLD FIRE", or "CONTINUE" when nothing can fire. The old FIRE ALL is now a small "SELECT ALL READY" helper, selected weapons say "SELECTED", and the log says "You fire" or "You hold fire". Two small bugs are fixed: the cost of a dodge counted weapons you hadn't declared, and the debrief said "1 of your missile".
+
+## Recent fixes (v2.93-S204)
+- **Evasive Maneuvers now shows the dodge.** When you choose to evade, a sensor scope opens in the pop-up: the six shield arcs are marked with their strengths, your ship (drawn with its own artwork) turns one hex-side, and the incoming missile arrives. If the dodge works you see the ship turn in time and the missile strike the next shield for half damage; if it fails you see the missile land while the ship is still turning, on the original shield. When the enemy dodges one of your missiles you see the same scope in its own colours. Press Space, Enter or click to skip. A whoosh plays at the dodge, then the weapon's own launch sound and the shield-hit sound (all of these sounds are placeholders and will be replaced).
+
+## Recent fixes (v2.92-S203)
+- **New optional rule: Evasive Maneuvers** (rulebook, Advanced Course). On the setup screen, beside the terrain options, choose the Intermediate rules and then tick it (it is off by default, and "ALL ON" does not switch it on, because it pauses play). When an enemy torpedo or plasma bolt is aimed at your ship, play stops and you choose: evade to port, evade to starboard, or take it. An evasion costs no movement points; your ship turns one hex-side; a 1-3 on a ten-sided die (30%, rolled in your faction's colour) makes the missile hit the shield now facing it for half damage; if it fails the missile hits the original shield for full damage. Either way you lose 1 hull point and cannot fire that phase. The enemy may dodge your missiles too, depending on its difficulty. With the rule on, you declare your shots and press "Lock in fire", and the side with the Tactical Advantage declares last. The debrief and the ending narratives mention your evasions, including the case where a ship is torn apart by its own evasive turn. With the rule off, the game plays exactly as before.
+
+## Recent fixes (v2.91-S202)
+- **Reversing now follows the rulebook in the Intermediate rules.** A ship may back up only if it stood still during the previous Movement Phase (turning on the spot counts as standing still), and to go forward again after reversing it must stand still for one phase. This applies to the arrow keys and to clicking a hex, the game says why when a move is refused, and the movement hint shows which way the engines are set. The Basic rules keep their free reverse, and the AI never reverses.
+
+## Recent fixes (v2.90-S201)
+- **New bridge sounds from the owner's recordings.** Every Romulan captain hears the Romulan bridge, every Klingon captain the Klingon bridge, and every Federation ship of the Motion Picture era (the Enterprise refits, Excelsior, Reliant, Federation II, the later Chandleys, Baker Mk IV, Andor, Northampton and Gagarin) the Enterprise bridge. Federation original-series ships keep their bridge, and the Gorn and Orions are unchanged for now. Each bridge plays under the Tactical and Power Allocation tabs, gives way to the engineering hum on Damage Control, and fades out when the battle ends. The Klingon and Enterprise bridges are mostly deep rumble, so they sound quieter than the Federation original-series bridge; if you want them louder it is one number each.
 
 ## Recent fixes (v2.89-S200)
 - **Plasma weapons now fire with the owner's "flame roar and spit" sound** (a crackling, roaring bolt, designed in the Torpedo Lab), on either side: the Romulan plasma bolt tubes and the plasma tubes of the Klingon D-7 G and R. It is a little quieter than the old computer-generated sound it replaces; the plasma torpedoes of the Romulans and the Gorn, all beams and the loading sound are as before.
@@ -94,6 +136,9 @@ one HTML file.
 ## Visual tool: Klingon weapons bay (a separate page, not part of the game)
 - One page, two eras. **TOS** shows the original-series D-7 and its green disruptor bolts (set to the speed and size chosen for the game). **TMP** shows a Motion Picture-era Klingon cruiser firing a photon torpedo: a glowing pale-yellow core with thin straight rays, as in the film. You can change how long the rays are, how big and bright the glow is, how fast the rays turn, the overall brightness and how fast the torpedo flies, plus the number of rays, how uneven they are, their thickness, the core size, the twinkle and the colour. The rays are always shared out around the whole core (with an optional "through the core" mode where each ray continues out the other side), and they keep turning at the rotation you set. There is a salvo of three, a cloud or space backdrop, a tactical and a viewscreen view, a Reset, copy, save and load for every setting, and a **Download this tool** button that saves the whole page as one file you can keep and open anywhere.
 - The six torpedo looks in the game came from this tool (v2.80 to v2.87): the Klingon Motion Picture look, the two Federation looks, and the Romulan, Gorn and Orion looks. Any faction's missiles can get a look the same way: design it here and send the settings.
+
+## Animation tool (a separate page, not part of the game)
+- **Evasion Animation Lab** (https://claude.ai/artifact/VdvgrAu4WtdSqmxKfTXtTu): a proof of concept for how a ship's evasive maneuver could be shown inside the Evasive Maneuvers pop-up. Six different animation styles side by side, each with the six shield arcs marked in the hex, a faction-coloured die, the ship's dodge and the missile's arrival; four whoosh sounds to try; controls for port or starboard, whether the dodge works or fails, torpedo or plasma bolt, the shooter's bearing, factions, speed, and an ending where the ship tears itself apart. It is only for choosing a style: nothing in it is in the game yet. It has the same "Download this tool" button as the other tools.
 
 ## Sound tools (separate pages, not part of the game)
 - **Beam Lab** (for beam weapons) now has a **Reset to starting point** button, and a small ↺ on every section that resets just that section. The starting point is whichever preset or recipe you loaded last, and Undo brings your changes back.
@@ -1006,48 +1051,3 @@ one HTML file.
 - `HANDOVER.md` — development state, open decisions, and backlog, for continuing work on the
   game in a fresh session.
 - `check.js` — structural validator (single script/style tag, balanced braces, syntax check).
-  Run with `node check.js StarTrek_TacticalCommand_GAME.html` before trusting any edited copy.
-- `*_integration.js` (Reliant, D10, Chandley, D7, D7RSM, WingedDefender, LoknarClass) —
-  reference bundles holding every extracted view for each ship's art, including angles not
-  currently used in the game. Kept so that extraction work never has to be repeated if a future
-  session wants a different angle or livery than what's currently wired in.
-- `D18_art.zip` — the Gull's profile view, saved for later use.
-- `Whitewind_art.zip` — the Whitewind's profile view, saved for later use.
-- `GallantWing_art.zip` — the Gallant Wing's bottom, back and profile views, saved for later use.
-- `BrightOne_art.zip` — every angle from both reference sheets supplied for this ship, including
-  the earlier sheet's views that weren't used in the end, saved for the record.
-- `CS2_art.zip` — the Graceful Flyer's profile view, saved for later use.
-- `Nova_art.zip` — the Nova's profile, aft and bottom views, saved for later use.
-- `Northampton_art.zip` — the Northampton's profile view, saved for later use.
-- `Remora_art.zip` — the Remora's profile view, saved for later use.
-- `F1_art.zip` — Federation I cutouts (top, profile, front), the 256px game sprite, viewscreen and damage-view art, original sheet.
-- `T5_art.zip` — Klingon T-5 cutouts (dorsal, port, bow), the 256px game sprite, viewscreen and damage-view art, original sheet, and the cutout script.
-- `D4_art.zip` — Klingon D-4 cutouts (top, front, profile), the 256px game sprite, upscaled viewscreen and damage-view art, original sheet, and the cutout script.
-- `Gagarin_art.zip` — all Gagarin views (top, bottom, profile, front, aft) relettered, the 256px game sprite, the original sheet, and the relettering helper script.
-- `Larson_art.zip` — the Larson's bottom, profile and aft views, saved for later use (the top and
-  front views are already in the game).
-- `Andor_art.zip` — all five views of the USS Andor (top, bottom, front, aft, profile) as transparent
-  cut-outs, plus the two in-game images and the original sheet; the extra angles are saved for later use.
-- `K23_LittleKiller_art.zip` — the K-23 art package (now embedded in the game as of v2.19-S130);
-  kept for its archived aft, profile, and bottom views.
-- `Z4_turning_profile_SAVED.png`, `Z4_mobile_deployed_config_SAVED.png` — extra Z-4 station views
-  saved for a possible future station-movement feature; not used in the game.
-- `generate_ship_art_master_list.py` — run this any time ship art changes. It reads the game
-  file directly and produces `Ship_Art_Master_List.html`, a checklist of every playable ship's
-  art status (top-down sprite, viewscreen portrait, or still-generated) so you always know
-  what's left to source reference art for. Run it with `--fix-catalog` to also correct the
-  in-game ship browser's own status flags against reality — full instructions are in its own
-  `README_generate_ship_art_master_list.md`, kept alongside it (this tool lives in a separate
-  tools folder, not the main project folder).
-
-## Continuing development
-
-See `HANDOVER.md` for the full technical state, including exact code locations for the ship
-roster, weapon system, viewscreen, AI logic, and house rules, plus two genuinely open decisions
-(Chandley's livery choice, a mark-naming mismatch against the FASA source) that didn't need
-resolving before this build shipped but are worth knowing about. If you're picking this project
-up in a new conversation, upload the current game HTML file, `HANDOVER.md`, and the FASA source
-`.md` files together so the assistant works from your actual current build rather than a stale
-copy. Easiest: keep the game HTML in the Project's files and replace it with each new build —
-the assistant has no memory between conversations, so whatever is in the Project is what it
-starts from.
