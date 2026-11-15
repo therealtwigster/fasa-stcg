@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.106-S217</title>
+<title>Star Trek: Tactical Command — v2.107-S218</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -871,6 +871,14 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
 #pa-stage #wpn-rows{position:absolute;left:18px;right:18px;top:46px}
 #pa-stage .wpn-row{display:flex;align-items:center;gap:8px;height:var(--rh,56px);margin:0;padding:0;background:none;border:0;border-bottom:1px solid var(--pb);border-radius:0;font-size:16px;font-weight:700;white-space:nowrap;letter-spacing:2px}
 #pa-stage .wpn-row.locked{opacity:1;pointer-events:none}
+#pa-stage #wpn-rows{max-height:calc(466px - 46px - 14px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+#pa-stage.wdense .wpn-row{font-size:13px;gap:6px;letter-spacing:1px}
+#pa-stage.wdense .wpn-arm{width:18px;height:18px;border-width:2px}
+#pa-stage.wdense .pa-arcs{font-size:8px;line-height:1;margin-top:0}
+#pa-stage.wdense .wpn-hit{font-size:8px;min-width:44px;padding:0 2px;line-height:1.2}
+#pa-stage.wdense .pa-step{font-size:15px;gap:3px}
+#pa-stage.wdense .pa-step button{width:18px;height:18px;font-size:13px;border-width:1px}
+#pa-stage.wdense .pa-step .wpn-val{min-width:36px}
 #pa-stage .wpn-arm{width:30px;height:30px;border-radius:var(--lampr);border:3px solid #000;background:#2a2d2f;flex:none;padding:0;box-shadow:none;cursor:pointer}
 #pa-stage.tmp .wpn-arm{border-radius:50%;border-color:#3a444c}
 #pa-stage .wpn-arm.on{background:var(--on)!important;border-color:#000!important;box-shadow:0 0 10px var(--on)}
@@ -1056,7 +1064,7 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
         <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.106-S217</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.107-S218</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -3109,6 +3117,7 @@ function launchGame() {
   log('BUILD v2.65-S176 -- The initiative dice are now drawn as a real ten-sided die (a pointed top and bottom with ten kite-shaped faces, seen at an angle) with the rolled number on the front face. The earlier version showed a single kite, which is only one face of the die.');
   log('BUILD v2.66-S177 -- Each side\'s die on the initiative screen is now in its faction colour: Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple (Gorn and Orion ships previously had no colour of their own on this screen). The winning die is brighter, glows and is a little larger; the losing die is dimmed.');
   log('BUILD v2.94-S205 -- The evade windows are clearer (the two costs and the rules in bold bullets, FULL and HALF damage in bold, identical missiles in one row, a result banner naming the shield and the damage, a die that really tumbles) and, with Evasive Maneuvers on, the firing screen has a big FIRE button that says what it will do.');
+  log('BUILD v2.107-S218 -- POWER TAB, BIG SHIPS: every weapon now fits on the Power tab (a 16-weapon Gorn BH-2 gets compact rows; the list scrolls if it ever needs more). The shield hex now has one pip per charge the facing can hold (BH-2: 13, Federation II: 20), so a full row means full, and it says MAX n PER FACING. A full facing shows its number in gold. Ship registry untouched.');
   log('BUILD v2.106-S217 -- The ending story and the debrief now say when a ship explosion happened and what the blast did to the other ship. A ship that has lost all power is drawn ADRIFT: the hull slews 18 to 32 degrees off its heading and sways slowly while the shield arcs stay lined up.');
   log('BUILD v2.105-S216 -- Damage Control: the enemy damage log now fills the column beside the ship view (the duplicate in the sidebar is gone), and System Status is filled from the first moment the tab opens. Power tab: MAKE DEFAULT button beside MANUAL shields (every turn and game then starts in manual).');
   log('BUILD v2.104-S215 -- The Damage Control sidebar lists every system again (System Status as before); the Damaged Systems column repeats only the damaged ones. Hold a + or - button on the Power tab (weapons, Motion, Shields) and it keeps adding or taking power, speeding up the longer it is held.');
@@ -13466,7 +13475,7 @@ function paSetFace(i,v){
     v=Math.min(v,pts-shieldManualPts.reduce((a,b,j)=>a+(j===i?0:b),0));}
   shieldManualPts[i]=Math.max(0,v);paSyncFaceSliders();updPwr();
 }
-function paHexScale(){const mx=GS.player.maxShieldPerFace,cap=mx<=10?mx:8;return {cap,scale:Math.ceil(mx/cap)};}
+function paHexScale(){const mx=Math.max(1,GS.player.maxShieldPerFace||1);return {cap:mx,scale:1};}   // v2.107: one pip per charge the facing can hold, so the row length IS the ship's maximum
 function paOnCommit(){const sk=paSkin();paSay(PA_FLAIR[sk]||'',0);}
 /* ---- sprites: measured once, drawn as a persistent <img> so slider drags never re-decode the art ---- */
 const paSpr={};
@@ -13533,12 +13542,12 @@ function paHexSVG(){
     const ev=(i===1||i===2||i===3)?[e[1],e[0]]:e;   // v2.103: every facing fills the same way: side edges bottom to top on BOTH sides, top and bottom edges left to right
     const [x0,y0]=V[ev[0]],[x1,y1]=V[ev[1]],dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;let nx=uy,ny=-ux;const mx=(x0+x1)/2,my=(y0+y1)/2;
     if((cx-mx)*nx+(cy-my)*ny<0){nx=-nx;ny=-ny;}
-    const alive=s.shieldGenAlive[i],pw=11,inset=12,gap=3,us=L*0.8,pl=(us-gap*(cap-1))/cap,sx=x0+ux*L*0.1+nx*inset,sy=y0+uy*L*0.1+ny*inset,litN=alive?Math.min(cap,Math.ceil(d[i]/scale)):0;
+    const alive=s.shieldGenAlive[i],pw=11,inset=12,gap=cap>12?1.5:3,us=L*0.8,pl=(us-gap*(cap-1))/cap,sx=x0+ux*L*0.1+nx*inset,sy=y0+uy*L*0.1+ny*inset,litN=alive?Math.min(cap,Math.ceil(d[i]/scale)):0;
     for(let p=0;p<cap;p++){
       const t0=p*(pl+gap),t1=t0+pl,a=[sx+ux*t0,sy+uy*t0],b=[sx+ux*t1,sy+uy*t1];
       const q=(w)=>[[a[0]-nx*w/2,a[1]-ny*w/2],[b[0]-nx*w/2,b[1]-ny*w/2],[b[0]+nx*w/2,b[1]+ny*w/2],[a[0]+nx*w/2,a[1]+ny*w/2]].map(z=>z[0].toFixed(1)+','+z[1].toFixed(1)).join(' ');
       const cl=alive?`data-f="${i}" data-v="${(p+1)*scale}"`:'';
-      if(alive)hits+=`<polygon class="pa-pip" ${cl} points="${q(30)}" fill="transparent"/>`;
+      if(alive){const g2=gap/2,a2=[a[0]-ux*g2,a[1]-uy*g2],b2=[b[0]+ux*g2,b[1]+uy*g2];hits+=`<polygon class="pa-pip" ${cl} points="${[[a2[0]-nx*15,a2[1]-ny*15],[b2[0]-nx*15,b2[1]-ny*15],[b2[0]+nx*15,b2[1]+ny*15],[a2[0]+nx*15,a2[1]+ny*15]].map(z=>z[0].toFixed(1)+','+z[1].toFixed(1)).join(' ')}" fill="transparent"/>`;}
       if(p<litN){const fr=d[i]/(s.maxShieldPerFace||1),lv=fr<=1/3?'#ff8a2a':fr<=2/3?'#ffd23a':'#3ed16b';   // v2.103: each pip is cut in half: outer half = the panel colour, inner half = charge level (orange low, yellow mid, green full)
         const qh=(off)=>[[a[0]+nx*off-nx*pw/4,a[1]+ny*off-ny*pw/4],[b[0]+nx*off-nx*pw/4,b[1]+ny*off-ny*pw/4],[b[0]+nx*off+nx*pw/4,b[1]+ny*off+ny*pw/4],[a[0]+nx*off+nx*pw/4,a[1]+ny*off+ny*pw/4]].map(z=>z[0].toFixed(1)+','+z[1].toFixed(1)).join(' ');
         o+=`<polygon points="${qh(-pw/4)}" fill="${lit}"/><polygon points="${qh(pw/4)}" fill="${lv}"/>`;
@@ -13546,10 +13555,11 @@ function paHexSVG(){
     }
     {const ex=sx+ux*(us+7),ey=sy+uy*(us+7);o+=`<polygon points="${(ex+ux*7).toFixed(1)},${(ey+uy*7).toFixed(1)} ${(ex+nx*3.5).toFixed(1)},${(ey+ny*3.5).toFixed(1)} ${(ex-nx*3.5).toFixed(1)},${(ey-ny*3.5).toFixed(1)}" fill="rgba(255,255,255,.4)"/>`;}   // small arrow: which way the pips fill
     const tx=mx+nx*(inset+pw+16),ty=my+ny*(inset+pw+16),ox=mx-nx*26,oy=my-ny*26;
-    o+=`<text x="${tx.toFixed(1)}" y="${(ty+9).toFixed(1)}" text-anchor="middle" font-family="var(--mono)" font-size="26" fill="${alive?'var(--txt)':'#ff5a3c'}" style="pointer-events:none">${alive?d[i]:'✕'}</text>`;
+    o+=`<text x="${tx.toFixed(1)}" y="${(ty+9).toFixed(1)}" text-anchor="middle" font-family="var(--mono)" font-size="26" fill="${alive?(d[i]>=s.maxShieldPerFace?'var(--acc)':'var(--txt)'):'#ff5a3c'}" style="pointer-events:none">${alive?d[i]:'✕'}</text>`;
     o+=`<text x="${ox.toFixed(1)}" y="${(oy+4).toFixed(1)}" text-anchor="middle" font-family="var(--head)" font-size="12" letter-spacing="1" fill="${alive?'var(--sub)':'#ff5a3c'}" style="pointer-events:none">${PA_FACES[i].toUpperCase()}${alive?'':' · OUT'}</text>`;
   });
   o+=`<g font-family="var(--head)" font-size="11" letter-spacing="1" fill="var(--sub)" style="pointer-events:none"><text x="145" y="17" text-anchor="end">LOW</text><rect x="151" y="9" width="16" height="9" fill="#ff8a2a"/><rect x="169" y="9" width="16" height="9" fill="#ffd23a"/><rect x="187" y="9" width="16" height="9" fill="#3ed16b"/><text x="209" y="17">FULL</text></g>`;   // v2.103 legend
+  o+=`<text x="180" y="34" text-anchor="middle" font-family="var(--head)" font-size="12" letter-spacing="1" fill="var(--sub)" style="pointer-events:none">MAX <tspan fill="var(--acc)" font-size="16">${s.maxShieldPerFace}</tspan> PER FACING</text>`;
   return o+hits+'</svg>';
 }
 function paRender(){
@@ -13563,7 +13573,7 @@ function paRender(){
    paEl('pa-p-mv').textContent=tx.m;paEl('pa-p-sh').textContent=tx.sh;paEl('pa-pv-mv').textContent=mp;paEl('pa-pv-sh').textContent=sp;
    paEl('pa-mvr').textContent=mp+' move pt'+(mp===1?'':'s')+' \u00b7 phases '+ph.join('/')+' \u00b7 '+s.moveRatio+' power each';
    paEl('pa-shr').textContent=sp+' shield pt'+(sp===1?'':'s')+' \u00b7 max '+s.maxShieldPerFace+' per facing';}
-  {const n=s.weapons.length||1,avail=466-46-14-(s.cloakCost?132:0);paEl('pa-wpn').style.setProperty('--rh',Math.max(30,Math.min(56,Math.floor(avail/n)))+'px');}
+  {const n=s.weapons.length||1,avail=466-46-14-(s.cloakCost?132:0);const rh=Math.max(22,Math.min(56,Math.floor(avail/n)));paEl('pa-wpn').style.setProperty('--rh',rh+'px');paEl('pa-stage').classList.toggle('wdense',rh<34);}
   const armedN=s.weapons.filter(w=>{const b=document.querySelector(`.wpn-arm[data-wid="${w.id}"]`);return b&&b.classList.contains('on');}).length,workN=s.weapons.filter(w=>w.alive).length;
   paEl('pa-d-wp').textContent=armedN+' of '+workN+' working mounts armed'+(s.cloaked?' · cloak engaged':'');
   // weapon rows: armed state on the row, readable value text
