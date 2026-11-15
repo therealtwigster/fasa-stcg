@@ -1,4 +1,6 @@
-> **Build v2.106-S217** · The ending story and debrief now say when a ship explosion hit the other ship; a ship with no power is drawn adrift on the map — 2026-11-15
+> **Build v2.107-S218** · Power tab: every weapon fits on big ships; the shield hex has one pip per charge and shows the ship's maximum — 2026-11-15
+>
+> Previous: **Build v2.106-S217** · The ending story and debrief now say when a ship explosion hit the other ship; a ship with no power is drawn adrift on the map — 2026-11-15
 >
 > Previous: **Build v2.105-S216** · Enemy damage log beside the Damage Control ship view, System Status filled from the start, SET DEFAULT for manual shields — 2026-11-15
 >
@@ -80,6 +82,10 @@ one HTML file.
 - **Where the rules are going**: the game has two rulesets today, Basic Course and Intermediate (a stand-in for the book's Advanced Course: sensors, locks, cloak detection). The plan is to build the whole rulebook in stages: the full Advanced Course (which will replace Intermediate), then the Graduate Course as a separate setting, then the Command & Control course (bridge officers and skill rolls). Nothing changes in the game until those stages are built; the details are in the wishlist.
 - **Ship Recognition Database**: browse all 103 catalogued hulls from the recognition manuals (Federation 35, Klingon 23, Romulan 40, Gorn 3, Orion 2),
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent changes (v2.107-S218)
+- **Every weapon fits on the Power tab.** Ships with many mounts (the 16-weapon Gorn BH-2) get compact rows; the list scrolls if it ever needs to.
+- **The shield hex shows the ship's real maximum.** One pip per charge a facing can hold (13 on the BH-2, 20 on the Federation II), a "MAX n PER FACING" line, and a full facing's number turns gold. Click targets cover the whole pip.
 
 ## Recent changes (v2.106-S217)
 - **Explosions are in the story.** When a ship blows up and the Ship Explosions option is on, the ending narrative and the debrief say what the blast did to the other ship (hull, weapons and power lost), or that it rode the blast out.
