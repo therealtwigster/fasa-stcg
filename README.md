@@ -1,4 +1,16 @@
-> **Build v2.98-S209** · Big Bad Wolf: its own bridge sound, a three-part story ending, a centred "Scenarios" heading — 2026-11-13
+> **Build v2.106-S217** · The ending story and debrief now say when a ship explosion hit the other ship; a ship with no power is drawn adrift on the map — 2026-11-15
+>
+> Previous: **Build v2.105-S216** · Enemy damage log beside the Damage Control ship view, System Status filled from the start, SET DEFAULT for manual shields — 2026-11-15
+>
+> Previous: **Build v2.104-S215** · System Status back in the sidebar; hold a + or - button on the Power tab to keep adding or taking power — 2026-11-15
+>
+> Previous: **Build v2.103-S214** · Damage Control damaged-systems column; shield hex fills the same way on both sides, with charge colours — 2026-11-15
+>
+> Previous: **Build v2.102-S213** · The Power Allocation tab redesigned, one look per faction — 2026-11-15
+>
+> Previous: **Build v2.101-S212** · End-of-battle stories now read the battle — 2026-11-15
+>
+> Previous: **Build v2.98-S209** · Big Bad Wolf: its own bridge sound, a three-part story ending, a centred "Scenarios" heading — 2026-11-13
 >
 > Previous: **Build v2.97-S208** · The Big Bad Wolf opening scene, Asteroid Fields switch, bigger scenario text, Lotus Flower and Monarch in the Recognition Database (not playable) — 2026-11-13
 >
@@ -39,6 +51,7 @@ one HTML file.
 - **FASA-faithful turn structure**: Power Allocation → Tactical Advantage → three rounds of
   Sensors/Movement/Firing → Shield Repowering. Commit your power allocation, then confirm with
   **Proceed to Combat** or catch a mistake with **Revise Allocation** before the fight begins.
+- **Power Allocation panel, one look per faction** (new in v2.102): Federation original series, Federation Motion Picture, Klingon "Throttle Bank", Romulan "Cloak Sweep", Orion "Smuggler's Rig" and Gorn "The Hatchery", each with its own colours, fonts and gauges. Upright Motion and Shields sliders with + and - buttons (hold a button to keep adding or taking power), a six-sided shield hex showing the ship's own top-down art, green lamps for armed weapons, red for destroyed ones, a cloak switch for ships that have one, and a SET DEFAULT button to start every turn in manual shields. In manual mode, click the pips on a facing; the panel moves power from what you have left to make it work. The rules underneath are unchanged.
 - **Step-by-step tutorial**: a dismissible coach card walks new captains through what to do in
   each phase, updating automatically as play advances. Veterans can switch it off from the
   header (🎓 TUTORIAL: ON/OFF) or dismiss it per-card.
@@ -59,13 +72,47 @@ one HTML file.
   Gravity Wells.
 - **Ship destruction**: a dying ship's remaining power becomes a FASA-rule blast that damages
   anything nearby, a short explosion animation plays before the result screen, and the victory
-  screen narrates the killing blow along with turn and shots-fired statistics.
+  screen narrates the killing blow along with turn and shots-fired statistics. With the Ship Explosions option, the ending story and debrief also say what the blast did to the other ship. A ship that loses all its power is drawn adrift on the map, its hull slewed off its heading.
+- **Damage Control**: the ship, shield ring, power, sensors and superstructure on the left; the enemy damage log beside it; System Status (every system) and your own damage log on the right.
 - **Sound** (Web Audio, nothing to download): the owner's own recordings and designed sounds play for the Federation's phasers, lasers and torpedoes (launch and arming), the Gorn beams and torpedoes, the Romulan torpedoes, the older Klingon D-7 disruptors, the plasma weapons (a loading sound when you arm one and the "flame roar and spit" firing sound), every ship that explodes, the Federation console chirps (commit, proceed) and bridge door, and six ambience recordings: the setup-screen rumble, four bridge beds (the Federation original-series bridge, the Federation Motion Picture Enterprise bridge, the Klingon bridge and the Romulan bridge; each captain hears their own) and the Damage Control engineering hum. **Everything else is still computer-generated and is being replaced one by one (the owner's goal, wishlist C10):** the beams of the Romulans, the newer Klingons and the Orions, the Klingon and Orion torpedoes, the hit, shield and miss sounds, the movement and turn blips, the victory and defeat tones, the Gorn and Orion tactical ambience, the Power tab hum and pad, and the alert and chatter layers on the Damage Control tab. Commit, proceed and weapon-arming sounds exist for the Federation (and plasma weapons) only; the other factions hear nothing at those moments yet.
 - **Weapon looks**: torpedoes are glowing, turning, many-rayed stars designed by the owner in the Klingon weapons bay: a small red one for the Klingon Motion Picture ships, two Federation looks (original series and Motion Picture), and green, orange and blue ones for the Romulan, Gorn and Orion torpedoes; the older Klingon D-7s fire green disruptor bolts. Plasma bolts and beams keep their old look.
 - **Power Allocation shows what you have armed**: above the weapon rows, "ARMED NOW: 3 weapons" lists each armed weapon with its points (yellow label, green count, bold names). You can click a weapon's name, not only its small circle, to arm it, and the commit writes the armed weapons into the logs.
 - **Where the rules are going**: the game has two rulesets today, Basic Course and Intermediate (a stand-in for the book's Advanced Course: sensors, locks, cloak detection). The plan is to build the whole rulebook in stages: the full Advanced Course (which will replace Intermediate), then the Graduate Course as a separate setting, then the Command & Control course (bridge officers and skill rolls). Nothing changes in the game until those stages are built; the details are in the wishlist.
 - **Ship Recognition Database**: browse all 103 catalogued hulls from the recognition manuals (Federation 35, Klingon 23, Romulan 40, Gorn 3, Orion 2),
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent changes (v2.106-S217)
+- **Explosions are in the story.** When a ship blows up and the Ship Explosions option is on, the ending narrative and the debrief say what the blast did to the other ship (hull, weapons and power lost), or that it rode the blast out.
+- **Adrift.** A ship with no power left but still in one piece is drawn adrift: its hull slews 18 to 32 degrees off its heading and sways gently, while the shield arcs stay lined up.
+
+## Recent changes (v2.105-S216)
+- **Enemy damage log beside the ship view** on Damage Control (with COPY); the old duplicate in the sidebar is gone, and your own ship's damage stays on the right.
+- **System Status is filled from the moment the tab opens**, not after round 1.
+- **SET DEFAULT** button next to MANUAL on the Power tab: manual shields become the starting choice for every turn this session (in the faction's own style).
+
+## Recent changes (v2.104-S215)
+- **System Status is back in the sidebar with every system listed**; damaged ones also appear in the column.
+- **Hold-to-repeat.** Hold the left button on any + or - on the Power tab to keep adding or taking power.
+
+## Recent changes (v2.103-S214)
+- **Damaged Systems column** on Damage Control beside the ship view.
+- **Shield hex fills the same way on both sides** (side edges bottom to top, top and bottom left to right). Each pip is cut in half: one half the panel colour, the other a charge colour, orange for low, yellow for mid, green for full, with small arrows and a LOW / FULL legend. All six faction looks.
+
+## Recent changes (v2.102-S213)
+- **Power Allocation tab redesigned**, one look per faction (Federation original series, Federation Motion Picture, Klingon, Romulan, Orion, Gorn). Upright Motion and Shields sliders, a shield hex drawn around the ship's own top-down art, click-the-pip manual shields with a Pull rule (spare shield points first, then Shields from what is left, then other faces), green lamps for armed weapons, red for destroyed, and a Visible / Cloaked switch. The rules and numbers underneath are unchanged.
+
+## Recent changes (v2.101-S212)
+- **End-of-battle stories read the battle.** Warp-out, destruction, power failure and mutual destruction are now written from what actually happened: how many turns, who fired and hit, how hurt each ship was, whether the shields did the work, which systems were lost, and how close the ships got. Warping out untouched without a shot fired is a different story from limping away at 20 percent hull.
+
+## Recent changes (v2.100-S211)
+- **Sensor lock and planets.** A planet or moon in the way now breaks your sensor lock; the Sensors panel and the intel query no longer contradict the static on the contact screen.
+- **Wider combat log by default** (20% of the window, 250 to 480 px). You can still drag it.
+
+## Recent changes (v2.99-S210)
+- **AI evasion safety.** From Ensign up, the AI no longer tries to dodge a missile when a failed try (1 point of stress) could take its ship to zero; it keeps its shots instead.
+- **Cloaked AI keeps moving.** A cloaked Captain spends at least 60% of its spare power on movement, an Admiral 85% (Legend already moved fully), so it can work toward an alpha strike.
+- **New option: Warp Out at the Map Edge.** Off by default. With it on, stepping off the map asks "Do you really want to do this?" (YES or NO); leaving counts as a defeat. The AI may run for the edge when losing. Dead sensors: no warp. The Big Bad Wolf always has it on.
+- **New option: Ship Explosions** (Intermediate rules). A ship destroyed with damage left over may explode (d10 against the overkill; 10 or more always), and the blast hurts the other ship by the rulebook's range table; both ships can die.
 
 ## Recent changes (v2.98-S209)
 - **Bridge sound in The Big Bad Wolf.** The scenario uses the new TOS bridge recording (a steady loop that fades in as the opening scene ends). Free Battle keeps the original bridge recording with its start-up sound. Weapon-arming and Damage Control sounds are unchanged.
@@ -1051,3 +1098,48 @@ one HTML file.
 - `HANDOVER.md` — development state, open decisions, and backlog, for continuing work on the
   game in a fresh session.
 - `check.js` — structural validator (single script/style tag, balanced braces, syntax check).
+  Run with `node check.js StarTrek_TacticalCommand_GAME.html` before trusting any edited copy.
+- `*_integration.js` (Reliant, D10, Chandley, D7, D7RSM, WingedDefender, LoknarClass) —
+  reference bundles holding every extracted view for each ship's art, including angles not
+  currently used in the game. Kept so that extraction work never has to be repeated if a future
+  session wants a different angle or livery than what's currently wired in.
+- `D18_art.zip` — the Gull's profile view, saved for later use.
+- `Whitewind_art.zip` — the Whitewind's profile view, saved for later use.
+- `GallantWing_art.zip` — the Gallant Wing's bottom, back and profile views, saved for later use.
+- `BrightOne_art.zip` — every angle from both reference sheets supplied for this ship, including
+  the earlier sheet's views that weren't used in the end, saved for the record.
+- `CS2_art.zip` — the Graceful Flyer's profile view, saved for later use.
+- `Nova_art.zip` — the Nova's profile, aft and bottom views, saved for later use.
+- `Northampton_art.zip` — the Northampton's profile view, saved for later use.
+- `Remora_art.zip` — the Remora's profile view, saved for later use.
+- `F1_art.zip` — Federation I cutouts (top, profile, front), the 256px game sprite, viewscreen and damage-view art, original sheet.
+- `T5_art.zip` — Klingon T-5 cutouts (dorsal, port, bow), the 256px game sprite, viewscreen and damage-view art, original sheet, and the cutout script.
+- `D4_art.zip` — Klingon D-4 cutouts (top, front, profile), the 256px game sprite, upscaled viewscreen and damage-view art, original sheet, and the cutout script.
+- `Gagarin_art.zip` — all Gagarin views (top, bottom, profile, front, aft) relettered, the 256px game sprite, the original sheet, and the relettering helper script.
+- `Larson_art.zip` — the Larson's bottom, profile and aft views, saved for later use (the top and
+  front views are already in the game).
+- `Andor_art.zip` — all five views of the USS Andor (top, bottom, front, aft, profile) as transparent
+  cut-outs, plus the two in-game images and the original sheet; the extra angles are saved for later use.
+- `K23_LittleKiller_art.zip` — the K-23 art package (now embedded in the game as of v2.19-S130);
+  kept for its archived aft, profile, and bottom views.
+- `Z4_turning_profile_SAVED.png`, `Z4_mobile_deployed_config_SAVED.png` — extra Z-4 station views
+  saved for a possible future station-movement feature; not used in the game.
+- `generate_ship_art_master_list.py` — run this any time ship art changes. It reads the game
+  file directly and produces `Ship_Art_Master_List.html`, a checklist of every playable ship's
+  art status (top-down sprite, viewscreen portrait, or still-generated) so you always know
+  what's left to source reference art for. Run it with `--fix-catalog` to also correct the
+  in-game ship browser's own status flags against reality — full instructions are in its own
+  `README_generate_ship_art_master_list.md`, kept alongside it (this tool lives in a separate
+  tools folder, not the main project folder).
+
+## Continuing development
+
+See `HANDOVER.md` for the full technical state, including exact code locations for the ship
+roster, weapon system, viewscreen, AI logic, and house rules, plus two genuinely open decisions
+(Chandley's livery choice, a mark-naming mismatch against the FASA source) that didn't need
+resolving before this build shipped but are worth knowing about. If you're picking this project
+up in a new conversation, upload the current game HTML file, `HANDOVER.md`, and the FASA source
+`.md` files together so the assistant works from your actual current build rather than a stale
+copy. Easiest: keep the game HTML in the Project's files and replace it with each new build —
+the assistant has no memory between conversations, so whatever is in the Project is what it
+starts from.
