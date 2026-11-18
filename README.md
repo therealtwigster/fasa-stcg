@@ -1,4 +1,12 @@
-> **Build v2.107-S218** · Power tab: every weapon fits on big ships; the shield hex has one pip per charge and shows the ship's maximum — 2026-11-15
+> **Build v2.111-S222** · AI runners really run for the edge, the ending story and debrief cover the run, Surrender & Self-Destruct is an Intermediate option (off by default), and a warp-out plays a cut scene — 2026-11-18
+>
+> Previous: **Build v2.110-S221** · A cloak-capable AI ship making a run for it cloaks only when the upkeep still leaves it good speed — 2026-11-18
+>
+> Previous: **Build v2.109-S220** · A crippled AI ship now runs, surrenders or scuttles itself; you have the same orders under COMMAND, behind "Are you sure?" confirmations — 2026-11-18
+>
+> Previous: **Build v2.108-S219** · Power tab tidy: centred Deflector Shields heading, small SET DEFAULT, no generated hum under recorded bridges — 2026-11-16
+>
+> Previous: **Build v2.107-S218** · Power tab: every weapon fits on big ships; the shield hex has one pip per charge and shows the ship's maximum — 2026-11-15
 >
 > Previous: **Build v2.106-S217** · The ending story and debrief now say when a ship explosion hit the other ship; a ship with no power is drawn adrift on the map — 2026-11-15
 >
@@ -82,6 +90,25 @@ one HTML file.
 - **Where the rules are going**: the game has two rulesets today, Basic Course and Intermediate (a stand-in for the book's Advanced Course: sensors, locks, cloak detection). The plan is to build the whole rulebook in stages: the full Advanced Course (which will replace Intermediate), then the Graduate Course as a separate setting, then the Command & Control course (bridge officers and skill rolls). Nothing changes in the game until those stages are built; the details are in the wishlist.
 - **Ship Recognition Database**: browse all 103 catalogued hulls from the recognition manuals (Federation 35, Klingon 23, Romulan 40, Gorn 3, Orion 2),
   including ones not yet flyable in-game, with full stat and weapon-loadout dossiers.
+
+## Recent changes (v2.111-S222)
+- **Runners really run.** An AI ship making a run for it picks one escape point and heads straight for it, and only runs if it can actually reach the edge.
+- **The story covers the run.** The ending narrative and debrief say that a ship broke off, and whether you fired on it. A Federation captain who shoots a retreating ship is told that is not very Starfleet.
+- **Surrender & Self-Destruct is now an Intermediate option**, off by default (the COMMAND button and the AI's surrender or self-destruct only exist when it is ticked). Running stays tied to Warp Out at the Map Edge.
+- **Warp-out cut scene.** When any ship successfully warps out, a short skippable cinematic plays before the result.
+
+## Recent changes (v2.110-S221)
+- **Running under cloak.** A Klingon or Romulan making a run for it now cloaks on purpose, but only when the cloak upkeep still leaves it good speed (about 60 percent of its power, at least 12 points). Otherwise it stays visible and runs flat out, and it drops the cloak when it can no longer afford it.
+
+## Recent changes (v2.109-S220)
+- **The AI knows when it is beaten.** At the start of each turn a ship checks whether its side is hopeless (no usable weapons, power or hull failing, or badly outmatched). Allies count: a hurt ship with strong friends keeps fighting. A hopeless ship then does one of three things: **makes a run for it** (when Warp Out at the Map Edge is on), **offers to surrender** (a window in its faction's voice; you accept or refuse), or **scuttles itself**.
+- **Temper and tier.** Cadet and Ensign captains run. Captain and above scuttle, and the higher tiers wait in silence until you are close enough for the blast to hurt (Legend waits for point-blank). The Federation and the Orions yield readily; the Klingons and Romulans almost never do and prefer to go out with a bang.
+- **Your COMMAND button** (sidebar): Demand Surrender, Make a Run for It, Strike Our Colours and Self-Destruct. Strike Colours and Self-Destruct ask three times (Are you sure? / REALLY sure? / REALLY, REALLY sure?), and YES unlocks a second after each question appears.
+- **Endings and debrief** tell the story: the hail, the surrender and its terms, or the scuttled ship and what the blast did. Not offered in scenarios (they keep only the old run).
+
+## Recent changes (v2.108-S219)
+- **Power tab tidy.** The "Deflector Shields" heading is centred, SET DEFAULT is a small button, and the shield maximum now sits in the line under the buttons.
+- **No generated hum under a recorded bridge.** The computer-generated Power-tab hum no longer plays for the Federation, Klingons and Romulans, whose recorded bridge already plays there. Gorn and Orion keep it until they get a bridge.
 
 ## Recent changes (v2.107-S218)
 - **Every weapon fits on the Power tab.** Ships with many mounts (the 16-weapon Gorn BH-2) get compact rows; the list scrolls if it ever needs to.
