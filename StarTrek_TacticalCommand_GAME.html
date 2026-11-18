@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.107-S218</title>
+<title>Star Trek: Tactical Command — v2.111-S222</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -251,6 +251,20 @@ select.sc-sel{width:100%;min-width:0;background:#040c18;border:1px solid #334455
 .sc-sel:disabled{opacity:.85;cursor:not-allowed;}
 .cx-rbtn.dis{opacity:.5;cursor:not-allowed;}
 .scn-lockmsg{font-size:calc(var(--u)*1.17);color:#ff9900;letter-spacing:.06em;margin-bottom:calc(var(--u)*.5);}
+#cs-modal{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:99999;display:flex;align-items:center;justify-content:center}
+.cs-win{--ac:#ff9900;background:#06101c;border:2px solid var(--ac);border-radius:6px;max-width:34em;width:calc(100% - 40px);padding:20px 24px;color:#cfe2f3;font-family:inherit;box-shadow:0 0 28px color-mix(in srgb,var(--ac) 40%,transparent)}
+.cs-win.danger{background:#1a0a08}
+.cs-t{color:var(--ac);letter-spacing:.18em;font-size:14px;margin-bottom:6px}
+.cs-s{color:#fff;letter-spacing:.14em;font-size:12px;margin-bottom:10px;opacity:.85}
+.cs-b{font-size:14px;line-height:1.55;margin:10px 0 16px}
+.cs-btns{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+.cs-btns button,.cs-opt button{background:#0a1a2c;border:1px solid var(--ac);color:var(--ac);padding:8px 14px;font:inherit;font-size:12px;letter-spacing:.15em;cursor:pointer;border-radius:3px}
+.cs-btns button:disabled,.cs-opt button:disabled{opacity:.35;cursor:not-allowed}
+.cs-btns button.cs-keep{background:var(--ac);color:#06101c;font-weight:700}
+.cs-opt{display:flex;gap:14px;align-items:center;justify-content:space-between;border-top:1px solid #1c3350;padding:10px 0}
+.cs-opt b{display:block;color:#fff;letter-spacing:.14em;font-size:13px;margin-bottom:3px}
+.cs-opt span{font-size:12px;opacity:.8;line-height:1.4}
+.cs-opt.off{opacity:.55}
 #scn-exit-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;display:flex;align-items:center;justify-content:center;}
 .scn-exit-win{background:#06101c;border:2px solid #ff9900;border-radius:6px;max-width:30em;padding:22px 26px;color:#cfe2f3;font-family:inherit;}
 .scn-exit-t{color:#ff9900;letter-spacing:.2em;font-size:15px;margin-bottom:10px;}
@@ -920,6 +934,8 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
 #pa-stage .pa-dv span{color:inherit;font-size:inherit}
 /* shields */
 #pa-shd{left:826px;top:96px;width:380px;height:466px}
+#pa-stage #pa-h-shd{left:0!important;width:100%;text-align:center}
+#pa-stage #pa-modes #pa-m-keep{font-size:10px!important;padding:3px 8px!important;letter-spacing:1px!important;border-width:2px!important;margin-left:2px;align-self:center}
 #pa-hexwrap{position:absolute;left:10px;top:34px}
 #pa-modes{position:absolute;left:18px;top:376px;display:flex;gap:8px}
 #pa-modes button{white-space:nowrap;letter-spacing:2px!important;padding:6px 10px!important}#pa-modes #pa-m-keep{font-size:12px;margin-left:6px;border-style:dashed}#pa-modes #pa-m-keep.on{background:var(--on);border-color:var(--on);border-style:solid;color:#04100a}
@@ -1064,7 +1080,7 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
         <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.107-S218</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.111-S222</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -1199,6 +1215,7 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
       <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
         <button class="action-btn primary" id="btn-endphase" onclick="endPhase()">End Phase →</button>
         <button class="action-btn" id="btn-hold" onclick="holdStation()" style="display:none">Hold Station</button>
+        <button class="action-btn" id="btn-command" onclick="csOpenCommand()" title="Demand surrender, make a run for it, strike your colours, self-destruct" style="border-color:#7a5a22;color:#d9b36a">⚑ COMMAND</button>
         <button class="action-btn" id="btn-undo" onclick="playerUndoMove()" style="display:none;border-color:#886600;color:#886600">↩ Undo Last Move</button>
         <button class="action-btn danger" id="btn-nofire" onclick="declareNoFire()" style="display:none">◯ No Fire</button>
         <div id="wpn-fire-panel" style="display:none;flex-direction:column;gap:4px;"></div>
@@ -3117,6 +3134,10 @@ function launchGame() {
   log('BUILD v2.65-S176 -- The initiative dice are now drawn as a real ten-sided die (a pointed top and bottom with ten kite-shaped faces, seen at an angle) with the rolled number on the front face. The earlier version showed a single kite, which is only one face of the die.');
   log('BUILD v2.66-S177 -- Each side\'s die on the initiative screen is now in its faction colour: Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple (Gorn and Orion ships previously had no colour of their own on this screen). The winning die is brighter, glows and is a little larger; the losing die is dimmed.');
   log('BUILD v2.94-S205 -- The evade windows are clearer (the two costs and the rules in bold bullets, FULL and HALF damage in bold, identical missiles in one row, a result banner naming the shield and the damage, a die that really tumbles) and, with Evasive Maneuvers on, the firing screen has a big FIRE button that says what it will do.');
+  log('BUILD v2.111-S222 -- From the Constitution vs Devisor log: a ship making a run for it now keeps ONE escape point (it used to flip it every phase and just turn in place) and only runs if it can really reach the edge; the ending story and debrief mention the run and any shots fired at a fleeing ship (a Starfleet captain is told what that looks like); Surrender and Self-Destruct is now an Intermediate option, off by default; a ship that warps out gets a short cut scene. Ship registry untouched.');
+  log('BUILD v2.110-S221 -- A cloak-capable AI ship making a run for it now cloaks on purpose, but only when the cloak upkeep still leaves it good speed (60 percent of its power or at least 12 points); otherwise it stays visible and runs flat out, and it drops the cloak when it can no longer afford it. Ship registry untouched.');
+  log('BUILD v2.109-S220 -- COMMAND DECISIONS: a crippled AI ship no longer fights on forever. At the start of every turn it weighs its whole side (allies count) and, if hopeless, runs (Warp Out on), offers to surrender (you accept or refuse) or scuttles itself (higher tiers wait until you are close). Cadet and Ensign run; Captain and up scuttle; the Klingons and Romulans hardly ever yield. You have the same orders under the COMMAND button (demand surrender, run, strike colours, self-destruct), each behind Are you sure confirmations. Endings, stories and debrief cover all of it. Ship registry untouched.');
+  log('BUILD v2.108-S219 -- POWER TAB TIDY: the Deflector Shields heading is centred, SET DEFAULT is a small button, the shield maximum moved into the line under the buttons. The generated Power-tab hum no longer plays under a recorded bridge (Federation, Klingon, Romulan). Ship registry untouched.');
   log('BUILD v2.107-S218 -- POWER TAB, BIG SHIPS: every weapon now fits on the Power tab (a 16-weapon Gorn BH-2 gets compact rows; the list scrolls if it ever needs more). The shield hex now has one pip per charge the facing can hold (BH-2: 13, Federation II: 20), so a full row means full, and it says MAX n PER FACING. A full facing shows its number in gold. Ship registry untouched.');
   log('BUILD v2.106-S217 -- The ending story and the debrief now say when a ship explosion happened and what the blast did to the other ship. A ship that has lost all power is drawn ADRIFT: the hull slews 18 to 32 degrees off its heading and sways slowly while the shield arcs stay lined up.');
   log('BUILD v2.105-S216 -- Damage Control: the enemy damage log now fills the column beside the ship view (the duplicate in the sidebar is gone), and System Status is filled from the first moment the tab opens. Power tab: MAKE DEFAULT button beside MANUAL shields (every turn and game then starts in manual).');
@@ -3149,7 +3170,7 @@ function launchGame() {
   GS = {
     scenario: _scn?{id:_scn.id,name:_scn.name,fieldExit:!!_scn.fieldExit,playerSide:scnSideMe(_scn).id,openingScene:!!_scn.openingScene&&scnSideMe(_scn).id==='hood',bridgeBed:(playerFaction==='fed'?(_scn.bridgeBed||null):null)}:null,
     turn: 1,
-    rules: { ruleset:customState.ruleset, nebula:customState.nebula, gravwell:customState.gravwell, planets:customState.planets, evasion:!!customState.evasion&&customState.ruleset==='inter', warpout:!!customState.warpout, explosions:!!customState.explosions&&customState.ruleset==='inter' },
+    rules: { ruleset:customState.ruleset, nebula:customState.nebula, gravwell:customState.gravwell, planets:customState.planets, evasion:!!customState.evasion&&customState.ruleset==='inter', warpout:!!customState.warpout, explosions:!!customState.explosions&&customState.ruleset==='inter', command:!!customState.command&&customState.ruleset==='inter' },
     phase: 'power', // power|tacadv|(sensorsN)|moveN|fireN|repower
     subPhaseIdx: 0, // 0,1,2 for move/fire cycles
     player: ps,
@@ -3376,6 +3397,7 @@ function endPhase() {
 }
 
 function advanceFromMove() {
+  if(typeof csBoomCheck==='function'&&csBoomCheck()) return;   // v2.109-S220: a scuttling AI ship blows up when the movement is done
   // FASA sequence: move1->fire1->move2->fire2->move3->fire3->repower
   const seq = subTurnSeq();
   const ci = seq.indexOf(GS.phase);
@@ -3895,8 +3917,7 @@ function proceedFromPower(){
   GS._powerCommitted=false;
   const cc=document.getElementById('commit-confirm'); if(cc) cc.style.display='none';
   const cb=document.getElementById('commit-btn'); if(cb) cb.style.display='block';
-  aiAllocatePower();
-  enterPhase('tacadv');
+  csAiDecide(()=>{ if(!GS||GS.over) return; aiAllocatePower(); enterPhase('tacadv'); });   // v2.109-S220: the AI may run, yield or scuttle before it allocates
 }
 
 function revisePwr(){
@@ -5603,7 +5624,8 @@ function _the(n){ return 'the '+n; }
 function _cap(t){ return t.charAt(0).toUpperCase()+t.slice(1); }
 function _lossList(o){ const b=[]; if(o.weap) b.push(o.weap+' weapon'+(o.weap>1?'s':'')); if(o.gen) b.push(o.gen+' shield generator'+(o.gen>1?'s':'')); if(o.eng) b.push(o.eng+' points of engine power'); return b.length?b.join(', ').replace(/, ([^,]*)$/,' and $1'):''; }
 // How the fight went (up to the final blow). Neutral voice, uses the ship names.
-function endLead(F){
+function endLead(F){ const l=endLead0(F), pre=(typeof csPrePara==='function')?csPrePara():''; return pre?l+'\n\n'+pre:l; }
+function endLead0(F){
   const P=_cap(_the(F.pn)), E=_cap(_the(F.en)), tot=F.pShots+F.eShots, t=F.turns;
   if(F.noShots) return `${P} and ${_the(F.en)} circled for ${t} turn${t===1?'':'s'} without a shot being fired, and then the end came all at once.`;
   const pace = t<=2 ? 'It was a short, savage fight' : t<=4 ? 'It was a quick fight' : t<=7 ? 'It was a hard fight' : 'It was a long, grinding fight';
@@ -6565,8 +6587,9 @@ function buildDebrief(win,mutual){
   // v2.106-S217: Ship Explosions: who blew up and what the blast did
   ((GS&&GS.blasts)||[]).forEach(b=>{
     const you=b.exIsPlayer, pa=b.range===0?'in the same hex':`${b.range} hex${b.range===1?'':'es'} away`;
-    out.push({k:'l',t:`Ship explosion: ${you?'your ship':'the enemy ship'} blew up ${pa}; the blast hit ${you?'the enemy':'your ship'} for ${b.dmg} points`+(b.killed?' and destroyed it.':(b.ssLost||b.gens>0?` and cost ${[b.ssLost?b.ssLost+' hull box'+(b.ssLost>1?'es':''):'',b.gens>0?b.gens+' shield generator'+(b.gens>1?'s':''):''].filter(Boolean).join(' and ')}.`:' without lasting harm.'))});
+    out.push({k:'l',t:`Ship explosion: ${you?'your ship':'the enemy ship'} ${b.selfDestruct?'self-destructed':'blew up'} ${pa}; the blast hit ${you?'the enemy':'your ship'} for ${b.dmg} points`+(b.killed?' and destroyed it.':(b.ssLost||b.gens>0?` and cost ${[b.ssLost?b.ssLost+' hull box'+(b.ssLost>1?'es':''):'',b.gens>0?b.gens+' shield generator'+(b.gens>1?'s':''):''].filter(Boolean).join(' and ')}.`:' without lasting harm.'))});
   });
+  try{ csDebriefLines(out); }catch(e){}   // v2.109-S220: run / surrender / self-destruct
   // v2.92-S203: Evasive Maneuvers: what the player and the AI chose, and what it cost and saved
   if(GS.rules&&GS.rules.evasion&&db.evasion){
     const E=db.evasion, s=n=>n===1?'':'s';
@@ -6616,6 +6639,7 @@ function checkVictory(){
     const win=isPowerLoss?(ep&&!pp):(!mutual&&!pd&&ed);
 
     function showEndgamePanel(){
+      if(GS.selfDestruct){ const T=csBoomEnd(win,mutual), pl=GS.selfDestruct.who==='player'; csShowEndPanel({title:mutual?'MUTUAL DESTRUCTION':(win?'VICTORY \u2014 THE ENEMY SCUTTLED ITS SHIP':'DEFEAT \u2014 SELF-DESTRUCT'),win:win&&!mutual,mutual,sub:mutual?`${GS.player.name} and ${GS.enemy.name} \u2014 both destroyed`:(pl?`${GS.player.name} was self-destructed`:`${GS.enemy.name} self-destructed`),narr:T.narr}); return; }   // v2.109-S220
       const eg=document.getElementById('eg-panel');
       const et=document.getElementById('eg-title');
       if(mutual){
@@ -6730,6 +6754,7 @@ function aiAllocatePower(){
                  : range<=4    ? [0.55,0.60,0.65,0.70,0.75][D-1]   // in range → decloak, strike
                  :                [0.10,0.12,0.15,0.18,0.20][D-1]; // still closing → stay cloaked
       }
+      if(s._aiRun) pDecloak=((tot-s.cloakCost)>=Math.max(12,Math.ceil(tot*0.6)))?0:1;   // v2.110-S221: a runner stays cloaked only while it can still afford good speed
       if(Math.random()<pDecloak || tot<=s.cloakCost+8){
         // Decloaking -- either a deliberate choice to attack, or forced by insufficient
         // power to keep paying the upkeep cost this turn.
@@ -6751,6 +6776,7 @@ function aiAllocatePower(){
         else if(range>9) pC=[0.35,0.45,0.55,0.60,0.65][D-1];       // far → close in unseen
         else pC=[0.15,0.20,0.25,0.30,0.35][D-1];                   // occasional feint up close
       }
+      if(s._aiRun) pC=((tot-s.cloakCost)>=Math.max(12,Math.ceil(tot*0.6)))?0.85:0;   // v2.110-S221: a runner slips away under cloak only if the upkeep leaves it good speed
       if(Math.random()<pC){
         cloaking=true; s.cloaked=true; tot-=s.cloakCost;
         triggerCloakFx(s, 'engage');
@@ -6931,6 +6957,7 @@ function aiAllocatePower(){
     if(move<minMove){ move=minMove; shields=Math.max(0,tot-move-weapPwr); }
   }
   { const boost=aiExploitMoveBoost(s,p,move,weapPwr); if(boost>0){ move+=boost; weapPwr-=boost; } }   // v2.42-S153: pay for a worthwhile flank
+  if(s._aiRun||s._aiBoom){ weapPwr=0; const shk=Math.floor(tot*(s._aiBoom?0.15:0.25)); shields=shk; move=Math.max(0,tot-shk); }   // v2.109-S220: a runner (or a ship about to scuttle) puts its power into moving
   const mp=Math.floor(move/s.moveRatio);
   const [p1,p2,p3]=movePtsPerPhase(mp);
   s.movePts=[p1,p2,p3]; s.movePtsUsed=[0,0,0];
@@ -7254,6 +7281,7 @@ function aiDoMove(subPhaseIdx){
   const pts=s.movePts[subPhaseIdx]-s.movePtsUsed[subPhaseIdx];
   if(pts<=0) return;
   if(fieldExitOn()&&scnAiFlee(s,p,subPhaseIdx,pts)) return;   // v2.95-S206
+  if(s._aiBoom&&csBoomApproach(s,p,subPhaseIdx,pts)) return;   // v2.109-S220
 
   let movesLeft=pts;
   let col=s.col,row=s.row,facing=s.facing;
@@ -7519,6 +7547,7 @@ function initHum(){
   }catch(e){}
 }
 function setHumLevel(powerFraction){
+  try{if(fedBr.wanted)powerFraction=0;}catch(e){}   // v2.108: a recorded bridge bed is playing (Federation, Klingon, Romulan): the generated Power-tab hum would only sit on top of it
   // powerFraction: 0-1 where 1=all power allocated
   initHum();
   const ac=getAC();if(!ac||!humGain)return;
@@ -10933,6 +10962,7 @@ function showButtons(show, hideOthers){
 
 function updatePhaseUI(){
   if(!GS) return;
+  try{ const cb=document.getElementById('btn-command'); if(cb) cb.style.display=commandOn()?'':'none'; }catch(e){}   // v2.111-S222
   const p=GS.phase;
   const name=PHASE_NAMES[p]||p;
   document.getElementById('hdr-phase').textContent=p.toUpperCase();
@@ -11337,6 +11367,7 @@ function fireWeapon(wid, countedInBatch){
   if(cloakPen>0) emit(`\u26a0 Firing at a CLOAKED contact \u2014 to-hit penalty +${cloakPen} (${target.movedThisTurn?'target moving':'target stationary'})`,'warn');
   // To-hit roll
   GS.turn_stats.playerShotsFired++;
+  if(GS.enemy&&GS.enemy._aiRun&&target===GS.enemy){ const c0=csG(); c0.firedOnRun=(c0.firedOnRun||0)+1; }   // v2.111-S222: shots at a ship that has broken off
   const chart=FIRING_CHARTS[w.chart]||FIRING_CHARTS.W;
   const rk=Math.min(range,15);
   const [,maxR]=chart[rk]||[0,0];
@@ -11832,6 +11863,9 @@ const HOUSE_RULES = [
   {id:'explosions', label:'Ship Explosions', hr:false, def:false, needs:'inter',
    desc:'Rulebook, Intermediate Course. A ship destroyed with damage left over may explode (d10 roll against the overkill; 10 or more always blows), and the blast hurts ships nearby. Off by default; needs the Intermediate rules.',
    tip:'SHIP EXPLOSIONS (rulebook, Intermediate Course)\nWhen a ship takes more superstructure damage than it has left, the captain rolls a d10. A roll equal to or less than the damage below zero, and the ship explodes. Ten or more points below zero always explodes.\n\u2022 Same hex: 2x the exploding ship\'s Total Power Units. Adjacent: 1x. Then halved for each hex further away, down to 1 point at 7-10 hexes.\n\u2022 The blast hits the shield facing the explosion. A same-hex blast is shared by all six shields.\n\u2022 A blast can destroy the other ship too: mutual destruction.'},
+  // v2.111-S222: surrender and self-destruct (the COMMAND button, the AI hailing you, the AI scuttling itself). Off by default; running (Warp Out) is its own option above.
+  {id:'command', label:'Surrender & Self-Destruct', hr:false, def:false, needs:'inter', noAll:true,
+   desc:'Intermediate Course option. Adds a COMMAND button (demand surrender, strike your colours, self-destruct, each with Are you sure? checks), and lets a hopeless AI ship offer to surrender or scuttle itself. Off by default; needs the Intermediate rules.'},
   {id:'planets', label:'Planets & Moons', hr:false, def:false, desc:'Sub-light worlds (FASA §13). They block movement, weapons fire, and sensors — slip behind one to break an enemy lock or deny a firing solution.'},
   // v2.92-S203: needs = only under that ruleset (greyed out otherwise); noAll = ALL ON does not switch it on (it pauses play)
   {id:'evasion', label:'Evasive Maneuvers', hr:false, def:false, needs:'inter', noAll:true,
@@ -11911,13 +11945,13 @@ function setScenario(id){
   customState.scenario=id;
   const sc=scnDef();
   if(id!=='free'){
-    if(!was) customState._saved={ruleset:customState.ruleset, nebula:customState.nebula, gravwell:customState.gravwell, asteroids:customState.asteroids, planets:customState.planets, evasion:customState.evasion, warpout:customState.warpout, faction:playerFaction};
-    customState.ruleset=sc.ruleset; Object.assign(customState, sc.terrain); customState.evasion=false; customState.warpout=!!sc.fieldExit; customState.explosions=false;
+    if(!was) customState._saved={ruleset:customState.ruleset, nebula:customState.nebula, gravwell:customState.gravwell, asteroids:customState.asteroids, planets:customState.planets, evasion:customState.evasion, warpout:customState.warpout, command:customState.command, faction:playerFaction};
+    customState.ruleset=sc.ruleset; Object.assign(customState, sc.terrain); customState.evasion=false; customState.warpout=!!sc.fieldExit; customState.explosions=false; customState.command=false;
     if(!sc.sides.find(x=>x.id===customState.scnSide)) customState.scnSide=sc.sides[0].id;
     scnApplyShips();
   } else if(was){
     const sv=customState._saved; customState._saved=null;
-    if(sv){ customState.ruleset=sv.ruleset; customState.nebula=sv.nebula; customState.gravwell=sv.gravwell; customState.asteroids=sv.asteroids; customState.planets=sv.planets; customState.evasion=sv.evasion; customState.warpout=!!sv.warpout; }
+    if(sv){ customState.ruleset=sv.ruleset; customState.nebula=sv.nebula; customState.gravwell=sv.gravwell; customState.asteroids=sv.asteroids; customState.planets=sv.planets; customState.evasion=sv.evasion; customState.warpout=!!sv.warpout; customState.command=!!sv.command; }
     scnUnlockShips(sv?sv.faction:'fed');
   }
   renderScenarioCard(); renderCustomPanel();
@@ -11996,7 +12030,8 @@ function scnFieldExit(who){
   const left=who==='player'?GS.player:GS.enemy, stay=who==='player'?GS.enemy:GS.player;
   const win=(who==='enemy');
   log(`${left.name} warps out \u2014 ${GS.scenario?GS.scenario.name+': ':''}${win?'VICTORY':'DEFEAT'}`,win?'info':'warn');
-  const narr = GS.scenario ? scnNarrative(win,false,'fled') : fledStory(endFacts(), who==='player');   // v2.98-S209 / v2.99-S210
+  const narr = GS.scenario ? scnNarrative(win,false,'fled') : fledStory(endFacts(), who==='player')+csRunPara(who);   // v2.98-S209 / v2.99-S210
+  const show=()=>{
   const eg=document.getElementById('eg-panel'), et=document.getElementById('eg-title');
   et.textContent=win?'VICTORY \u2014 THE ENEMY WARPED OUT':'DEFEAT \u2014 WARPED OUT';
   et.className='eg-title '+(win?'win':'lose'); eg.className=win?'win':'lose';
@@ -12009,6 +12044,8 @@ function scnFieldExit(who){
   try{ snd(win?'victory':'defeat'); }catch(e){}
   eg.style.transform='translateY(0)';
   try{ updateSidebar(); renderTac(); }catch(e){}
+  };
+  try{ playWarpOutScene(left,who,show); }catch(e){ console.error(e); show(); }   // v2.111-S222: the warp-out cut scene, then the result
 }
 function scnEpilogue(win,mutual){
   if(!GS.scenario) return '';
@@ -12019,17 +12056,12 @@ function scnEpilogue(win,mutual){
                  : 'THE BIG BAD WOLF: the Hood is gone and the convoy is at the Klingons\u2019 mercy. Qapla\u2019 \u2014 for the Empire, at least.';
 }
 // The AI's side of "driven from the field": a captain who is losing badly runs for the nearest edge.
-function scnAiWantsOut(s,p){
-  if(aiDifficulty<2) return false;
-  if(s.sensors<=0) return false;   // v2.99-S210: dead sensors, no warp
-  const sf=s.superstructure/s.superstructureMax, pf=p.superstructure/p.superstructureMax, pw=s.currentPower/s.totalPower;
-  return (sf<=0.30||pw<=0.35) && sf<pf;
-}
+function scnAiWantsOut(s,p){ return !!s._aiRun&&s.sensors>0; }   // v2.109-S220: the decision is made at the start of the turn by csAiDecide() (every difficulty; dead sensors, no warp)
 function scnAiFlee(s,p,idx,pts){
   if(!scnAiWantsOut(s,p)) return false;
   if(!s._scnFleeLogged){ s._scnFleeLogged=true; log(`${s.name} is breaking off \u2014 she\u2019s making a run for the edge of the field!`,'warn'); }
-  const edges=[{col:0,row:s.row},{col:COLS-1,row:s.row},{col:s.col,row:0},{col:s.col,row:ROWS-1}];
-  let g=edges[0],gs=1e9; edges.forEach(e=>{ const sc=hexDist(s.col,s.row,e.col,e.row)-0.6*hexDist(p.col,p.row,e.col,e.row); if(sc<gs){gs=sc;g=e;} });
+  let g=s._runGoal;   // v2.111-S222: the escape point is chosen ONCE (it used to be recomputed each phase and flipped as the player moved, so the ship just turned in place)
+  if(!g){ const edges=[{col:0,row:s.row},{col:COLS-1,row:s.row},{col:s.col,row:0},{col:s.col,row:ROWS-1}]; let gs=1e9; g=edges[0]; edges.forEach(e=>{ const sc=hexDist(s.col,s.row,e.col,e.row)-0.35*hexDist(p.col,p.row,e.col,e.row); if(sc<gs){gs=sc;g=e;} }); s._runGoal=g; }
   const bestFac=(fc,fr,tc,tr)=>{ const a=hexCen(fc,fr), b=hexCen(tc,tr), ang=Math.atan2(b.y-a.y,b.x-a.x); let best=0,bd=1e9; for(let i=0;i<6;i++){ const d=Math.abs(((ang-i*Math.PI/3)+3*Math.PI)%(2*Math.PI)-Math.PI); if(d<bd){bd=d;best=i;} } return best; };
   let col=s.col,row=s.row,fac=s.facing,left=pts,used=0,gone=false;
   while(left>0){
@@ -12048,6 +12080,398 @@ function scnAiFlee(s,p,idx,pts){
   try{ updateSidebar(); renderTac(); }catch(e){}
   if(gone) scnFieldExit('enemy');
   return true;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMMAND DECISIONS: RUN, SURRENDER, SELF-DESTRUCT (v2.109-S220)
+// A crippled AI ship no longer fights on forever. At the start of every turn (before power is allocated) it weighs the SIDE'S chances, not just its own hull:
+// csValue() rates a ship's fighting strength, csAssess() compares the whole side (this ship plus GS.enemyAllies / GS.playerAllies, which a future fleet
+// mode fills) against the other side, so a wrecked ship that still has strong friends does not give up. When it is hopeless the ship picks one of
+//   RUN (needs the Warp Out option), YIELD (hail, the player accepts or refuses) or BOOM (self-destruct, held until the player is close enough to hurt),
+// by faction temper and by difficulty (Cadet/Ensign run, Captain+ scuttle and wait for the best range). The player has the same three from the COMMAND button,
+// each behind "Are you sure?" confirmations. Scenarios keep only the old run. Ship data is not touched.
+// ═══════════════════════════════════════════════════════════════════════════
+const CS_COL={fed:'#4aa3ff',kli:'#e0453a',rom:'#3ecf6b',gor:'#e08a2a',ori:'#a96ae6'};
+const CS_FAC={fed:{run:3,yield:4,boom:0.2,fight:1},kli:{run:1.2,yield:0.35,boom:3,fight:1.5},rom:{run:2,yield:0.35,boom:3,fight:1.2},gor:{run:2,yield:1.5,boom:1,fight:1.2},ori:{run:4,yield:3,boom:0.3,fight:0.6}};
+const CS_HULL=[0,.45,.40,.30,.25,.20,.15], CS_POW=[0,.35,.30,.25,.20,.15,.12], CS_ODDS=[0,.5,.4,.3,.25,.2,.15], CS_BOOMRANGE=[0,4,4,3,2,1,1];
+const CS_WHY={
+  fed:{nogun:'All of our weapons are gone. We cannot fight you.',power:'Our power is nearly exhausted; we cannot keep this up.',hull:'Our hull is failing around us.',odds:'We are outmatched and losing people for nothing.'},
+  kli:{nogun:'You have torn out every gun I own! What is a warship that cannot fight?',power:'The engines are dying under us; there is no honour in drifting.',hull:'The hull is breaking, and my crew would die for nothing.',odds:'The numbers are against us, and there is no glory in a pointless death.'},
+  rom:{nogun:'Every weapon is dead. The Praetor gains nothing from a helpless hulk.',power:'The core is starved; we cannot hold this engagement.',hull:'The hull will not take another hit.',odds:'The balance of force is against us.'},
+  gor:{nogun:'Weapons: gone. Hunting: over.',power:'Power: failing. Fighting: not possible.',hull:'Hull: breaking.',odds:'We are the hunted now.'},
+  ori:{nogun:'Every gun I own is scrap. I cannot make a living fighting like this!',power:'The engines are on their last legs.',hull:'This hull is not worth dying for.',odds:'The odds are lousy, and I am no hero.'}
+};
+const CS_FRAME={
+  fed:{yield:'This is the commanding officer of {N}. {W} We are striking our colors and request terms, and fair treatment for my crew.',run:'{N} to all stations. {W} We are breaking off — all power to the engines, make for the edge of the field!',boom:'{N}. {W} Computer, initiate auto-destruct.',refuse:'{N}. Request denied. We are not beaten yet.'},
+  kli:{yield:'{N}. {W} I yield the ship. Let it be known this was not my wish.',run:'{N}. {W} The Empire is better served by a captain who lives to return. Set course for the edge — warp speed!',boom:'{N}. {W} Then we do not die alone. Self-destruct — now! Qapla’!',refuse:'{N}. Surrender? Klingons do not surrender! Prepare to die!'},
+  rom:{yield:'{N}. {W} We yield. The Star Empire will remember this mercy.',run:'{N}. {W} Disengage. Make for the edge, and let distance be our cloak.',boom:'{N}. {W} The Praetor’s secrets die with this ship. Scuttle her.',refuse:'{N}. We will not be taken alive.'},
+  gor:{yield:'{N}. {W} We yield. Hssss. The hatchling survives.',run:'{N}. {W} Retreat. The hunt is lost. Go to the edge.',boom:'{N}. {W} The nest will not be taken. Burn the hull.',refuse:'{N}. No. The Gorn fight on.'},
+  ori:{yield:'{N}. {W} All right, all right — I surrender! Let us talk terms.',run:'{N}. {W} This is not my fight to die in. Punch it — we are out of here!',boom:'{N}. {W} If I cannot keep her, nobody will. Blow the charges.',refuse:'{N}. Not a chance, friend. We are not done.'}
+};
+function csG(){ return GS.cs||(GS.cs={events:[]}); }
+function csEvent(k,t){ try{ csG().events.push({k,t,turn:GS.turn}); }catch(e){} }
+function csShort(n){ return String(n||'').replace(/^(USS|IKS|IKV|ISS|RIS|UFS|U\.S\.S\.|ChR|USS\/Starbase)\s+/i,''); }
+function csText(ship,kind,reason){
+  const fac=CS_FRAME[ship.faction]?ship.faction:'fed', why=(CS_WHY[fac][reason||'odds']||'');
+  return CS_FRAME[fac][kind].replace('{N}',ship.name).replace('{W} ',why+' ').replace('{W}',why);
+}
+function csSideShips(side){ const base=side==='player'?[GS.player].concat(GS.playerAllies||[]):[GS.enemy].concat(GS.enemyAllies||[]); return base.filter(x=>x&&x.superstructure>0&&x.currentPower>0); }
+function csValue(sh){
+  if(!sh||sh.superstructure<=0||sh.currentPower<=0) return 0;
+  const w=(sh.weapons||[]).filter(x=>x.alive); if(!w.length) return 0;
+  const off=w.reduce((a,x)=>a+Math.max(1,weaponPowerCap(x)),0);
+  const hullF=Math.max(0.1,sh.superstructure/sh.superstructureMax), pwF=Math.min(1,sh.currentPower/Math.max(1,(sh.totalPower||sh.currentPower)*0.6));
+  return off*(0.35+0.65*hullF)*(0.4+0.6*pwF);
+}
+// How hopeless is this ship's SIDE? ratio = this side's fighting value / the other side's. Friends count: a hurt ship among strong friends is not hopeless.
+function csAssess(s){
+  const D=aiDifficulty, side=(s===GS.player||(GS.playerAllies||[]).includes(s))?'player':'enemy', foeSide=side==='player'?'enemy':'player';
+  const mine=csSideShips(side), foes=csSideShips(foeSide);
+  const myV=mine.reduce((a,x)=>a+csValue(x),0), foeV=foes.reduce((a,x)=>a+csValue(x),0), ratio=foeV>0?myV/foeV:9;
+  const friendsV=mine.filter(x=>x!==s).reduce((a,x)=>a+csValue(x),0);
+  const sf=s.superstructure/s.superstructureMax, pw=s.currentPower/Math.max(1,s.totalPower||s.currentPower);
+  const live=(s.weapons||[]).filter(w=>w.alive);
+  const minCost=live.length?Math.min(...live.map(w=>(w.type==='missile'||w.type==='plasma')?(w.armCost||6):1)):0;
+  const helpless=!live.length||s.currentPower<minCost;
+  const hurt=sf<0.85||live.length<(s.weapons||[]).length||(s.shieldGenAlive||[]).some(a=>!a);
+  const trig=[];
+  if(helpless&&ratio<0.6) trig.push('nogun');
+  if(pw<=CS_POW[D]&&ratio<0.8) trig.push('power');
+  if(sf<=CS_HULL[D]&&ratio<0.8) trig.push('hull');
+  if(hurt&&ratio<=CS_ODDS[D]&&GS.turn>=2) trig.push('odds');
+  return {trig,reason:trig[0]||null,ratio,myV,foeV,friendsV,sf,pw,helpless,side,friends:mine.length-1};
+}
+function csCanRun(s){   // v2.111-S222: only if it can really reach the edge (the Devisor with 9 power left spun on the spot for turns)
+  if(!fieldExitOn()||s.sensors<=0) return false;
+  if(s._aiRun) return true;
+  const mpMax=Math.floor(s.currentPower*0.75/(s.moveRatio||1)); if(mpMax<1) return false;
+  const d=Math.min(s.col,COLS-1-s.col,s.row,ROWS-1-s.row)+1;
+  return d<=mpMax*4;
+}
+function commandOn(){ return !!(GS&&GS.rules&&GS.rules.command&&interMode()&&!GS.scenario); }
+function csCanYield(s){ return commandOn()&&GS.turn>=(s._yieldCool||0); }
+function csCanBoom(s){ return commandOn()&&s.currentPower>=6; }
+// pick what a hopeless ship does: weights by faction temper and by difficulty (low tiers run, high tiers scuttle). demand=true: the player has hailed it.
+function csChoose(s,A,demand){
+  const D=aiDifficulty, F=CS_FAC[s.faction]||CS_FAC.fed;
+  const w={run:csCanRun(s)?F.run:0, yield:(demand?commandOn():csCanYield(s))?F.yield:0, boom:csCanBoom(s)?F.boom:0,
+           fight:F.fight*(A.helpless?0.15:(A.trig.length===1&&A.trig[0]==='odds'?2:1))};
+  if(D<=2){ w.run*=2; w.boom*=0.15; } else if(D===4){ w.boom*=1.5; w.run*=0.8; } else if(D===5){ w.boom*=2; w.run*=0.7; w.yield*=0.7; } else if(D>=6){ w.boom*=2.5; w.run*=0.6; w.yield*=0.5; }
+  if(GS.scenario||!commandOn()){ w.yield=0; w.boom=0; w.fight=w.run>0?0:1; }   // scenarios, and battles without the Surrender option, keep only the run
+  const tot=w.run+w.yield+w.boom+w.fight; let r=Math.random()*tot;
+  for(const k of ['run','yield','boom','fight']){ if((r-=w[k])<0&&w[k]>0) return k; }
+  return 'fight';
+}
+// ── the hail window ──
+function csHail(ship,kind,reason,buttons,title,sub){
+  const old=document.getElementById('cs-modal'); if(old) old.remove();
+  const m=document.createElement('div'); m.id='cs-modal';
+  const ac=CS_COL[ship.faction]||'#ff9900';
+  m.innerHTML=`<div class="cs-win" style="--ac:${ac}"><div class="cs-t">${title||'INCOMING TRANSMISSION'} — ${ship.name}</div>${sub?`<div class="cs-s">${sub}</div>`:''}<div class="cs-b">“${csText(ship,kind,reason)}”</div><div class="cs-btns">${buttons.map((b,i)=>`<button type="button" data-i="${i}">${b.t}</button>`).join('')}</div></div>`;
+  document.body.appendChild(m);
+  m.querySelectorAll('button').forEach(b=>b.onclick=()=>{ m.remove(); const f=buttons[+b.dataset.i].go; if(f) f(); });
+}
+function csNote(title,body,go){   // a plain OK window (used for the player's confirmations' results)
+  const old=document.getElementById('cs-modal'); if(old) old.remove();
+  const m=document.createElement('div'); m.id='cs-modal';
+  m.innerHTML=`<div class="cs-win" style="--ac:#ff9900"><div class="cs-t">${title}</div><div class="cs-b">${body}</div><div class="cs-btns"><button type="button">OK</button></div></div>`;
+  document.body.appendChild(m); m.querySelector('button').onclick=()=>{ m.remove(); if(go) go(); };
+}
+// ── the AI's turn-start decision (runs before aiAllocatePower; cb continues the turn) ──
+function csAiDecide(cb){
+  const s=GS.enemy;
+  if(!GS||GS.over||!s||s._aiRun||s._aiBoom){ cb(); return; }
+  const A=csAssess(s);
+  if(!A.trig.length){ cb(); return; }
+  const pick=csChoose(s,A,false), reason=A.reason;
+  if(pick==='fight'){ cb(); return; }
+  csG().reason=reason;
+  if(pick==='run'){
+    s._aiRun=true; s._aiRunReason=reason; csG().runTurn=GS.turn; csEvent('l',`${s.name} signalled that it was making a run for it (${reason==='nogun'?'no usable weapons':reason==='power'?'power failing':reason==='hull'?'hull failing':'outmatched'}).`);
+    log(`${s.name} is breaking off — she’s making a run for the edge of the field!`,'warn');
+    csHail(s,'run',reason,[{t:'OK — LET HER GO?',go:cb}],'INCOMING TRANSMISSION','MAKING A RUN FOR IT');
+  } else if(pick==='yield'){
+    log(`${s.name} is hailing you: she wants to surrender.`,'warn');
+    csEvent('l',`${s.name} offered to surrender on turn ${GS.turn}.`);
+    csHail(s,'yield',reason,[{t:'REFUSE — FIGHT ON',go:()=>{ s._yieldCool=GS.turn+2; csEvent('l','You refused the surrender and fought on.'); log('You refuse the surrender: the fight goes on.','info'); cb(); }},{t:'ACCEPT SURRENDER',go:()=>csEndYield('enemy',reason)}],'INCOMING TRANSMISSION','SURRENDER OFFERED');
+  } else {   // boom: armed now, detonates when the player is close enough (higher tiers wait for the best range, and say nothing)
+    s._aiBoom={turn:GS.turn,reason}; csG().reason=reason;
+    csEvent('l',`${s.name} armed its self-destruct on turn ${GS.turn}.`);
+    if(aiDifficulty<=4){ log(`${s.name}: self-destruct sequence initiated!`,'warn'); csHail(s,'boom',reason,[{t:'OK',go:cb}],'INCOMING TRANSMISSION','FINAL ORDER'); }
+    else cb();
+  }
+}
+// ── a boom-armed ship closes with the player; it goes up at the range its tier waits for (or when it is about to die, or after 4 turns) ──
+function csBoomApproach(s,p,idx,pts){
+  if(!s._aiBoom) return false;
+  const g={col:p.col,row:p.row}; let col=s.col,row=s.row,fac=s.facing,left=pts,used=0;
+  const bestFac=(fc,fr,tc,tr)=>{ const a=hexCen(fc,fr), b=hexCen(tc,tr), ang=Math.atan2(b.y-a.y,b.x-a.x); let best=0,bd=1e9; for(let i=0;i<6;i++){ const d=Math.abs(((ang-i*Math.PI/3)+3*Math.PI)%(2*Math.PI)-Math.PI); if(d<bd){bd=d;best=i;} } return best; };
+  while(left>0&&!(col===g.col&&row===g.row)){
+    const tf=bestFac(col,row,g.col,g.row);
+    if(fac!==tf){ const d=((tf-fac)+6)%6; fac=((fac+(d<=3?1:-1))+6)%6; left--; used++; continue; }
+    const nb=neighbour(col,row,fac);
+    if(!inBounds(nb.col,nb.row)||celBlocked(nb.col,nb.row)){ fac=(fac+1)%6; left--; used++; continue; }
+    col=nb.col; row=nb.row; left--; used++;
+  }
+  if(col!==s.col||row!==s.row) s.movedThisTurn=true;
+  s.col=col; s.row=row; s.facing=fac; s.movePtsUsed[idx]+=used;
+  log(`AI ${s.name}: Moved to ${col},${row} facing ${fac}`,'ai');
+  try{ updateSidebar(); renderTac(); }catch(e){}
+  return true;
+}
+function csBoomCheck(){   // called when a movement phase ends; true if the AI blew itself up
+  const s=GS&&GS.enemy; if(!s||GS.over||!s._aiBoom||s.superstructure<=0) return false;
+  const p=GS.player, rng=hexDist(s.col,s.row,p.col,p.row), D=aiDifficulty, waited=GS.turn-s._aiBoom.turn;
+  const thr=CS_BOOMRANGE[D], dying=s.superstructure/s.superstructureMax<=0.10;
+  if(!(rng<=thr||dying||(waited>=4&&rng<=thr+2))) return false;
+  const go=()=>{ s._aiBoom.waited=waited; csDetonate(s); };
+  if(D<=4) go(); else { log(`${s.name}: power surge — the reactor is going critical!`,'warn'); go(); }
+  return true;
+}
+function csDetonate(ex){
+  if(!GS||GS.over||ex._exploded) return;
+  const other=ex===GS.player?GS.enemy:GS.player;
+  ex._exploded=true; ex._expRolled=true; ex._selfDestruct=true;
+  try{ snd('explosion'); }catch(e){}
+  const dl0=(GS.dmgLog||[]).length, was=other.superstructure, gensWas=other.shieldGenAlive.filter(a=>!a).length, rngB=hexDist(ex.col,ex.row,other.col,other.row), dmgB=calculateExplosionDamage(ex.currentPower,rngB);
+  log(`💥 ${ex.name} SELF-DESTRUCTS!`,'dmg'); try{ addDmgLog('SELF-DESTRUCT','crit',ex); }catch(e){}
+  applyExplosionDamage(ex,other);
+  const log2=(GS.dmgLog||[]).slice(dl0);
+  (GS.blasts=GS.blasts||[]).push({exName:ex.name,exFaction:ex.faction,exIsPlayer:ex===GS.player,vName:other.name,vFaction:other.faction,range:rngB,dmg:dmgB,ssLost:Math.max(0,was-Math.max(0,other.superstructure)),gens:other.shieldGenAlive.filter(a=>!a).length-gensWas,killed:other.superstructure<=0,wpns:log2.filter(e=>/ DESTROYED$/.test(String(e.msg||''))&&!/shield generator|TOTAL/i.test(String(e.msg||''))).length,eng:log2.reduce((a,e)=>a+(+((String(e.msg||'').match(/^Engine hit — power −(\d+)/)||[])[1]||0)),0),selfDestruct:true});
+  GS.selfDestruct={who:ex===GS.player?'player':'enemy',reason:(ex._aiBoom&&ex._aiBoom.reason)||csG().reason||null,range:rngB,dmg:dmgB,waited:(ex._aiBoom&&ex._aiBoom.waited)||0,tier:aiDifficulty,ordered:ex===GS.player,pre:{pct:ex.superstructure/Math.max(1,ex.superstructureMax),ss:ex.superstructure,max:ex.superstructureMax}};
+  ex.superstructure=0;
+  if(was>0&&other.superstructure<=0) GS.blastKill={victimName:other.name,victimFaction:other.faction,exploderName:ex.name,exploderFaction:ex.faction,victimIsPlayer:other===GS.player};
+  try{ updateSidebar(); renderTac(); }catch(e){}
+  checkVictory();
+}
+// ── endings ──
+function csShowEndPanel(o){
+  const eg=document.getElementById('eg-panel'), et=document.getElementById('eg-title');
+  et.textContent=o.title; et.className='eg-title '+(o.win?'win':'lose'); eg.className=o.win?'win':'lose';
+  document.getElementById('eg-sub').textContent=o.sub;
+  const nEl=document.getElementById('eg-narrative'); nEl.textContent=o.narr; nEl.classList.remove('expanded');
+  document.getElementById('eg-readmore').textContent='Read full narrative';
+  const st=GS.turn_stats;
+  document.getElementById('eg-stats').innerHTML=`Turns: ${GS.turn} &middot; Shots fired: ${st.playerShotsFired} &middot; Hits: ${st.playerShotsHit}<br>Enemy shots: ${st.enemyShotsFired} &middot; Enemy hits: ${st.enemyShotsHit}`;
+  try{ const lines=buildDebrief(o.win,!!o.mutual); if(!GS.debriefLogged){GS.debriefLogged=true; logDebrief(lines);} document.getElementById('eg-debrief').innerHTML=renderDebriefHTML(lines); }catch(e){ document.getElementById('eg-debrief').innerHTML=''; }
+  try{ snd(o.win?'victory':'defeat'); }catch(e){}
+  eg.style.transform='translateY(0)';
+  try{ updateSidebar(); renderTac(); }catch(e){}
+}
+function csEndYield(who,reason){
+  if(!GS||GS.over) return;
+  GS.over=true; GS.surrender={who,reason,turn:GS.turn};
+  try{ stopAllAmb(1.5); stopFedBridge(1.5); setHumLevel(0); }catch(e){}
+  const win=who==='enemy', y=win?GS.enemy:GS.player;
+  log(`${y.name} strikes her colours — ${win?'VICTORY':'DEFEAT'}`,win?'info':'warn');
+  csEvent('l',win?'You accepted the surrender.':'You struck your colours.');
+  csShowEndPanel({title:win?'VICTORY — THE ENEMY SURRENDERED':'DEFEAT — SURRENDERED',win,sub:`${y.name} struck ${y.faction==='gor'?'its':'her'} colours`,narr:csYieldStory(endFacts(),who,reason)});
+}
+function csYieldStory(F,who,reason){
+  const enemyY=(who==='enemy'), Y=enemyY?F.E:F.P, W=enemyY?F.P:F.E, yn=enemyY?F.en:F.pn, wn=enemyY?F.pn:F.en, yp=_pr(Y), wp=_pr(W), Yc=_cap(_the(yn)), Wc=_cap(_the(wn)), ypct=enemyY?F.ePct:F.pPct, lost=_lossList(enemyY?F.eLost:F.pLost), t=GS.turn;
+  const cond=`${Yc} was ${_cond(ypct,false)} (${Y.superstructure} of ${Y.superstructureMax} hull)${lost?', having lost '+lost:''}`;
+  const rs={nogun:`with every weapon gone there was nothing left to fight with`,power:`with the power draining away there was nothing left to fight with`,hull:`with the hull coming apart there was no more fighting to be done`,odds:`and the odds had stopped being a matter of opinion`}[reason||'odds'];
+  const p1=`${cond} when ${yp.p} captain ran the numbers: ${rs}. The captain opened a channel on turn ${t}.`;
+  const hail=`“${csText(Y,'yield',reason)}”`;
+  const aft={fed:`${Wc} held fire. Boarding parties and medical teams crossed under a flag of truce, and every article of Starfleet’s regulations on the treatment of prisoners applied.`,
+    kli:`${Wc}’s captain took the surrender the way the Empire takes everything: as a prize. The crew was marched off and the ship claimed for the Fleet, and the tale will be told, and improved, in many a mess hall.`,
+    rom:`${Wc} sent a prize crew across in silence. The Star Empire does not waste a hull, and the intelligence service had questions for the crew.`,
+    gor:`${Wc} closed and held position. The Gorn do not waste what they have caught, and the prisoners were taken aboard.`,
+    ori:`${Wc} took the surrender and, since this was the Colonies, the talk soon turned to terms, and what the ship and her crew might be worth.`}[W.faction]||`${Wc} took the surrender.`;
+  const last=enemyY?`Nobody could say the fight was one-sided to the end, and nobody had to: the engagement closed on a hail, not a hit.`:`${Yc} was out of the fight by ${yp.p} own captain’s order.`;
+  return endLead(F)+'\n\n'+p1+'\n\n'+hail+'\n\n'+aft+' '+last;
+}
+function csBoomEnd(win,mutual){
+  const F=endFacts(), sd=GS.selfDestruct, exP=(sd.who==='player'), ex=exP?F.P:F.E, vc=exP?F.E:F.P, exn=exP?F.pn:F.en, vn=exP?F.en:F.pn, ep=_pr(ex), vp=_pr(vc), Ec=_cap(_the(exn)), Vc=_cap(_the(vn));
+  const B=(GS.blasts||[]).slice(-1)[0]||{}, where=sd.range===0?'in the same hex':sd.range===1?'one hex away':`${sd.range} hexes away`;
+  const rs={nogun:`with every weapon gone`,power:`with the engines dying`,hull:`with the hull coming apart`,odds:`seeing the odds`,undefined:`with the fight lost`,null:`with the fight lost`}[sd.reason];
+  const pre=sd.pre||{pct:0,ss:0,max:ex.superstructureMax};
+  const decide=exP?`${Ec} was ${_cond(pre.pct,false)} (${pre.ss} of ${pre.max} hull) when the order came from the bridge: self-destruct.`
+    :`${Ec} was ${_cond(pre.pct,false)} (${pre.ss} of ${pre.max} hull), and ${ep.p} captain decided ${rs} that the ship would not be taken, and would not die for nothing.`;
+  const wait=(!exP&&sd.waited>0)?` For ${sd.waited} turn${sd.waited===1?'':'s'} ${ep.s} held ${ep.p} course and said nothing, closing the distance to ${_the(vn)} until the blast would count.`:'';
+  const cost=mutual?`${Vc} did not survive it either.`:(B.ssLost||B.gens>0||B.wpns>0)?`The blast cost ${_the(vn)} ${[B.ssLost?B.ssLost+' hull box'+(B.ssLost>1?'es':''):'',B.gens>0?B.gens+' shield generator'+(B.gens>1?'s':''):'',B.wpns>0?B.wpns+' weapon'+(B.wpns>1?'s':''):''].filter(Boolean).join(', ').replace(/, ([^,]*)$/,' and $1')}.`:`The shields and the hull turned the blast aside; ${_the(vn)} took no lasting harm.`;
+  const boom=`Then the reactor let go: a blast of ${sd.dmg} points that caught ${_the(vn)} ${where}. ${cost}`;
+  const end=mutual?`Two ships became one expanding cloud, and the log of the engagement ends mid-sentence.`:`${Vc} was left alone on the grid, ${_cond(exP?F.ePct:F.pPct,false)}, among the pieces of a ship that had chosen its ending.`;
+  return {narr:endLead(F)+'\n\n'+decide+wait+'\n\n'+boom+' '+end};
+}
+// v2.111-S222: the paragraph before the ending: a ship that declared a run, and what the other side did about it
+function csPrePara(){
+  try{
+    const c=csG(); if(!GS||!c.events||!GS.enemy) return '';
+    const e=GS.enemy, f=e.faction, fired=c.firedOnRun||0;
+    const ran=!!e._aiRun||(c.events||[]).some(x=>/run|break/i.test((x.kind||'')+(x.text||'')));
+    if(!ran||GS.scenario) return '';
+    const nm=e.name, pf=playerFaction;
+    let t=`${nm} declared she was breaking off and turned for the edge of the field. `;
+    if(fired>0){
+      if(pf==='fed') t+=`Starfleet fired on her anyway (${fired} ${fired>1?'shots':'volleys'} at a ship in retreat). That is not how a Starfleet captain is meant to treat a vessel that has struck her fighting stance and is leaving; the Articles of the Federation have words for it, and so will the admiral reading the log.`;
+      else t+=`Your gunners kept firing on her as she ran (${fired} ${fired>1?'shots':'volleys'}); a ship that is running is still a ship that can come back.`;
+    } else t+=(pf==='fed'?'Starfleet held fire on a ship that was leaving the field, as a Starfleet captain should.':'You let her go without firing.');
+    return t;
+  }catch(e){ return ''; }
+}
+function csRunPara(who){
+  if(who!=='enemy'||!GS.enemy._aiRun) return '';
+  const r=GS.enemy._aiRunReason, F=endFacts(), e=F.E, ep=_pr(e);
+  const rs={nogun:`with every weapon gone`,power:`with the power failing`,hull:`with the hull failing`,odds:`with the odds turned`}[r]||'';
+  return `\n\n${_cap(_the(F.en))}’s captain had made the call on turn ${(GS.cs&&GS.cs.runTurn)||GS.turn}, ${rs}: “${csText(e,'run',r)}”`;
+}
+function csDebriefLines(out){
+  const ev=(GS.cs&&GS.cs.events)||[];
+  ev.forEach(e=>out.push({k:e.k||'l',t:`Command: ${e.t}`}));
+  const sd=GS.selfDestruct;
+  if(sd) out.push({k:sd.who==='player'?'warn':'good',t:sd.who==='player'?'You ordered the self-destruct.':`The enemy scuttled its own ship${sd.waited>0?` after waiting ${sd.waited} turn${sd.waited===1?'':'s'} for the range`:''}${aiDifficulty>=5?': a tier that waits for the best range':''}.`});
+}
+// ═══════════════════════════════════════════════════════════════════════════
+// WARP-OUT CUT SCENE (v2.111-S222): when a ship makes its run for it and really leaves the map (AI or player, Free Battle or scenario), a short skippable cinematic
+// plays before the result panel: the ship turns, lights its engines, accelerates, the stars streak, it stretches into a line and is gone in a flash.
+// Same overlay and Skip / Sound buttons as the Big Bad Wolf opening (the #scn-intro styles). The ship is drawn with its own top-down art (drawShipAuto).
+// ═══════════════════════════════════════════════════════════════════════════
+function playWarpOutScene(ship,who,done){
+  const W=1280,H=720,T={turn0:0.5,turn1:1.5,go:1.7,flash:3.3,cap:3.5,fade:5.0,total:5.8};
+  const ac0=CS_COL[ship.faction]||'#ffb347';
+  let finished=false,raf=0,t0=0,aud=null,muted=false;
+  const ov=document.createElement('div'); ov.id='scn-intro';
+  ov.innerHTML='<canvas id="scn-intro-cv"></canvas><div id="scn-intro-ctl"><button type="button" id="scn-intro-snd" title="Sound on/off">\u{1F50A} Sound</button><button type="button" id="scn-intro-skip">SKIP ▶▶ <span>(Esc)</span></button></div>';
+  document.body.appendChild(ov);
+  const cv=ov.querySelector('#scn-intro-cv'),dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); const ctx=cv.getContext('2d'); ov.style.opacity='1';
+  try{ stopAllAmb(0.5); stopFedBridge(0.5); }catch(e){}
+  function end(){
+    if(finished) return; finished=true; cancelAnimationFrame(raf);
+    window.removeEventListener('keydown',onKey,true);
+    if(aud) aud.stop();
+    ov.style.opacity='0';
+    setTimeout(()=>{ try{ ov.remove(); }catch(e){} try{ done(); }catch(e){ console.error(e); } },420);
+  }
+  function onKey(e){ if(finished) return; e.stopPropagation(); if(e.key==='Escape'||e.key==='Enter'||e.key===' '){ e.preventDefault(); end(); } }
+  window.addEventListener('keydown',onKey,true);
+  ov.querySelector('#scn-intro-skip').onclick=end;
+  ov.querySelector('#scn-intro-snd').onclick=e=>{ muted=!muted; if(aud) aud.mute(muted); e.currentTarget.textContent=muted?'\u{1F507} Sound off':'\u{1F50A} Sound'; };
+  // sound: engine hum, a rising warp whine, and the whoosh and thump at the flash
+  try{
+    const ac=getAC();
+    if(ac){
+      const now=ac.currentTime+0.05,master=ac.createGain(); master.gain.value=0.5; master.connect(ac.destination);
+      const o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain(); o.type='sawtooth'; f.type='lowpass';
+      o.frequency.setValueAtTime(60,now+T.turn1); o.frequency.exponentialRampToValueAtTime(520,now+T.flash); f.frequency.setValueAtTime(250,now+T.turn1); f.frequency.exponentialRampToValueAtTime(3200,now+T.flash);
+      g.gain.setValueAtTime(0.0001,now+T.turn1); g.gain.linearRampToValueAtTime(0.12,now+T.flash); g.gain.linearRampToValueAtTime(0.0001,now+T.flash+0.25); o.connect(f).connect(g).connect(master); o.start(now+T.turn1); o.stop(now+T.flash+0.3);
+      const hum=ac.createOscillator(),hg=ac.createGain(); hum.type='sine'; hum.frequency.value=55; hg.gain.value=0.05; hum.connect(hg).connect(master); hum.start(now); hum.stop(now+T.total);
+      const nb=ac.createBuffer(1,Math.floor(ac.sampleRate*1.2),ac.sampleRate),d=nb.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      const s=now+T.flash-0.05,src=ac.createBufferSource(); src.buffer=nb; const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.1; bp.frequency.setValueAtTime(400,s); bp.frequency.exponentialRampToValueAtTime(5200,s+0.7);
+      const ng=ac.createGain(); ng.gain.setValueAtTime(0.0001,s); ng.gain.linearRampToValueAtTime(0.25,s+0.08); ng.gain.exponentialRampToValueAtTime(0.0001,s+1.0); src.connect(bp).connect(ng).connect(master); src.start(s); src.stop(s+1.1);
+      const o2=ac.createOscillator(),og=ac.createGain(); o2.type='sine'; o2.frequency.setValueAtTime(900,s); o2.frequency.exponentialRampToValueAtTime(60,s+0.6); og.gain.setValueAtTime(0.2,s); og.gain.exponentialRampToValueAtTime(0.0001,s+0.7); o2.connect(og).connect(master); o2.start(s); o2.stop(s+0.8);
+      aud={mute(on){ try{ master.gain.setTargetAtTime(on?0:0.5,ac.currentTime,0.03); }catch(e){} }, stop(){ try{ master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(0,ac.currentTime,0.05); setTimeout(()=>{ try{ master.disconnect(); }catch(e){} },400); }catch(e){} }};
+    }
+  }catch(e){ console.warn('warp-out audio unavailable',e); }
+  let seed=ship.name.length*977+13; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
+  const stars=[]; for(let i=0;i<170;i++) stars.push({x:rnd()*W,y:rnd()*H,z:0.25+rnd()*0.75,b:0.4+rnd()*0.6});
+  const ss=(a,b,t)=>{ const u=Math.max(0,Math.min(1,(t-a)/(b-a))); return u*u*(3-2*u); };
+  const name=ship.name, left=(who==='enemy');
+  function frame(now){
+    if(finished) return;
+    if(!t0) t0=now+60;
+    const t=Math.max(0,(now-t0)/1000);
+    if(t>=T.total){ end(); return; }
+    ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);
+    ctx.fillStyle='#02040a'; ctx.fillRect(0,0,W,H);
+    // speed of the stars rises as the ship accelerates, falls away after the flash
+    const acc=Math.max(0,t-T.go), v=(t<T.flash)?(16+Math.pow(acc,2.2)*420):Math.max(0,(1-ss(T.flash,T.flash+1.4,t))*2400);
+    const cx0=W*0.40, cy=H*0.5;
+    stars.forEach(s=>{
+      const trav=(t<T.flash)?(16*t+Math.pow(Math.max(0,t-T.go),3.2)*140):(16*T.flash+Math.pow(T.flash-T.go,3.2)*140+(t-T.flash)*60), x=(((s.x-trav*s.z)%W)+W)%W;
+      const len=Math.min(520,v*s.z*0.05+1.2);
+      ctx.strokeStyle='rgba(205,225,255,'+(0.25+0.6*s.b*Math.min(1,0.4+s.z)).toFixed(2)+')'; ctx.lineWidth=s.z>0.7?1.6:1;
+      ctx.beginPath(); ctx.moveTo(x,s.y); ctx.lineTo(x+len,s.y); ctx.stroke();
+    });
+    // the ship
+    if(t<T.flash){
+      const turn=ss(T.turn0,T.turn1,t), ang=turn*Math.PI/2;   // sprite art has its nose up; turn it nose-right
+      const x=cx0+Math.pow(Math.max(0,t-T.go),2.6)*210, stretch=1+ss(T.go+0.9,T.flash,t)*5.0, thin=1-ss(T.go+1.0,T.flash,t)*0.6;
+      const glow=ss(T.turn1-0.3,T.go+0.6,t);
+      ctx.save(); ctx.translate(x,cy);
+      if(glow>0){   // engine glow trailing behind
+        const gr=ctx.createRadialGradient(-110*stretch,0,4,-110*stretch,0,160+160*glow); gr.addColorStop(0,ac0+'dd'); gr.addColorStop(0.35,ac0+'55'); gr.addColorStop(1,ac0+'00');
+        ctx.globalAlpha=0.35+0.65*glow; ctx.fillStyle=gr; ctx.fillRect(-1600,-800,3200,1600); ctx.globalAlpha=1;
+      }
+      ctx.rotate(ang); ctx.scale(thin,stretch);   // after the 90 degree turn the sprite's long axis is horizontal, so stretch it there
+      try{ drawShipAuto(ctx,ship,92,t,false); }catch(e){}
+      ctx.restore();
+      ctx.save(); ctx.globalAlpha=ss(0.2,0.9,t)*(1-ss(T.go+0.8,T.flash-0.2,t)); ctx.textAlign='left'; ctx.fillStyle=ac0; ctx.font='600 15px "Segoe UI",Arial,sans-serif'; ctx.fillText(name.toUpperCase(),cx0-90,cy-150);
+      ctx.fillStyle='#9fb8d4'; ctx.font='12px "Segoe UI",Arial,sans-serif'; ctx.fillText(left?'BREAKING OFF — WARP SPEED':'WARP SPEED — ESCAPING THE FIELD',cx0-90,cy-130); ctx.restore();
+    }
+    // the flash and ring
+    const fl=ss(T.flash-0.12,T.flash,t)*(1-ss(T.flash,T.flash+0.7,t));
+    if(fl>0){ ctx.fillStyle='rgba(255,255,255,'+(fl*0.95).toFixed(3)+')'; ctx.fillRect(0,0,W,H); }
+    if(t>=T.flash&&t<T.flash+1.2){ const u=(t-T.flash)/1.2, xr=cx0+Math.pow(T.flash-T.go,2.6)*210; ctx.strokeStyle=ac0; ctx.globalAlpha=(1-u)*0.9; ctx.lineWidth=3; ctx.beginPath(); ctx.ellipse(xr,cy,20+u*300,10+u*150,0,0,6.2832); ctx.stroke(); ctx.globalAlpha=1; }
+    // the caption after it is gone
+    if(t>T.cap){
+      const a=ss(T.cap,T.cap+0.8,t); ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center';
+      ctx.fillStyle=ac0; ctx.font='600 26px "Segoe UI",Arial,sans-serif'; ctx.fillText(name+(left?' HAS WARPED OUT':' ESCAPES AT WARP'),W/2,H/2-8);
+      ctx.fillStyle='#9fb8d4'; ctx.font='15px "Segoe UI",Arial,sans-serif'; ctx.fillText(left?'The enemy breaks off. The field is yours.':'You broke off the engagement and left the field.',W/2,H/2+24); ctx.restore();
+    }
+    const black=ss(T.fade,T.total,t)||0, fi=1-ss(0,0.5,t);
+    const bl=Math.max(black,fi); if(bl>0){ ctx.fillStyle='rgba(0,0,0,'+bl.toFixed(3)+')'; ctx.fillRect(0,0,W,H); }
+    raf=requestAnimationFrame(frame);
+  }
+  raf=requestAnimationFrame(frame);
+}
+
+// ── the player's COMMAND window ──
+function csConfirm(title,steps,onYes){
+  const old=document.getElementById('cs-modal'); if(old) old.remove();
+  const m=document.createElement('div'); m.id='cs-modal'; let i=0;
+  const draw=()=>{
+    m.innerHTML=`<div class="cs-win danger" style="--ac:#ff5a3c"><div class="cs-t">${title}</div><div class="cs-b">${steps[i]}</div><div class="cs-btns"><button type="button" id="cs-no" class="cs-keep">NO — GO BACK</button><button type="button" id="cs-yes" disabled>YES</button></div></div>`;
+    m.querySelector('#cs-no').onclick=()=>m.remove();
+    const y=m.querySelector('#cs-yes'); setTimeout(()=>{ try{y.disabled=false;}catch(e){} },1100);
+    y.onclick=()=>{ if(++i<steps.length) draw(); else { m.remove(); onYes(); } };
+    try{ m.querySelector('#cs-no').focus(); }catch(e){}
+  };
+  document.body.appendChild(m); draw();
+}
+function csOpenCommand(){
+  if(!GS||GS.over||document.getElementById('cs-modal')||!commandOn()) return;
+  const p=GS.player, e=GS.enemy, sc=false, run=fieldExitOn();
+  const m=document.createElement('div'); m.id='cs-modal';
+  const ac=CS_COL[p.faction]||'#ff9900';
+  const row=(id,t,d,off)=>`<div class="cs-opt${off?' off':''}"><div><b>${t}</b><span>${d}</span></div><button type="button" id="${id}"${off?' disabled':''}>${off?'N/A':'SELECT'}</button></div>`;
+  m.innerHTML=`<div class="cs-win" style="--ac:${ac}"><div class="cs-t">COMMAND OPTIONS — ${p.name}</div><div class="cs-s">Orders that end or change the battle. Each asks you to confirm.</div>
+    ${row('cs-o-dem','DEMAND SURRENDER',`Hail ${e.name} and call on it to strike its colours. It only agrees if its position is truly hopeless, and your timing and its temper decide.`,sc)}
+    ${row('cs-o-run','MAKE A RUN FOR IT',run?'Warp Out is ON: steer to the edge of the map and step off it. The game asks once more before you go.':'Warp Out at the Map Edge is OFF for this battle.',!run)}
+    ${row('cs-o-col','STRIKE OUR COLOURS',`Surrender ${p.name}. The battle ends as a defeat.`,sc)}
+    ${row('cs-o-boom','SELF-DESTRUCT',`Blow up ${p.name} with all the power you have left: the blast hurts anything close, and the closer ${e.name} is, the worse it is for it. You lose the battle (unless the blast takes the enemy too).`,sc||p.currentPower<=0)}
+    <div class="cs-btns"><button type="button" id="cs-o-x">CLOSE</button></div></div>`;
+  document.body.appendChild(m);
+  const $=id=>m.querySelector('#'+id);
+  $('cs-o-x').onclick=()=>m.remove();
+  if(!sc){
+    $('cs-o-dem').onclick=()=>{ m.remove(); csConfirm('DEMAND SURRENDER?',[`Hail <b>${e.name}</b> and demand that it surrender?<br><br>It may refuse, and you can only ask once a turn.`],csDemand); };
+    $('cs-o-col').onclick=()=>{ m.remove(); csConfirm('STRIKE OUR COLOURS?',[`<b>Are you sure?</b><br><br>You are about to surrender <b>${p.name}</b> to <b>${e.name}</b>. The battle will end as a defeat.`,`<b>Are you REALLY sure?</b><br><br>This is the surrender of your ship. There is no way to take it back once it is made.`,`<b>Are you REALLY, REALLY sure?</b><br><br>Last chance. Press YES only if you truly mean to strike the colours.`],()=>csEndYield('player',null)); };
+    if(p.currentPower>0) $('cs-o-boom').onclick=()=>{ m.remove(); csConfirm('SELF-DESTRUCT?',[`<b>Are you sure?</b><br><br>You are about to destroy <b>${p.name}</b> and everyone aboard. Range to ${e.name}: <b>${hexDist(p.col,p.row,e.col,e.row)} hexes</b>; blast damage if you do it now: <b>${calculateExplosionDamage(p.currentPower,hexDist(p.col,p.row,e.col,e.row))}</b> points.`,`<b>Are you REALLY sure?</b><br><br>The ship will be lost. You can wait until the enemy is closer for a bigger blast: damage is 2x your power in the same hex, 1x at one hex, 1/2 at two, and so on.`,`<b>Are you REALLY, REALLY sure?</b><br><br>This cannot be undone. Press YES only if you mean to blow up your own ship.`],()=>csDetonate(GS.player)); };
+  }
+  if(run) $('cs-o-run').onclick=()=>{ m.remove(); log('Make a run for it: steer for the edge of the map and step off it (the game will ask you to confirm).','info'); showHint('Make a run for it: head for the map edge, then step off it.'); };
+}
+function csDemand(){
+  const s=GS.enemy; if(!GS||GS.over||!commandOn()) return;
+  if(s._demandTurn===GS.turn){ csNote('ALREADY HAILED','You already demanded a surrender this turn. Try again next turn.'); return; }
+  s._demandTurn=GS.turn;
+  const A=csAssess(s); let pick='fight';
+  log(`You hail ${s.name} and demand its surrender.`,'info');
+  if(A.trig.length) pick=csChoose(s,A,true);
+  csEvent('l',`You demanded the surrender of ${s.name} on turn ${GS.turn}${pick==='yield'?' and it agreed.':' and it refused.'}`);
+  const reason=A.reason||'odds';
+  if(pick==='yield'){
+    csG().reason=reason;
+    csHail(s,'yield',reason,[{t:'REFUSE — FIGHT ON',go:()=>{ s._yieldCool=GS.turn+2; log('You withdraw the demand and fight on.','info'); }},{t:'ACCEPT SURRENDER',go:()=>csEndYield('enemy',reason)}],'REPLY TO YOUR DEMAND','SURRENDER');
+  } else if(pick==='run'&&csCanRun(s)){
+    s._aiRun=true; s._aiRunReason=reason; csG().runTurn=GS.turn; csG().reason=reason;
+    csHail(s,'run',reason,[{t:'OK',go:null}],'REPLY TO YOUR DEMAND','MAKING A RUN FOR IT');
+    log(`${s.name} is breaking off — she’s making a run for the edge of the field!`,'warn');
+  } else if(pick==='boom'&&csCanBoom(s)){
+    s._aiBoom={turn:GS.turn,reason}; csG().reason=reason;
+    csHail(s,'refuse',reason,[{t:'OK',go:null}],'REPLY TO YOUR DEMAND','REFUSED');
+  } else csHail(s,'refuse',reason,[{t:'OK',go:null}],'REPLY TO YOUR DEMAND','REFUSED');
 }
 
 // ===== OPENING SCENE DRAWING CODE (v2.97-S208) =====
@@ -13559,7 +13983,6 @@ function paHexSVG(){
     o+=`<text x="${ox.toFixed(1)}" y="${(oy+4).toFixed(1)}" text-anchor="middle" font-family="var(--head)" font-size="12" letter-spacing="1" fill="${alive?'var(--sub)':'#ff5a3c'}" style="pointer-events:none">${PA_FACES[i].toUpperCase()}${alive?'':' · OUT'}</text>`;
   });
   o+=`<g font-family="var(--head)" font-size="11" letter-spacing="1" fill="var(--sub)" style="pointer-events:none"><text x="145" y="17" text-anchor="end">LOW</text><rect x="151" y="9" width="16" height="9" fill="#ff8a2a"/><rect x="169" y="9" width="16" height="9" fill="#ffd23a"/><rect x="187" y="9" width="16" height="9" fill="#3ed16b"/><text x="209" y="17">FULL</text></g>`;   // v2.103 legend
-  o+=`<text x="180" y="34" text-anchor="middle" font-family="var(--head)" font-size="12" letter-spacing="1" fill="var(--sub)" style="pointer-events:none">MAX <tspan fill="var(--acc)" font-size="16">${s.maxShieldPerFace}</tspan> PER FACING</text>`;
   return o+hits+'</svg>';
 }
 function paRender(){
@@ -13593,7 +14016,7 @@ function paRender(){
   {const kb=paEl('pa-m-keep');kb.style.display=shieldMode==='manual'?'':'none';kb.classList.toggle('on',shieldPreferManual);kb.textContent=shieldPreferManual?'\u2713 DEFAULT':'SET DEFAULT';}
   paEl('pa-m-auto').classList.toggle('on',shieldMode==='auto');paEl('pa-m-man').classList.toggle('on',shieldMode==='manual');
   const d=paDist(),dsum=d.reduce((a,b)=>a+b,0),spts=Math.floor(v.sh/s.shieldRatio),down=s.shieldGenAlive.filter(a=>!a).length;
-  let info=shieldMode==='auto'?`${spts} points spread over six facings.`:(spts===0?"No shield points yet — click a pip and I'll pull power from what's left.":`Click pips to set a facing. ${Math.max(0,spts-dsum)} of ${spts} unassigned.`);
+  let info=`Max ${s.maxShieldPerFace} per facing. `+(shieldMode==='auto'?`${spts} points spread over six facings.`:(spts===0?"No shield points yet — click a pip and I'll pull power from what's left.":`Click pips to set a facing. ${Math.max(0,spts-dsum)} of ${spts} unassigned.`));
   if(down)info+=` ${down} generator${down>1?'s':''} knocked out.`;
   paEl('pa-shinfo').textContent=info;
   paFit();
