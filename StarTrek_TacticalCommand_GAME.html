@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Trek: Tactical Command — v2.120-S231b</title>
+<title>Star Trek: Tactical Command — v2.121-S232</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8d8f0;user-select:none;}
@@ -1097,7 +1097,7 @@ font-family:var(--head);color:var(--txt);text-transform:uppercase;letter-spacing
         <div class="hdr-seg seg-d" id="hdr-init" style="display:none" title="Who holds the tactical advantage this turn"></div>
   </div>
   <div class="hdr-alert off" id="hdr-alert">⬡ RED ALERT</div>
-  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.120-S231bb</div>
+  <div class="hdr-seg" id="hdr-build" style="margin-left:auto;opacity:.55;font-size:9px;letter-spacing:2px;">BUILD v2.121-S232</div>
   <div class="hdr-seg" id="hdr-tutorial" onclick="toggleTutorial()" title="Toggle step-by-step tutorial guidance (for new captains)">&#127891; TUTORIAL: <b style="color:#5fe08a">ON</b></div>
 </div>
 
@@ -3590,6 +3590,7 @@ function launchGame0() {
   log('BUILD v2.66-S177 -- Each side\'s die on the initiative screen is now in its faction colour: Federation blue, Klingon crimson, Romulan green, Gorn burnt orange, Orion purple (Gorn and Orion ships previously had no colour of their own on this screen). The winning die is brighter, glows and is a little larger; the losing die is dimmed.');
   log('BUILD v2.94-S205 -- The evade windows are clearer (the two costs and the rules in bold bullets, FULL and HALF damage in bold, identical missiles in one row, a result banner naming the shield and the damage, a die that really tumbles) and, with Evasive Maneuvers on, the firing screen has a big FIRE button that says what it will do.');
   log('BUILD v2.114-S225 -- 35 new playable marks for every class that has real art: Federation Reliant I/III, Larson I/II/VI, Remora II, Loknar I/IV/V, Northampton I; Klingon T-5 B, D-10 A/F/G/H, D-18 A/B, D-32 C, K-22 B, K-23 A/B/D/E, L-9 A/E/F/G, L-42 B, D-2 B; Romulan Graceful Flyer 2/6, Gallant Wing 1/7, Whitewind 1, Bright One 1. Stats, power plants and weapon fits from the FASA 2302/2301/2303 stat blocks; every mark is rated for the fair-match helper and linked from the Recognition database.');
+  log('BUILD v2.121-S232 -- (1) Evasive Maneuvers wording: the dodge only decides which shield a missile is aimed at; the result and the choice cards now say "if it hits" instead of claiming a hit (the to-hit roll comes after). (2) A ship that warps away on an accepted surrender stays gone after the animation (it used to reappear on the map). (3) The surrender ending now says the beaten ship turned away and went to warp, whichever side surrendered (the old text had the winner taking the crew aboard). (4) Investigated the Captain AI matching your movement points: it reads your PREVIOUS turn only (never the current commitment), as a deliberate floor within 4 hexes.','info');
   log('BUILD v2.120-S231b -- Fix: on a narrow or squeezed map pane the accepted-surrender warp-away was skipped (the map had no usable size). It now falls back to the full-screen warp-out scene, and a safety timer guarantees the result panel.','info');
   log('BUILD v2.120-S231 -- From the Klingon vs Reliant log (11-22 15-03-22). (1) The per-faction Power Allocation names from the proof-of-concept designs (Throttle Bank, Cloak Sweep, Smuggler\'s Rig, The Hatchery and the odd gauge labels) are gone: every faction shows the plain labels. (2) A surrender that was offered and refused (or demanded and refused) is now told in the ending, in the refuser\'s own voice. (3) An ACCEPTED surrender returns to the space map: the surrendering ship turns away from the victor, stretches and warps out with the warp-out sound, then the end panel. (4) After the battle, the Tactical tab brings back the recorded bridge bed instead of the generated one. (5) Every faction can name its ship (free text, faction prefix, Random from a small pool). (6) The owner\'s computer beep plays when a hail, surrender or command window opens.','info');
   log('BUILD v2.119-S230 -- From the SS-3 vs D-7 A log and the wishlist. (1) A kill that comes through a cascade (a hit on a dead shield generator, or a weapon hit with nothing able to bear) now gets a real ending story instead of \u201clost in the chaos\u201d. (2) The log says WHY a hit went straight through (the facing had 0 points) and what a shield-generator roll means, and the allocation line shows the shields by facing. (3) The debrief reports the Ship Explosions roll and a refused retreat. (4) D2: the AI never allocates more power than it has. (5) D3: no more \u201cClass undefined\u201d in the Recognition Manual. (6) C11: the Power and Sensors gauges pulse at CRITICAL, flash and blink at OFFLINE, and flash the boxes just lost (steady tint with reduced motion). (7) A17: the Tactical Advantage winner rolls sensors last, and the AI declares fire last when it holds the advantage.','info');
@@ -5911,7 +5912,7 @@ function showEvasionPopup(missiles,decide,done){
         ? `<span class="nm">${n} \u00D7 ${evEsc(x.base)} ${kind}</span> <span>(${oo.dmg} damage each) are aimed at your <b>${face} shield</b> (${oo.now.sh} points); each hits ${pct}% of the time at this range.</span> <span class="one">You may evade ONE of the ${n}.</span>`
         : `<span class="nm">${evEsc(x.ms[0].name)}</span> <span>(${kind}, ${oo.dmg} damage) is aimed at your <b>${face} shield</b> (${oo.now.sh} points); it hits ${pct}% of the time at this range.</span>`;
       return `<div class="ev-m ${i===sel?'sel':''}" data-i="${i}">${groups.length>1?`<span>${i===sel?'\u25C9':'\u25CB'}</span>`:''}${text}</div>`; };
-    const dirCard=(dir,key,label,num)=>{ const d=o[dir]; return `<div class="ev-opt" tabindex="0" data-k="${key}"><div class="h"><span class="k">${num}</span>${label}</div>Your ship turns one hex-side to ${label.split(' ').pop().toLowerCase()}; it does not move.<br><span class="good">Works (30%):</span> it hits your ${SHIELD_NAMES[d.face]} shield (${d.sh}) for <b class="dm">HALF damage (${o.half})</b>: ${thr(evPen(o.half,d.sh))}.<br><span class="bad">Fails (70%):</span> it hits your ${SHIELD_NAMES[o.now.face]} shield (${o.now.sh}) for <b class="dm">FULL damage (${o.dmg})</b>: ${thr(evPen(o.dmg,o.now.sh))}.</div>`; };
+    const dirCard=(dir,key,label,num)=>{ const d=o[dir]; return `<div class="ev-opt" tabindex="0" data-k="${key}"><div class="h"><span class="k">${num}</span>${label}</div>Your ship turns one hex-side to ${label.split(' ').pop().toLowerCase()}; it does not move.<br><span class="good">Works (30%):</span> if it hits, it strikes your ${SHIELD_NAMES[d.face]} shield (${d.sh}) for <b class="dm">HALF damage (${o.half})</b>: ${thr(evPen(o.half,d.sh))}.<br><span class="bad">Fails (70%):</span> if it hits, it strikes your ${SHIELD_NAMES[o.now.face]} shield (${o.now.sh}) for <b class="dm">FULL damage (${o.dmg})</b>: ${thr(evPen(o.dmg,o.now.sh))}.</div>`; };
     const names=at.map(x=>evEsc(x.name)).join(', ');
     const noFire=locked
       ? (at.length?`<b>You cannot fire this phase</b>: the shots you declared (${names}) are replaced by the manoeuvre and will not fire.`:`<b>You cannot fire this phase</b> (you declared no shots, so nothing is lost).`)
@@ -6315,7 +6316,8 @@ function evPlayback(ov,sp,onClose){
   const banner=now=>{   // which shield, what kind of damage, how much, and what it does to the shield
     const w=q('#ev-why'); w.className='why ev-banner '+(sp.success?'ok':'bad');
     if(sp.lethal&&now){ w.innerHTML=`<b>HULL FAILURE:</b> the stress of the turn tears ${sp.isPlayer?'your ship':'the ship'} apart; the ${sp.kind} finds only wreckage.`; return; }
-    w.innerHTML=`<div class="l1"><b>${sp.success?'WORKED':'FAILED'}:</b> ${lead} ${sp.kind} ${now?'hit':'will hit'} ${A} <b>${nm} shield</b> for <b class="dm">${word} damage: ${dm}</b></div><div class="l2">Shield ${sh} \u2192 ${after} \u00B7 ${absb} absorbed \u00B7 ${thru>0?`<b>${thru} gets through</b>`:'<b>none gets through</b>'}</div>`;
+    // v2.121: the dodge only decides WHICH shield the missile is aimed at and how much damage it would do. Whether it hits is rolled afterwards, so never say it "hit".
+    w.innerHTML=`<div class="l1"><b>${sp.success?'WORKED':'FAILED'}:</b> ${lead} ${sp.kind} is now aimed at ${A} <b>${nm} shield</b>: if it hits, <b class="dm">${word} damage: ${dm}</b></div><div class="l2">If it hits: shield ${sh} \u2192 ${after} \u00B7 ${absb} absorbed \u00B7 ${thru>0?`<b>${thru} gets through</b>`:'<b>none gets through</b>'} \u00B7 the to-hit roll comes next</div>`;
   };
   const showResult=()=>{
     if(shown) return; shown=true; setDie(sp.d); die.style.transform=''; die.classList.remove('rolling'); die.classList.add(sp.success?'win':'lose');
@@ -10539,7 +10541,7 @@ function renderTac(){
 
   // Ships
   [GS.player,GS.enemy].forEach(s=>{
-    if(s._warpHide) return;   // v2.120-S231: the ship that is warping away is drawn by playMapWarpAway
+    if(s._warpHide||s._warpGone) return;   // v2.121: a ship that has warped away stays gone after the animation (v2.120-S231: drawn by playMapWarpAway while it leaves): the ship that is warping away is drawn by playMapWarpAway
     // A ship whose superstructure has actually been destroyed (the explosion condition,
     // not the separate power-loss/"adrift" ending) is gone -- don't draw its hull, shields,
     // or glow. Previously nothing here checked this, so playDestructionSequence()'s
@@ -12916,7 +12918,7 @@ function playMapWarpAway(ship,done){
   try{ stopAllAmb(0.4); stopFedBridge(0.4); }catch(e){}
   try{ aud=warpSceneAudio(T); }catch(e){}
   ship._warpHide=true; try{ renderTac(); }catch(e){}
-  function end(){ if(finished) return; finished=true; try{ clearTimeout(safety); }catch(e){} cancelAnimationFrame(raf); try{ if(aud) aud.stop(); }catch(e){} try{ cv.remove(); }catch(e){} try{ ship._warpHide=false; }catch(e){} try{ done(); }catch(e){ console.error(e); } }
+  function end(){ if(finished) return; finished=true; try{ clearTimeout(safety); }catch(e){} cancelAnimationFrame(raf); try{ if(aud) aud.stop(); }catch(e){} try{ cv.remove(); }catch(e){} try{ ship._warpHide=false; ship._warpGone=true; }catch(e){} try{ done(); }catch(e){ console.error(e); } }
   const safety=setTimeout(end,(T.total+1.5)*1000);   // v2.120b: never leave the player without the result panel
   function frame(now){
     try{ frameBody(now); }catch(e){ console.error('map warp frame',e); end(); }
@@ -12949,7 +12951,7 @@ function csEndYield(who,reason){
   const win=who==='enemy', y=win?GS.enemy:GS.player;
   log(`${y.name} strikes her colours — ${win?'VICTORY':'DEFEAT'}`,win?'info':'warn');
   csEvent('l',win?'You accepted the surrender.':'You struck your colours.');
-  const show=()=>csShowEndPanel({title:win?'VICTORY — THE ENEMY SURRENDERED':'DEFEAT — SURRENDERED',win,sub:`${y.name} struck ${y.faction==='gor'?'its':'her'} colours`,narr:csYieldStory(endFacts(),who,reason)});
+  const show=()=>{ y._warpGone=true; try{ renderTac(); }catch(e){} csShowEndPanel({title:win?'VICTORY — THE ENEMY SURRENDERED':'DEFEAT — SURRENDERED',win,sub:`${y.name} struck ${y.faction==='gor'?'its':'her'} colours`,narr:csYieldStory(endFacts(),who,reason)}); };
   try{ playMapWarpAway(y,show); }catch(e){ console.error(e); show(); }   // v2.120-S231: back to the map; the surrendering ship warps away, then the result
 }
 function csYieldStory(F,who,reason){
@@ -12958,13 +12960,16 @@ function csYieldStory(F,who,reason){
   const rs={nogun:`with every weapon gone there was nothing left to fight with`,power:`with the power draining away there was nothing left to fight with`,hull:`with the hull coming apart there was no more fighting to be done`,odds:`and the odds had stopped being a matter of opinion`}[reason||'odds'];
   const p1=`${cond} when ${yp.p} captain ran the numbers: ${rs}. The captain opened a channel on turn ${t}.`;
   const hail=`“${csText(Y,'yield',reason)}”`;
-  const aft={fed:`${Wc} held fire. Boarding parties and medical teams crossed under a flag of truce, and every article of Starfleet’s regulations on the treatment of prisoners applied.`,
-    kli:`${Wc}’s captain took the surrender the way the Empire takes everything: as a prize. The crew was marched off and the ship claimed for the Fleet, and the tale will be told, and improved, in many a mess hall.`,
-    rom:`${Wc} sent a prize crew across in silence. The Star Empire does not waste a hull, and the intelligence service had questions for the crew.`,
-    gor:`${Wc} closed and held position. The Gorn do not waste what they have caught, and the prisoners were taken aboard.`,
-    ori:`${Wc} took the surrender and, since this was the Colonies, the talk soon turned to terms, and what the ship and her crew might be worth.`}[W.faction]||`${Wc} took the surrender.`;
-  const last=enemyY?`Nobody could say the fight was one-sided to the end, and nobody had to: the engagement closed on a hail, not a hit.`:`${Yc} was out of the fight by ${yp.p} own captain’s order.`;
-  return endLead(F)+'\n\n'+p1+'\n\n'+hail+'\n\n'+aft+' '+last;
+  // v2.121-S232: an accepted surrender now ends with the beaten ship leaving the field at warp (see playMapWarpAway), whichever side it was, so the story says so
+  const aft={fed:`${Wc} held fire and accepted the surrender. Under the terms offered the beaten ship was allowed to withdraw from the field, and Starfleet's regulations on the treatment of a yielding vessel were observed to the letter.`,
+    kli:`${Wc}’s captain accepted the surrender the way the Empire accepts everything: as proof of the better ship. The beaten ship was ordered off the field, and the tale will be told, and improved, in many a mess hall.`,
+    rom:`${Wc} accepted the surrender in silence. The Star Empire notes every surrender, and every name, and the beaten ship was permitted to leave.`,
+    gor:`${Wc} held position and let the matter end. The Gorn see no need to finish what has already been decided.`,
+    ori:`${Wc} took the surrender and, this being the Colonies, named a price before the loser was allowed to leave.`}[W.faction]||`${Wc} accepted the surrender.`;
+  const away=enemyY?`${Yc} turned away from the fight and ${yp.p} engines came up to full. ${_cap(yp.s)} went to warp, a streak of light and then nothing, and ${_the(wn)} did not pursue.`
+                   :`${Yc} turned away on ${yp.p} own captain’s order and went to warp, a streak of light and then nothing, leaving the field to ${_the(wn)}.`;
+  const last=enemyY?`Nobody could say the fight was one-sided to the end, and nobody had to: the engagement closed on a hail, not a hit.`:`The fight was lost on the bridge, not on the grid.`;
+  return endLead(F)+'\n\n'+p1+'\n\n'+hail+'\n\n'+aft+'\n\n'+away+' '+last;
 }
 function csBoomEnd(win,mutual){
   const F=endFacts(), sd=GS.selfDestruct, exP=(sd.who==='player'), ex=exP?F.P:F.E, vc=exP?F.E:F.P, exn=exP?F.pn:F.en, vn=exP?F.en:F.pn, ep=_pr(ex), vp=_pr(vc), Ec=_cap(_the(exn)), Vc=_cap(_the(vn));
